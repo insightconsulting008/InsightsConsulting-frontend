@@ -18,18 +18,17 @@ const StaffNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // initialize from current location so refresh shows correct active item
-  const [activeRoute, setActiveRoute] = useState(location.pathname || '/staff/dashboard');
+  const [activeRoute, setActiveRoute] = useState(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     { path: '/staff/dashboard', icon: Home, label: 'Dashboard' },
-    { path: '/staff/my-services', icon: Briefcase, label: 'My Services' },
-    { path: '/my-tasks', icon: CheckSquare, label: 'My Tasks' },
+    { path: '/services', icon: Briefcase, label: 'Services' }, // Changed from /staff/my-services
+    { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
     { path: '/schedule', icon: Calendar, label: 'Schedule' },
-    { path: '/compliance-reminder', icon: Bell, label: 'Compliance Reminder' },
+    { path: '/compliance', icon: Bell, label: 'Compliance' }, // Shortened
     { path: '/documents', icon: FileText, label: 'Documents' },
-    { path: '/profile', icon: UserCircle, label: 'My Profile' },
+    { path: '/profile', icon: UserCircle, label: 'Profile' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
@@ -38,9 +37,8 @@ const StaffNav = () => {
     navigate(path);
   };
 
-  // sync activeRoute whenever the URL changes (handles refresh & external navigation)
   useEffect(() => {
-    setActiveRoute(location.pathname || '/dashboard');
+    setActiveRoute(location.pathname);
   }, [location.pathname]);
 
   return (
@@ -50,6 +48,7 @@ const StaffNav = () => {
           isOpen ? 'w-64' : 'w-20'
         } overflow-hidden`}
       >
+        {/* Rest of your component remains the same */}
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="h-16 flex items-center justify-between border-b border-gray-200 px-4">
@@ -71,7 +70,7 @@ const StaffNav = () => {
                   !isOpen ? 'hidden' : 'inline'
                 }`}
               >
-                Gridlines UI
+                Staff Portal
               </span>
             </div>
           </div>
@@ -101,7 +100,7 @@ const StaffNav = () => {
             })}
           </nav>
 
-          {/* Footer - Optional: Add user info when expanded */}
+          {/* Footer */}
           {isOpen && (
             <div className="border-t border-gray-200 p-4">
               <div className="flex items-center gap-3">

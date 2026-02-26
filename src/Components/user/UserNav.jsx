@@ -20,20 +20,19 @@ const UserNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // initialize from current location so refresh shows correct active item
-  const [activeRoute, setActiveRoute] = useState(location.pathname || '/dashboard');
+  const [activeRoute, setActiveRoute] = useState(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/my-services', icon: Package, label: 'My Services' },
-    { path: '/user/service-hub', icon: Briefcase, label: 'All Services' },
-    { path: '/documents', icon: FileText, label: 'My Documents' },
+    { path: '/services', icon: Briefcase, label: 'Browse Services' }, // Changed from /user/service-hub
+    { path: '/documents', icon: FileText, label: 'Documents' },
     { path: '/messages', icon: MessageSquare, label: 'Messages' },
-    { path: '/billing', icon: CreditCard, label: 'Billing & Payments' },
+    { path: '/billing', icon: CreditCard, label: 'Billing' },
     { path: '/notifications', icon: Bell, label: 'Notifications' },
-    { path: '/help', icon: HelpCircle, label: 'Help & Support' },
-    { path: '/profile', icon: UserCircle, label: 'My Profile' },
+    { path: '/help', icon: HelpCircle, label: 'Help' },
+    { path: '/profile', icon: UserCircle, label: 'Profile' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
@@ -42,9 +41,8 @@ const UserNav = () => {
     navigate(path);
   };
 
-  // sync activeRoute whenever the URL changes (handles refresh & external navigation)
   useEffect(() => {
-    setActiveRoute(location.pathname || '/dashboard');
+    setActiveRoute(location.pathname);
   }, [location.pathname]);
 
   return (
@@ -54,6 +52,7 @@ const UserNav = () => {
           isOpen ? 'w-64' : 'w-20'
         } overflow-hidden`}
       >
+        {/* Rest of your component remains the same */}
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="h-16 flex items-center justify-between border-b border-gray-200 px-4">
@@ -75,7 +74,7 @@ const UserNav = () => {
                   !isOpen ? 'hidden' : 'inline'
                 }`}
               >
-                Gridlines UI
+                ServicePortal
               </span>
             </div>
           </div>
@@ -105,7 +104,7 @@ const UserNav = () => {
             })}
           </nav>
 
-          {/* Footer - User info when expanded */}
+          {/* Footer */}
           {isOpen && (
             <div className="border-t border-gray-200 p-4">
               <div className="flex items-center gap-3">
@@ -119,18 +118,6 @@ const UserNav = () => {
                   <p className="text-xs text-gray-500 truncate">
                     john.doe@email.com
                   </p>
-                </div>
-              </div>
-              
-              {/* Quick Status */}
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Active Services</span>
-                  <span className="font-semibold text-indigo-600">3</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1">
-                  <span className="text-gray-500">Pending Tasks</span>
-                  <span className="font-semibold text-orange-600">2</span>
                 </div>
               </div>
             </div>

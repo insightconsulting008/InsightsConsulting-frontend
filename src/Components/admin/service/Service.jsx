@@ -265,14 +265,14 @@ export default function Service() {
             </div>
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => navigate('/add-service')}
+                onClick={() => navigate('/services/add')}
                 className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Add Service
               </button>
               <button
-                onClick={() => navigate('/add-bundle-service')}
+                onClick={() => navigate('/services/bundle/add')}
                 className="flex items-center gap-2 px-4 py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors"
               >
                 <Plus className="w-5 h-5" />
@@ -459,7 +459,7 @@ export default function Service() {
                     Test Endpoint
                   </button>
                   <button
-                    onClick={() => navigate('/add-service')}
+                    onClick={() => navigate('/services/add')}
                     className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                   >
                     Add First Service

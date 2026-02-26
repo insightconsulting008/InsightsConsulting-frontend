@@ -39,17 +39,19 @@ const AdminNav = () => {
   const [deptServerTotalPages, setDeptServerTotalPages] = useState(null);
   const [deptServerTotalDocs, setDeptServerTotalDocs] = useState(null);
 
-  const navItems = [
-    { path: '/dashboard', icon: Home, label: 'Dashboard' },
-    { path: '/service-hub', icon: Briefcase, label: 'Service Hub' },
-    { path: '/order-management', icon: Users, label: 'Order Management' },
-    { path: '/task-list', icon: CheckSquare, label: 'Task List' },
-    { path: '/compliance-reminder', icon: Bell, label: 'Compliance Reminder' },
-    { path: '/documents-hub', icon: FileText, label: 'Documents Hub' },
-    { path: '/customer-base', icon: UserCircle, label: 'Customer Base' },
-    { path: '/employee-repo', icon: BarChart3, label: 'Employee Repo' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
-  ];
+  // AdminNav.jsx - Update the navItems array
+const navItems = [
+  { path: '/admin/dashboard', icon: Home, label: 'Dashboard' },
+  { path: '/services', icon: Briefcase, label: 'Services' }, // Changed from /service-hub
+  { path: '/orders', icon: Users, label: 'Orders' }, // Changed from /order-management
+  { path: '/employees', icon: BarChart3, label: 'Employees' }, // Changed from /employee-repo
+  { path: '/customers', icon: UserCircle, label: 'Customers' }, // Added
+  { path: '/tasks', icon: CheckSquare, label: 'Tasks' }, // Added
+  { path: '/compliance', icon: Bell, label: 'Compliance' }, // Shortened
+  { path: '/documents', icon: FileText, label: 'Documents' }, // Shortened
+  { path: '/reports', icon: FileText, label: 'Reports' }, // Added
+  { path: '/settings', icon: Settings, label: 'Settings' }, // Will have sub-routes
+];
 
   const handleNavClick = (path) => {
     setActiveRoute(path);

@@ -137,7 +137,7 @@ export default function MyService() {
   };
 
   const handleViewDetails = (applicationId) => {
-    navigate(`/staff/service/${applicationId}`);
+    navigate(`/services/${applicationId}`);
   };
 
   const filteredApplications = applications.filter(app => {
@@ -435,7 +435,7 @@ export default function MyService() {
                                 View Details
                               </button>
                               <button
-                                onClick={() => window.open(`/staff/service/${app.applicationId}`, '_blank')}
+                                onClick={() => window.open(`/services/${app.applicationId}`, '_blank')}
                                 className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition whitespace-nowrap flex items-center justify-center gap-2"
                               >
                                 <ExternalLink size={16} />
