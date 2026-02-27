@@ -321,12 +321,7 @@ const ServiceContent = () => {
 
   return (
     <div>
-      {/* Sticky Navigation - Now with conditional sticky class */}
-      <div
-        ref={tabsRef}
-       className={`${isStickyActive ? 'md:sticky md:top-25' : ''} z-30 bg-white`}
-      >
-        <div className="px-4 flex lg:flex-row flex-col justify-between lg:px-12 mx-auto py-4  pt-12    lg:pb-5">
+      <div className="px-4 flex lg:flex-row flex-col justify-between lg:px-12 mx-auto py-4  lg:pt-12 p-5   lg:pb-5">
           <h2 className="text-2xl lg:text-4xl font-semibold mb-2 lg:mb-4">
             PROFESSIONAL BUSINESS SERVICES  <br />
             EVERYTHING YOU NEED TO KNOW
@@ -344,6 +339,12 @@ const ServiceContent = () => {
             </p>
           </div>
         </div>
+      {/* Sticky Navigation - Now with conditional sticky class */}
+      <div
+        ref={tabsRef}
+       className={`${isStickyActive ? 'md:sticky md:top-33' : ''} z-30 bg-white`}
+      >
+        
 
         <div className="px-4 lg:px-12 mx-auto">
           <div className="flex flex-wrap md:flex-nowrap border-[#EEF3F6] md:border-20 border-14 px- rounded-2xl gap-2 py-2 md:overflow-x-auto">

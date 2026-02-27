@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUpRight, Linkedin, Mail } from 'lucide-react';
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -10,20 +11,21 @@ import { useState } from "react";
 
 
 const Contact = () => {
+  const navigate=useNavigate()
  const cards = [
   {
     title: "Book a Consultation",
     description:
       "Have questions about GST registration, filings, or compliance? Speak directly with our experts and get clear, practical guidance tailored to your business.",
     buttonText: "Schedule a Call",
-    link: "/contact"
+    link: "/"
   },
   {
     title: "Explore Our Services",
     description:
       "Discover our complete range of GST and business compliance solutions, designed to simplify regulations, reduce risk, and keep your business running smoothly.",
     buttonText: "View Services",
-    link: "/services"
+    link: "/servicehub"
   }
 ];
 
@@ -94,7 +96,7 @@ const Contact = () => {
           </p>
 
           {/* SOCIAL ICONS */}
-          <div className='flex gap-[12px] w-fit p-4 h-[60px] md:h-[70px] rounded-full border items-center justify-between border-black/5 border-[2px] self-center lg:self-start bg-white'>
+          <div className='flex gap-[12px] w-fit  p-2  h-[60px] md:h-[70px] rounded-full border items-center justify-between border-black/5 border-[2px] self-center lg:self-start bg-white'>
             <img className='rounded-full bg-[#FFF6D7] p-[10px] md:p-[12px] w-[40px] h-[40px] md:w-[52px] md:h-[52px] object-contain hover:scale-110 transition-transform cursor-pointer' src="https://img.icons8.com/?size=100&id=118466&format=png&color=000000" alt="fb" />
             <img className='rounded-full bg-[#FFF6D7] p-[10px] md:p-[12px] w-[40px] h-[40px] md:w-[52px] md:h-[52px] object-contain hover:scale-110 transition-transform cursor-pointer' src="https://img.icons8.com/?size=100&id=60014&format=png&color=000000" alt="tw" />
             <img className='rounded-full bg-[#FFF6D7] p-[10px] md:p-[12px] w-[40px] h-[40px] md:w-[52px] md:h-[52px] object-contain hover:scale-110 transition-transform cursor-pointer' src="https://img.icons8.com/?size=100&id=98960&format=png&color=000000" alt="li" />
@@ -214,7 +216,7 @@ const Contact = () => {
                     I agree with <span className="underline">Terms</span> and <span className="underline">Privacy</span>
                   </label>
                 </div>
-                <button className="w-full lg:w-auto bg-[#1a1a1a] text-white px-8 py-3 rounded-full font-medium hover:bg-black transition-colors">
+                <button  className="w-full lg:w-auto bg-[#1a1a1a] text-white px-8 py-3 rounded-full font-medium hover:bg-black transition-colors">
           Request Consultation
                 </button>
               </div>
@@ -232,7 +234,7 @@ const Contact = () => {
                 <h3 className="text-[1.1rem] md:text-[1.25rem] font-semibold text-[#1A1A1A] mb-4">{card.title}</h3>
                 <p className="text-[#555555] text-[0.85rem] md:text-[0.9rem] leading-relaxed mb-8">{card.description}</p>
               </div>
-              <button className="flex items-center gap-4 bg-[#1A1A1A] hover:bg-black text-white pl-6 pr-2 py-2 rounded-full transition-all group">
+              <button  onClick={() => navigate(card.link)} className="flex items-center  gap-4 bg-[#1A1A1A] hover:bg-black text-white pl-6 pr-2 py-2 rounded-full transition-all group">
                 <span className="text-[0.8rem] md:text-[0.85rem] font-medium">{card.buttonText}</span>
                 <div className="bg-[#333333] p-2 rounded-full flex items-center justify-center group-hover:bg-[#444444]">
                   <ArrowUpRight size={18} />
@@ -270,7 +272,7 @@ const Contact = () => {
               <span className="text-[13px] md:text-[15px] px-4 font-medium text-[#1A1A1A] hidden md:block">
                    Get started with professional assistance
               </span>
-              <button className="flex items-center gap-3 bg-[#D11C16] hover:bg-red-700 text-white px-5 md:px-8 py-3 rounded-full transition-all  ">
+              <button onClick={()=>navigate('/')} className="flex items-center gap-3 bg-[#D11C16] hover:bg-red-700 text-white px-5 md:px-8 py-3 rounded-full transition-all  ">
                 <span className="text-[14px]">Get Expert Assistance</span>
                 <ArrowUpRight className='bg-white text-black rounded-full p-1' size={20} />
               </button>

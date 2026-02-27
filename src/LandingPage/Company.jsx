@@ -67,13 +67,13 @@ const values = [
     <div className="font-inter w-full overflow-x-hidden">
 
       {/* Header Section */}
-      <section className="w-full bg-white py-5 lg:py-24">
+      <section className="w-full bg-white py-5 lg:py-20">
         <div className="w-full lg:max-w-[1280px] mx-auto px-[20px] lg:px-[32px]">
          <div className="w-full flex flex-col items-center gap-[24px] text-center lg:max-w-[960px] lg:mx-auto">
              <span className="text-[#D11C16] text-[16px] font-semibold leading-[24px]">
               About us
             </span>
- <h1 className="text-[32px] leading-[40px] lg:text-[48px] lg:leading-[60px] font-semibold text-[#181D27] tracking-[-0.02em]">
+ <h1 className="text-2xl leading-[40px] lg:text-5xl lg:leading-[60px] font-semibold text-[#181D27] tracking-[-0.02em]">
   Building Reliable Business Solutions
 </h1>
 
@@ -85,7 +85,7 @@ const values = [
       </section>
 
       {/* Metrics Section */}
-      <section className="w-full bg-gray-50 py-[64px] lg:py-[96px]">
+      <section className="w-full bg-gray-50 py-10 lg:py-20">
         <div className="w-full lg:max-w-[1280px] mx-auto px-[20px] lg:px-[32px]">
             <div className="flex flex-col lg:flex-row gap-[48px] lg:gap-[96px] items-center">
 
@@ -112,7 +112,7 @@ const values = [
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-[32px] gap-y-[32px] lg:gap-y-[48px] w-full lg:w-[560px]">
 <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left ">
-                  <h3 className="text-[48px] lg:text-[60px] leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
+                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
                     400+
                   </h3>
                   <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
@@ -121,7 +121,7 @@ const values = [
                 </div>
 
                 <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-[48px] lg:text-[60px] leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
+                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
                    30+
                   </h3>
                   <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
@@ -130,7 +130,7 @@ const values = [
                 </div>
 
                 <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-[48px] lg:text-[60px] leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
+                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
                     10k
                   </h3>
                   <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
@@ -139,7 +139,7 @@ const values = [
                 </div>
 
                 <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-[48px] lg:text-[60px] leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
+                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
                    200+
                   </h3>
                   <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
@@ -232,11 +232,11 @@ const values = [
    
 </section> */}
 
-<section className="w-full bg-white py-14 lg:py-20">
-  <div className="lg:px-12 mx-auto px-4 m container flex flex-col lg:flex-row items-center gap-12">
+<section className="w-full bg-white py-1 lg:py-20">
+  <div className="lg:px-12 mx-auto px-4  container flex grid grid-cols-1 lg:grid-cols-3 items-center jus gap-12">
 
     {/* LEFT CONTENT */}
-    <div className="flex-1  text-center lg:text-left">
+    <div className="flex flex-col lg:col-span-2  text-center md:text-left">
 
       <span className="text-[#D11C16] text-sm font-semibold tracking-wide">
         About Us
@@ -249,7 +249,7 @@ const values = [
         <img
           src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Vector%20(1).png?updatedAt=1771488262931"
           alt="underline"
-          className="absolute -bottom-2 left-0 w-40 opacity-80 hidden sm:block"
+          className="absolute -bottom-2 left-0 w-40 opacity-80 hidden lg:block"
         />
       </h2>
 
@@ -268,7 +268,7 @@ const values = [
     </div>
 
     {/* RIGHT IMAGE */}
-    <div className=" p-8 md:p-0 lg:pr-12">
+    <div className=" p-8 md:p-0 lg:pr-12 lg:col-span-1 mx-auto">
       <div className="flex-1 w-full max-w-[520px] relative ">
       <div className="">
         <img
@@ -285,28 +285,44 @@ const values = [
 
   </div>
 
-   <section className="w-full bg-white py-16 lg:py-24 antialiased">
-      <div className="max-w-[1280px] mx-auto px-[20px] lg:px-[32px]">
-         <div className="flex flex-col gap-[32px] items-center">
-          <p className="text-[16px] leading-[24px] font-medium text-[#535862] text-center">
-           Trusted by startups, SMEs, and growing enterprises
-          </p>
-<div className="w-full max-w-[1216px] flex flex-col md:flex-row md:flex-wrap lg:flex-nowrap justify-center lg:justify-between items-center gap-y-[40px] gap-x-[32px] md:gap-x-[48px] lg:gap-x-0">
-             {logos.map((logo, index) => (
-              <div 
-                key={index} 
-                className="flex items-center gap-[12px] flex-shrink-0">
-                <img  src={logo.src}  alt={`${logo.name} mark`}  className="w-[44px] h-[44px] object-contain flex-shrink-0" />
- <span className="text-[24px] font-bold text-[#535862] tracking-tight antialiased">
-                  {logo.name}
-                </span>
-              </div>
-            ))}
+<section className="w-full bg-white py-10 lg:py-20 overflow-hidden">
+  <div className="mx-auto">
+    <p className="text-[16px] leading-[24px] font-medium text-[#535862] text-center mb-10">
+      Trusted by startups, SMEs, and growing enterprises
+    </p>
 
+    <div className="relative w-full overflow-hidden">
+      <div className="flex gap-[48px] animate-marquee">
+        {[...logos, ...logos, ...logos].map((logo, index) => (
+          <div key={index} className="flex items-center gap-[12px] flex-shrink-0">
+            <img
+              src={logo.src}
+              alt={`${logo.name} mark`}
+              className="w-[44px] h-[44px] object-contain"
+            />
+            <span className="text-[24px] font-bold text-[#535862] tracking-tight">
+              {logo.name}
+            </span>
           </div>
-        </div>
+        ))}
       </div>
-    </section>
+    </div>
+  </div>
+
+  <style>
+    {`
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        width: max-content;
+        animation: marquee 35s linear infinite;
+      }
+    `}
+  </style>
+</section>
   
  {/* Divider Section */}
  
@@ -314,7 +330,7 @@ const values = [
 
 
   {/* --- Our values section --- */}
-  <section className="w-full bg-[#FAFAFA] py-[64px] lg:py-[96px] antialiased">
+  <section className="w-full bg-[#FAFAFA] py-10 lg:py-20 antialiased">
          <div className="w-full md:px-12 px-4 mx-auto ">
            <div className="flex flex-col items-center gap-[48px] lg:gap-[64px]">
             <div className="w-full max-w-[768px] flex flex-col items-center gap-[20px] text-center">

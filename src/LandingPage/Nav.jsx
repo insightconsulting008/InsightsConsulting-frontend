@@ -110,6 +110,24 @@ export default function Nav() {
     setActiveSub(null);
   };
 
+  const handleSelectService = (service) => {
+  navigate(`/services/${activeCat}/${activeSub}/${service.serviceId}`, {
+    state: {
+      categoryName:
+        categories.find((c) => c.categoryId === activeCat)?.categoryName,
+      subCategoryName:
+        subcategories.find((s) => s.subCategoryId === activeSub)?.subCategoryName,
+      serviceName: service.name,
+    },
+  });
+
+  setOpenServices(false);
+  setMobileMenuOpen(false);
+  setExpandedCategory(null);
+  setActiveCat(null);
+  setActiveSub(null);
+};
+
   /* ================= OUTSIDE CLICK ================= */
   useEffect(() => {
     const handler = (e) => {
@@ -136,16 +154,19 @@ export default function Nav() {
   return (
     <header className="w-full shadow-sm sticky top-0 z-40">
       {/* TOP BAR */}
-      <div className="bg-black text-white text-sm py-2 px-4 flex items-center justify-center gap-2 text-center flex-wrap">
-        <span>
+      <div className="bg-black text-white text-sm py-2  px-4 flex items-center justify-center gap-2 text-center flex-wrap">
+        <span className="hidden md:block">
           Looking For The Right{" "}
           <span className="text-yellow font-medium">
             Compliance & Registration Services
           </span>{" "}
           | Get A Quick Guidance From Our Team →
         </span>
+        <span className="md:hidden block">
+  Get expert <span className="text-yellow font-medium "> guidance</span>  
+</span>
 
-        <button className="ml-3 bg-red text-white px-3 py-1 rounded-md text-sm whitespace-nowrap">
+        <button onClick={()=>navigate('/contact')} className="ml-3 bg-red text-white px-3 py-1 rounded-md text-sm whitespace-nowrap">
           Enquire Now
         </button>
       </div>
@@ -173,7 +194,7 @@ export default function Nav() {
               onClick={() => setOpenServices(!openServices)}
               className={`flex items-center gap-1 ${navLinkClass} ${isServicesActive ? activeClass : ""}`}
             >
-              Service We Provide <ChevronDown size={16} />
+              Services <ChevronDown size={16} />
             </button>
 
             {openServices && (
@@ -245,22 +266,25 @@ export default function Nav() {
 
                   {!loadingServices && services.length > 0 && (
                     <div className="space-y-3">
-                      {services.map((service) => (
-                        <div
-                          key={service.serviceId}
-                          className="flex gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                        >
-                          <img
-                            src={service.photoUrl}
-                            alt={service.name}
-                            className="w-10 h-10 rounded-md object-cover"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-800">{service.name}</p>
-                            <p className="text-xs text-gray-500 line-clamp-2">{service.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                     {services.map((service) => (
+  <div
+    key={service.serviceId}
+    onClick={() => handleSelectService(service)}
+    className="flex gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+  >
+    <img
+      src={service.photoUrl}
+      alt={service.name}
+      className="w-10 h-10 rounded-md object-cover"
+    />
+    <div>
+      <p className="font-medium text-gray-800">{service.name}</p>
+      <p className="text-xs text-gray-500 line-clamp-2">
+        {service.description}
+      </p>
+    </div>
+  </div>
+))}
                     </div>
                   )}
 
@@ -277,7 +301,7 @@ export default function Nav() {
           </NavLink>
 
           <NavLink to="/resource" className={({ isActive }) => `${navLinkClass} flex items-center gap-1 ${isActive ? activeClass : ""}`}>
-            Resources <ChevronDown size={16} />
+            Blog <ChevronDown size={16} />
           </NavLink>
 
           <NavLink to="/company" className={({ isActive }) => `${navLinkClass} flex items-center gap-1 ${isActive ? activeClass : ""}`}>
@@ -291,13 +315,13 @@ export default function Nav() {
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-2 text-gray-700">
+          {/* <div className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-2 text-gray-700">
             <Phone size={18} />
             <span className="font-medium">+91 98578474975</span>
-          </div>
+          </div> */}
 
           <Link to="/login">
-            <button className="bg-red text-white px-5 py-2 rounded-lg font-medium">
+            <button className="bg-red hidden lg:block text-white px-5 py-2 rounded-lg font-medium">
               Login →
             </button>
           </Link>
@@ -317,14 +341,14 @@ export default function Nav() {
         <>
           {/* Overlay */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
+            className="fixed inset-0 bg-black/50  bg-opacity-50 z-50 lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Side Navigation */}
           <div 
             ref={mobileMenuRef}
-            className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 lg:hidden transform transition-transform duration-300 ease-in-out"
+            className="fixed top-0 right-0 h-full w-full bg-white shadow-2xl z-50 lg:hidden transform transition-transform duration-300 ease-in-out"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">

@@ -68,8 +68,7 @@ const Enquiryform = () => {
               Get Expert Compliance Support
             </h3>
             <p className="text-sm text-gray-600">
-              Response Time : ⚡{" "}
-              <span className="text-blue-600 font-medium">&lt; 15 Mins</span>
+              We’re here to assist you quickly ⚡
             </p>
           </div>
         </div>
@@ -117,21 +116,16 @@ const Enquiryform = () => {
 
           <div>
             <label className="text-sm text-gray-600">Service Required</label>
-            <select
+            <input
+              type="text"
               name="serviceRequired"
               required
               value={formData.serviceRequired}
               onChange={handleChange}
+              placeholder="Enter the service you need"
               className="mt-1 w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="">Select the service required</option>
-              <option>GST Registration</option>
-              <option>GST Filing</option>
-              <option>Company Incorporation</option>
-              <option>Trademark Registration</option>
-            </select>
+            />
           </div>
-
           <div>
             <label className="text-sm text-gray-600">Comments</label>
             <textarea

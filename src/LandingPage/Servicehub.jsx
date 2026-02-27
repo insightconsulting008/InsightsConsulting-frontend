@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
-const LIMIT = 10;
+const LIMIT = 6;
 
 /* ───────────────── SKELETON CARD ───────────────── */
 function SkeletonCard() {
@@ -274,7 +274,7 @@ export default function RecommendedServices() {
 
   /* ───────────────── UI ───────────────── */
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className=" bg-gray-50 font-sans">
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-6 py-3">

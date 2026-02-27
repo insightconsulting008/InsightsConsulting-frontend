@@ -162,12 +162,12 @@ export default function Blogdesc() {
       {/* CONTENT */}
       <div className="grid md:grid-cols-4 gap-10 mt-14">
         {/* TOC — collapsible on mobile */}
-        <aside className="md:col-span-1 md:sticky md:top-24 md:h-fit">
-          <h3 className="text-red-500 font-semibold mb-4">
+        <aside className="md:col-span-1 md:sticky md:top-35 md:h-fit">
+          <h3 className="text-red-500 text-xl font-semibold mb-4">
             Table of contents
           </h3>
 
-          <ul className="space-y-3 text-sm border-l pl-4">
+          <ul className="space-y-3 border-l pl-4">
             {headings.map((item) => (
               <li key={item.id}>
                 <a

@@ -1,15 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const Footer = () => {
+   const navigate = useNavigate();
   //Links
   const footerData = [
     {
       title: "Services",
       links: [
-        { label: "All Services", path: "/services" },
-        { label: "GST Services", path: "/services" },
-        { label: "Business Registration", path: "/services" },
-        { label: "Compliance Services", path: "/services" },
+        { label: "All Services", path: "/servicehub" },
+        { label: "GST Services", path: "/servicehub" },
+        { label: "Business Registration", path: "/servicehub" },
+        { label: "Compliance Services", path: "/servicehub" },
       ],
     },
     {
@@ -72,12 +75,12 @@ const Footer = () => {
 
             <div className="flex flex-col flex-row items-center justify-center gap-[12px] w-full lg:w-auto">
 
-              <button className="w-full sm:w-[128px] h-[48px] border border-[#D5D7DA] rounded-[8px] text-[#414651] font-semibold shadow-sm hover:bg-gray-50 transition-all">
+              <button  onClick={() => navigate("/company")} className="w-full sm:w-[128px] h-[48px] border border-[#D5D7DA] rounded-[8px] text-[#414651] font-semibold shadow-sm hover:bg-gray-50 transition-all">
                 Learn more
               </button>
 
 
-              <button className="w-full sm:w-[129px] h-[48px] bg-[#D11C16] border border-[#D11C16] rounded-[8px] text-white font-semibold shadow-sm hover:bg-[#b01712] transition-all">
+              <button  onClick={() => navigate("/login")} className="w-full sm:w-[129px] h-[48px] bg-[#D11C16] border border-[#D11C16] rounded-[8px] text-white font-semibold shadow-sm hover:bg-[#b01712] transition-all">
                 Get started
               </button>
             </div>

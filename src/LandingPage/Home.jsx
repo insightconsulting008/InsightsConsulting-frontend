@@ -31,6 +31,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { IoPlay } from "react-icons/io5";
 import Enquiryform from "./reusable/Enquiryform";
+import { useNavigate } from "react-router-dom";
 
 
 const steps = [
@@ -63,10 +64,10 @@ const steps = [
 
 export default function Home() {
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // 👉 handle submit logic here
-  };
+   const navigate = useNavigate();
+
+
+  
   const services = [
     "GST Registration",
     "GST Filing",
@@ -184,13 +185,13 @@ export default function Home() {
     { value: "100%", label: "Compliance Track" },
   ];
 
-  const logos = [
-    "Layers",
-    "Sisyphus",
-    "Circooles",
-    "Catalog",
-    "Quotient",
-  ];
+  // const logos = [
+  //   "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png?updatedAt=1771784349810",
+  //   "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark1.png?updatedAt=1771784349777",
+  //   "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png?updatedAt=1771784349810",
+  //   "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png?updatedAt=1771784349879",
+  //   "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png?updatedAt=1771784350077",
+  // ];
 
   const testimonials = [
     {
@@ -198,7 +199,7 @@ export default function Home() {
       location: "Chennai, India",
       title: "Smooth GST Registration",
       desc: `I was completely confused about GST registration and worried about making mistakes.
-Insight Consultancy handled everything effortlessly — clear guidance, minimal paperwork, and quick completion.`,
+Insight Consulting handled everything effortlessly — clear guidance, minimal paperwork, and quick completion.`,
       img: "https://i.pravatar.cc/100?img=12",
     },
     {
@@ -214,7 +215,7 @@ Every step of my company registration was explained in simple terms, making the 
       location: "Bangalore, India",
       title: "Fast & Hassle-Free Service",
       desc: `Quick responses, zero confusion, and excellent support.
-From documentation to filing, Insight Consultancy made compliance feel surprisingly easy.`,
+From documentation to filing, Insight Consulting made compliance feel surprisingly easy.`,
       img: "https://i.pravatar.cc/100?img=33",
     },
   ];
@@ -239,7 +240,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
   const faqData = {
     Services: [
       {
-        q: "What services does Insight Consultancy provide?",
+        q: "What services does Insight Consulting provide?",
         a: "We offer end-to-end compliance solutions including GST registration & filing, company incorporation, MSME registration, trademark registration, and ongoing regulatory support."
       },
       {
@@ -294,7 +295,13 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
       }
     ]
   };
-
+ const logos = [
+    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png", name: "Layers" },
+    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png", name: "Sisyphus" },
+    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png", name: "Circooles" },
+    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark3.png", name: "Catalog" },
+    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark1.png", name: "Quotient" },
+  ];
 
 
   return (
@@ -343,13 +350,16 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
               across multiple regulatory requirements.
             </p>
 
-            <button className="mt-6 bg-red  text-white px-6 py-3 rounded-lg font-medium shadow">
-              Explore Service Hub
-            </button>
+           <button
+      onClick={() => navigate("/servicehub")}
+      className="mt-6 bg-red text-white px-6 py-3 rounded-lg font-medium shadow"
+    >
+      Explore Service Hub
+    </button>
           </div>
 
           {/* RIGHT FORM */}
-          <div className="relative px-4 ">
+          <div className="relative  ">
 
 
             <Enquiryform />
@@ -365,9 +375,9 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
         <div className="w-full px-4 py-3 flex items-center gap-6">
 
           {/* Left Title */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap">
-            <span>Top Services Offered in</span>
-            <span className="text-blue-600 font-medium">
+          <div className="flex items-center gap-2 text-sm hidden md:block text-gray-600 whitespace-nowrap">
+            <span className="hidden md:block">Top Services Offered in</span>
+            <span className=" text-blue-600 font-medium">
               Insight Consulting
             </span>
           </div>
@@ -423,7 +433,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
               </p>
             </div>
 
-            <button className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition">
+            <button className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"  onClick={() => navigate("/contact")}>
               Enquire Now &gt;&gt;
             </button>
           </div>
@@ -505,13 +515,13 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
             ))}
 
             {/* CTA block */}
-            <div className="lg:col-span-1 flex flex-col items-end justify-center">
-              <p className="text-gray- text-right italic mb-4">
+            <div className="lg:col-span-1 flex flex-col md:items-end items-center justify-center">
+              <p className="  text-center md:text-right italic mb-4">
                 Compliance services, available when you need them without{" "}
                 <span className="font-semibold">Manual Coordination</span>
               </p>
 
-              <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max">
+              <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max"  onClick={() => navigate("/servicehub")}>
                 Explore Service Hub &gt;&gt;
               </button>
             </div>
@@ -539,7 +549,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
               experience compliance, communication, and follow-ups.
             </p>
 
-            <button className="bg-red  text-white px-5 py-2 rounded-lg font-medium">
+            <button className="bg-red  text-white px-5 py-2 rounded-lg font-medium"  onClick={() => navigate("/company")}>
               Enquire Now &gt;&gt;
             </button>
           </div>
@@ -642,7 +652,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
               </p>
             </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium">
+            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium"  onClick={() => navigate("/servicehub")}>
               Explore Service Hub &gt;&gt;
             </button>
           </div>
@@ -737,7 +747,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
                   </div>
                 </div>
 
-                <button className="bg-red px-4 py-2 flex gap-2 rounded-full w-max">
+                <button className="bg-red pl-2 pr-4 py-2 flex gap-2 rounded-full w-max"  onClick={() => navigate("/contact")}>
                   < HiArrowRight size={10} className="w-8 h-8 p-2 text-black bg-white rounded-full" /> Enquire Now
                 </button>
               </div>
@@ -833,7 +843,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
             </div>
 
             <div className="flex items-center">
-              <button className="bg-red  text-white px-6 py-3 rounded-md font-medium transition">
+              <button className="bg-red  text-white px-6 py-3 rounded-md font-medium transition"  onClick={() => navigate("/servicehub")}>
                 Explore Service Hub →
               </button>
             </div>
@@ -913,14 +923,42 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
           </p>
 
           {/* Logos */}
-          <div className="flex flex-wrap justify-center items-center gap-10 mt-8 text-gray-700 font-medium">
-            {logos.map((logo, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                {logo}
-              </div>
-            ))}
+          <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
+  <div className="mx-auto">
+
+
+    <div className="relative w-full overflow-hidden">
+      <div className="flex gap-[48px] animate-marquee">
+        {[...logos, ...logos, ...logos].map((logo, index) => (
+          <div key={index} className="flex items-center gap-[12px] flex-shrink-0">
+            <img
+              src={logo.src}
+              alt={`${logo.name} mark`}
+              className="w-[44px] h-[44px] object-contain"
+            />
+            <span className="text-[24px] font-bold text-[#535862] tracking-tight">
+              {logo.name}
+            </span>
           </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    {`
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        width: max-content;
+        animation: marquee 35s linear infinite;
+      }
+    `}
+  </style>
+</section>
         </div>
       </section>
 
@@ -1013,7 +1051,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
               </p>
             </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition">
+            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition"  onClick={() => navigate("/contact")}>
               Enquire Now ››
             </button>
           </div>
@@ -1033,7 +1071,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
             </div>
 
             <div>
-              <button className="bg-red text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 transition">
+              <button   onClick={() => navigate("/contact")} className="bg-red text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 transition">
                 Contact Us
               </button>
             </div>
@@ -1141,7 +1179,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
                   </h4>
 
                   <p className="text-gray-500 text-sm">
-                    Founder, Insight Consultancy
+                    Founder, Insight Consulting
                   </p>
                 </div>
               </div>
@@ -1158,14 +1196,14 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
 
         {/* Description */}
         <p className="text-gray-500 mb-6 max-w-lg">
-          Insight Consultancy was built with a simple goal — to remove the complexity
+          Insight Consulting was built with a simple goal — to remove the complexity
           of registrations, filings, and regulatory requirements so entrepreneurs
           can focus on growing their businesses with clarity and confidence.
         </p>
 
               {/* Button */}
-              <button className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
-                Meet the Panther
+              <button  onClick={() => navigate("/contact")} className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
+                Meet the Partner
               </button>
             </div>
 
@@ -1204,7 +1242,7 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
         </div>
       </section>
 
-      <section className="py-15 bg-[#f5f6f7]">
+      <section className="lg:py-15 py-10 bg-[#f5f6f7]">
         <div className="max-w-6xl mx-auto px-6">
 
           <div className="relative overflow-hidden rounded-2xl border border-[#E5EFFF] bg-white px-8 py-12 text-center">
@@ -1245,17 +1283,17 @@ From documentation to filing, Insight Consultancy made compliance feel surprisin
 
         {/* Description */}
         <p className="text-gray-500 mt-4 text-sm">
-          From registrations to filings, Insight Consultancy helps you navigate
+          From registrations to filings, Insight Consulting helps you navigate
           regulatory requirements with ease, accuracy, and complete peace of mind.
         </p>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-          <button className="bg-red text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
+          <button  onClick={() => navigate("/servicehub")} className="bg-red text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
             Explore Our Services
           </button>
 
-          <button className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition">
+          <button  onClick={() => navigate("/contact")} className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition">
             Speak With an Expert
           </button>
         </div>

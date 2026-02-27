@@ -64,14 +64,17 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
 
-  useEffect(() => {
-    const updateVisible = () => {
-      setVisibleCount(window.innerWidth < 640 ? 1 : 4);
-    };
-    updateVisible();
-    window.addEventListener("resize", updateVisible);
-    return () => window.removeEventListener("resize", updateVisible);
-  }, []);
+ useEffect(() => {
+  const updateVisible = () => {
+    setVisibleCount(window.innerWidth >= 1024 ? 4 : 1);
+  };
+
+  updateVisible(); // run on mount
+  window.addEventListener("resize", updateVisible);
+
+  return () => window.removeEventListener("resize", updateVisible);
+}, []);
+ 
 
   const total = services.length;
   const maxIndex = Math.max(0, total - visibleCount);
@@ -106,7 +109,7 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
   return (
     <div className="relative">
       {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {visibleServices.map((service) => (
           <div
             key={service.serviceId}
@@ -116,7 +119,7 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
             <img
               src={service.photoUrl}
               alt={service.name}
-              className="w-full h-70 p-4 rounded-3xl object-cover"
+              className=" lg:w-96 p-4 rounded-3xl object-cover"
             />
 
             {/* Body */}
@@ -296,8 +299,8 @@ const ServiceInfoSection = () => {
 
             <div className="flex flex-col gap-6 items-start">
               {/* Top Row */}
-              <div className="grid grid-cols-3 justify-baseline w-full">
-                <div className="bg-gray-200 col-span-2 rounded-2xl p-6 flex gap-4 items-start">
+              <div className="grid grid-cols-3  gap-3 justify-baseline w-full">
+                <div className="bg-gray-200 col-span-2 rounded-2xl p-3 lg:p-6 flex flex-col lg:flex-row gap-4 items-start">
                   <div className="bg-yellow-500 text-white p-3 rounded-full">
                     {data.support.icon}
                   </div>
@@ -307,10 +310,10 @@ const ServiceInfoSection = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center col-span-1 justify-end">
+                <div className="flex items-center col-span-1 bg-yellow text-white rounded-2xl p-5 justify-end">
                   <div className="text-right">
                     <div className="flex items-center justify-end gap-3 mb-2">
-                      <h2 className="text-4xl font-semibold text-gray-800">
+                      <h2 className="text-base lg:text-3xl font-semibold text-gray-800">
                         {data.experience.years}
                       </h2>
                       <div className="bg-yellow-500 text-white p-2 rounded-full">
@@ -324,7 +327,7 @@ const ServiceInfoSection = () => {
 
               {/* Bottom Cards */}
               <div className="grid sm:grid-cols-2 gap-6 w-full">
-                <div className="bg-yellow-500 text-white rounded-2xl p-6">
+                <div className="bg-yellow-500 text-white rounded-2xl p-3 lg:p-6">
                   <div className="bg-white/20 w-10 h-10 flex items-center justify-center rounded-full mb-3">
                     {data.whoShouldRegister.icon}
                   </div>
@@ -361,7 +364,7 @@ const ServiceInfoSection = () => {
           {/* HEADER */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <div>
-              <h2 className="text-4xl font-semibold tracking-wide">
+              <h2 className=" text-2xl lg:text-4xl font-semibold tracking-wide">
                 RECOMMENDED SERVICES
               </h2>
               <p className="text-gray-500 mt-1">
