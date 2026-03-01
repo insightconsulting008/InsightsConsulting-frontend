@@ -23,7 +23,7 @@ import StaffPage   from './Components/staff/StaffPage';
 import UserPage    from './Components/user/UserPage';
 import AdminLogin  from './providers/Adminlogin';
 import UserLogin   from './providers/Userlogin';
-import NotFound    from './components/NotFound';
+import NotFound    from './Components/NotFound';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KNOWN ROUTE REGISTRY — audit every Route in every shell page here
