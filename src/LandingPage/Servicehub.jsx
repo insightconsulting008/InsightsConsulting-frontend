@@ -102,10 +102,9 @@ export default function RecommendedServices() {
         );
         const cats = res.data?.data || res.data?.categories || res.data || [];
         setCategories(Array.isArray(cats) ? cats : []);
-        if (Array.isArray(cats) && cats.length > 0) {
-          setSelectedCatId(cats[0].categoryId);
-          setPanelCatId(cats[0].categoryId);
-        }
+       if (Array.isArray(cats) && cats.length > 0) {
+  setPanelCatId(cats[0].categoryId); // only for panel default
+}
       } catch (err) {
         console.error("Error fetching categories", err);
       }
@@ -155,35 +154,61 @@ export default function RecommendedServices() {
   }, [panelCatId]);
 
   /* ───────────────── FETCH SERVICES ───────────────── */
-  useEffect(() => {
-    if (!selectedSubId) return;
+ /* ───────────────── FETCH SERVICES ───────────────── */
+useEffect(() => {
+  let cancelled = false;
 
-    let cancelled = false;
+  const fetchServices = async () => {
+    setLoadingServices(true);
 
-    const fetchServices = async () => {
-      setLoadingServices(true);
-      try {
-        const res = await axios.get(
-          `https://insightsconsult-backend.onrender.com/api/subcategories/${selectedSubId}/services`,
-          { params: { page: currentPage, limit: LIMIT } }
-        );
-        if (cancelled) return;
+    try {
+      const url = selectedSubId
+        ? `https://insightsconsult-backend.onrender.com/api/subcategories/${selectedSubId}/services`
+        : `https://insightsconsult-backend.onrender.com/service`;
 
-        const svcs = res.data?.data || res.data?.services || [];
-        setServices(Array.isArray(svcs) ? svcs : []);
-        setTotalServices(res.data?.total ?? 0);
-        setTotalPages(res.data?.totalPages ?? 1);
-      } catch (err) {
-        if (!cancelled) console.error("Error fetching services", err);
-      } finally {
-        if (!cancelled) setLoadingServices(false);
-      }
-    };
+      const res = await axios.get(url, {
+        params: {
+          page: currentPage,
+          limit: LIMIT,
+          orderBy: "createdAt",
+          order: "desc",
+        },
+      });
 
-    fetchServices();
+      if (cancelled) return;
 
-    return () => { cancelled = true; };
-  }, [selectedSubId, currentPage]);
+      /* 🔹 unified response handling */
+      const servicesFromApi = res.data?.data || [];
+
+      const totalPagesFromApi =
+        res.data?.pagination?.totalPages ??
+        res.data?.totalPages ??
+        1;
+
+      const limitFromApi =
+        res.data?.pagination?.limit ??
+        LIMIT;
+
+      // optional total calculation
+      const totalCalculated = totalPagesFromApi * limitFromApi;
+
+      setServices(servicesFromApi);
+      setTotalPages(totalPagesFromApi);
+      setTotalServices(totalCalculated);
+
+    } catch (err) {
+      if (!cancelled) console.error("Error fetching services", err);
+    } finally {
+      if (!cancelled) setLoadingServices(false);
+    }
+  };
+
+  fetchServices();
+
+  return () => {
+    cancelled = true;
+  };
+}, [selectedSubId, currentPage]);
 
   // Close panel on outside click
   useEffect(() => {
@@ -278,37 +303,46 @@ export default function RecommendedServices() {
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-6 py-3">
-        <nav className="flex items-center gap-1 text-gray-400 text-sm">
-          <span className="text-blue-500 cursor-pointer hover:underline">Home</span>
-          {selectedCat && (
-            <>
-              <span className="mx-1">›</span>
-              <span
-                className="text-blue-500 cursor-pointer hover:underline"
-                onClick={() => {
-                  setSelectedCatId(selectedCat.categoryId);
-                  setPanelCatId(selectedCat.categoryId);
-                }}
-              >
-                {selectedCat.categoryName}
-              </span>
-            </>
-          )}
-          {selectedSub && (
-            <>
-              <span className="mx-1">›</span>
-              <span className="text-blue-600 font-semibold">{selectedSub.subCategoryName}</span>
-            </>
-          )}
-        </nav>
+       <nav className="flex items-center gap-1 text-gray-400 text-sm">
+  <span
+    className="text-blue-500 cursor-pointer hover:underline"
+    onClick={() => {
+      setSelectedCatId(null);
+      setSelectedSubId(null);
+      setCurrentPage(1);
+    }}
+  >
+    All Services
+  </span>
+
+  {selectedCat && (
+    <>
+      <span className="mx-1">›</span>
+      <span className="text-blue-500">{selectedCat.categoryName}</span>
+    </>
+  )}
+
+  {selectedSub && (
+    <>
+      <span className="mx-1">›</span>
+      <span className="text-blue-600 font-semibold">
+        {selectedSub.subCategoryName}
+      </span>
+    </>
+  )}
+</nav>
       </div>
 
       <div className="bg-white px-6 pt-5 pb-0 border-b border-gray-100">
         {/* ── Page Title ── */}
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
-            {selectedSub?.subCategoryName || selectedCat?.categoryName || "GST Registration"}
-          </h1>
+         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
+  {selectedSub
+    ? selectedSub.subCategoryName
+    : selectedCat
+    ? selectedCat.categoryName
+    : "All Services"}
+</h1>
           <p className="text-sm text-gray-400 mt-0.5">
             {loadingServices ? (
               <span className="inline-block w-24 h-3 bg-gray-200 rounded animate-pulse" />
@@ -428,7 +462,7 @@ export default function RecommendedServices() {
       <div className="px-6 py-6">
         {loadingServices ? (
           /* ── SKELETON GRID ── */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-5">
             {Array.from({ length: LIMIT }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
@@ -438,7 +472,7 @@ export default function RecommendedServices() {
           <NoData search={search} />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-5">
               {displayedServices.map((service) => (
                 <div
                   key={service.serviceId}
@@ -449,7 +483,7 @@ export default function RecommendedServices() {
                     <img
                       src={service.photoUrl}
                       alt={service.name}
-                      className="w-full h-44 p-3 rounded object-cover rounded-t-xl"
+                      className="  p-3 rounded object-cover rounded-t-xl"
                     />
                   </div>
 

@@ -18,7 +18,7 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => {
     <>
       <AdminNav setRefreshDepartmentsTrigger={setRefreshDepartmentsTrigger} />
       <Routes>
-        <Route path="/Admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         
         {/* Employee Management */}
         <Route path="/employees" element={<Employe />} /> {/* Changed from /employee-repo */}

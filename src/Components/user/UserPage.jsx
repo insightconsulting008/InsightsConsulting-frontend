@@ -11,7 +11,7 @@ const UserPage = () => {
     <>
       <UserNav />
       <Routes>
-        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/services" element={<GetService />} /> {/* Changed from /user/service-hub */}
         <Route path="/my-services" element={<MyService />} />
         {/* Add these for completeness */}

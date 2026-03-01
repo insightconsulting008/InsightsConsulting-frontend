@@ -6,6 +6,8 @@ import LandingPage from "./LandingPage/LandingPage";
 import AdminPage from "./Components/admin/AdminPage";
 import StaffPage from "./Components/staff/StaffPage";
 import UserPage from "./Components/user/UserPage";
+import AdminLogin from "./providers/Adminlogin";
+import UserLogin from "./providers/Userlogin";
 
  const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -31,7 +33,9 @@ const App = () => {
       <Routes>
        
         {/* Public route */}
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/login" element={<UserLogin />} />
         
         {/* Role-based routing */}
         <Route 

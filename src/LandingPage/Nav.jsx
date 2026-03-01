@@ -4,6 +4,8 @@ import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, Phone, FileText, ChevronRight, Menu, X, ChevronUp } from "lucide-react";
 
 export default function Nav() {
+  const [isPinned, setIsPinned] = useState(false);
+const hoverTimeout = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const menuRef = useRef(null);
@@ -73,6 +75,21 @@ export default function Nav() {
     }
   };
 
+  const handleMouseEnter = () => {
+  if (!isPinned) {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    setOpenServices(true);
+  }
+};
+
+const handleMouseLeave = () => {
+  if (!isPinned) {
+    hoverTimeout.current = setTimeout(() => {
+      setOpenServices(false);
+    }, 180);
+  }
+};
+
   /* ================= FETCH SERVICES ================= */
   const fetchServices = async (subId) => {
     if (activeSub === subId) return;
@@ -131,9 +148,10 @@ export default function Nav() {
   /* ================= OUTSIDE CLICK ================= */
   useEffect(() => {
     const handler = (e) => {
-      if (!menuRef.current?.contains(e.target)) {
-        setOpenServices(false);
-      }
+     if (!menuRef.current?.contains(e.target) && !isPinned) {
+  setOpenServices(false);
+}
+   
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -189,16 +207,28 @@ export default function Nav() {
           </NavLink>
 
           {/* SERVICES */}
-          <div className="relative" ref={menuRef}>
+         <div
+  className="relative"
+  ref={menuRef}
+  onMouseEnter={handleMouseEnter}
+  onMouseLeave={handleMouseLeave}
+>
             <button
-              onClick={() => setOpenServices(!openServices)}
+             onClick={() => {
+  setIsPinned((prev) => !prev);
+  setOpenServices((prev) => !prev);
+}}
               className={`flex items-center gap-1 ${navLinkClass} ${isServicesActive ? activeClass : ""}`}
             >
               Services <ChevronDown size={16} />
             </button>
 
             {openServices && (
-              <div className="absolute -left-57 top-full mt-6 w-[900px] bg-white shadow-xl border rounded-xl p-8 grid grid-cols-3 gap-10">
+            <div
+  className="absolute -left-57 top-full mt-6 w-[900px] bg-white shadow-xl border rounded-xl p-8 grid grid-cols-3 gap-10"
+  onMouseEnter={handleMouseEnter}
+  onMouseLeave={handleMouseLeave}
+>
                 
                 {/* CATEGORIES */}
                 <div>
