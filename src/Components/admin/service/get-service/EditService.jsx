@@ -13,7 +13,6 @@ import {
 import axiosInstance from '@src/providers/axiosInstance'; // ← fixed: was @src/providers/axiosInstance
 import Cropper from 'react-easy-crop';
 
-const API_BASE = 'https://insightsconsult-backend.onrender.com';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ServiceInfo step
@@ -1238,82 +1237,126 @@ const EditService = () => {
   const goToPreviousStep = () => currentStep > 1 && setCurrentStep(p => p - 1);
   const goToNextStep = () => { if (validateCurrentStep() && currentStep < 5) { setCurrentStep(p => p + 1); setStepErrors({}); } };
 
-  const handleUpdateService = async () => {
-    setError(''); setSubmissionStatus('loading'); setLoading(true);
-    try {
-      let finalCustomFields = [...customFields];
-      if (newCustomField.label?.trim()) {
-        const f = { label: newCustomField.label.trim(), type: newCustomField.type, placeholder: newCustomField.placeholder || '', required: newCustomField.required };
-        if (['select', 'radio', 'checkbox'].includes(newCustomField.type)) {
-          const valid = newCustomField.options.filter(o => o?.trim());
-          if (valid.length) f.options = valid;
-        }
-        finalCustomFields.push(f);
-      }
 
-      const serviceData = {
-        name: basicInfo.name.trim(), description: basicInfo.description.trim(),
-        serviceType: basicInfo.serviceType,
-        documentsRequired: basicInfo.documentsRequired,
-        individualPrice: parseFloat(basicInfo.individualPrice),
-        offerPrice: parseFloat(basicInfo.offerPrice),
-        isGstApplicable: basicInfo.isGstApplicable,
-        gstPercentage: basicInfo.isGstApplicable ? parseFloat(basicInfo.gstPercentage) : 0,
-        finalIndividualPrice: parseFloat(basicInfo.finalIndividualPrice || basicInfo.offerPrice),
-        employeeId: basicInfo.employeeId,
-        subCategoryId: basicInfo.subCategoryId,
+const handleUpdateService = async () => {
+  setError(''); 
+  setSubmissionStatus('loading'); 
+  setLoading(true);
+  
+  try {
+    let finalCustomFields = [...customFields];
+    if (newCustomField.label?.trim()) {
+      const f = { 
+        label: newCustomField.label.trim(), 
+        type: newCustomField.type, 
+        placeholder: newCustomField.placeholder || '', 
+        required: newCustomField.required 
       };
-      if (basicInfo.serviceType === 'RECURRING') {
-        serviceData.frequency = basicInfo.frequency;
-        serviceData.duration = parseInt(basicInfo.duration);
-        serviceData.durationUnit = basicInfo.durationUnit;
+      if (['select', 'radio', 'checkbox'].includes(newCustomField.type)) {
+        const valid = newCustomField.options.filter(o => o?.trim());
+        if (valid.length) f.options = valid;
       }
-
-      const svcRes  = await fetch(`${API_BASE}/service/${serviceId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(serviceData) });
-      const svcData = await svcRes.json();
-      if (!svcData.success) throw new Error(svcData.error || svcData.message || 'Service update failed');
-
-      if (basicInfo.photoChanged && basicInfo.photoFile) {
-        const fd = new FormData(); fd.append('photoUrl', basicInfo.photoFile, basicInfo.photoFile.name);
-        await fetch(`${API_BASE}/service/${serviceId}/image`, { method: 'PUT', body: fd }).catch(console.warn);
-      }
-
-      if (finalCustomFields.length > 0 || selectedMasterFields.length > 0) {
-        const payload = [
-          ...finalCustomFields.map(f => {
-            const obj = { label: f.label, type: f.type, placeholder: f.placeholder || '', required: f.required || false };
-            if (['select', 'radio', 'checkbox'].includes(f.type) && f.options?.length) obj.options = f.options;
-            return obj;
-          }),
-          ...selectedMasterFields.map(f => {
-            const mf = masterFields.find(m => m.masterFieldId === f.masterFieldId);
-            const obj = { masterFieldId: f.masterFieldId, required: f.required || false };
-            if (mf?.options?.length) obj.options = mf.options;
-            return obj;
-          }),
-        ];
-        await fetch(`${API_BASE}/service/${serviceId}/input-fields`, { method: 'DELETE' }).catch(console.warn);
-        await fetch(`${API_BASE}/service/${serviceId}/input-fields`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: payload }) }).catch(console.warn);
-      }
-
-      if (trackSteps.length > 0) {
-        await fetch(`${API_BASE}/service/${serviceId}/track-steps`, { method: 'DELETE' }).catch(console.warn);
-        await fetch(`${API_BASE}/service/${serviceId}/track-steps`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ steps: trackSteps.map(s => ({ title: s.title, description: s.description, order: s.order })) }),
-        }).catch(console.warn);
-      }
-
-      setSubmissionStatus('success');
-      setShowSuccessPopup(true);
-    } catch (err) {
-      console.error(err);
-      setError(err.message || 'Failed to update service. Please try again.');
-      setSubmissionStatus('error');
-    } finally {
-      setLoading(false);
+      finalCustomFields.push(f);
     }
-  };
+
+    const serviceData = {
+      name: basicInfo.name.trim(), 
+      description: basicInfo.description.trim(),
+      serviceType: basicInfo.serviceType,
+      documentsRequired: basicInfo.documentsRequired,
+      individualPrice: parseFloat(basicInfo.individualPrice),
+      offerPrice: parseFloat(basicInfo.offerPrice),
+      isGstApplicable: basicInfo.isGstApplicable,
+      gstPercentage: basicInfo.isGstApplicable ? parseFloat(basicInfo.gstPercentage) : 0,
+      finalIndividualPrice: parseFloat(basicInfo.finalIndividualPrice || basicInfo.offerPrice),
+      employeeId: basicInfo.employeeId,
+      subCategoryId: basicInfo.subCategoryId,
+    };
+    
+    if (basicInfo.serviceType === 'RECURRING') {
+      serviceData.frequency = basicInfo.frequency;
+      serviceData.duration = parseInt(basicInfo.duration);
+      serviceData.durationUnit = basicInfo.durationUnit;
+    }
+
+    // Update service details
+    const svcRes = await axiosInstance.put(`/service/${serviceId}`, serviceData);
+    const svcData = svcRes.data;
+    
+    if (!svcData.success) {
+      throw new Error(svcData.error || svcData.message || 'Service update failed');
+    }
+
+    // Update image if changed
+    if (basicInfo.photoChanged && basicInfo.photoFile) {
+      const fd = new FormData(); 
+      fd.append('photoUrl', basicInfo.photoFile, basicInfo.photoFile.name);
+      
+      await axiosInstance.put(`/service/${serviceId}/image`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).catch(console.warn);
+    }
+
+    // Update input fields
+    if (finalCustomFields.length > 0 || selectedMasterFields.length > 0) {
+      const payload = [
+        ...finalCustomFields.map(f => {
+          const obj = { 
+            label: f.label, 
+            type: f.type, 
+            placeholder: f.placeholder || '', 
+            required: f.required || false 
+          };
+          if (['select', 'radio', 'checkbox'].includes(f.type) && f.options?.length) {
+            obj.options = f.options;
+          }
+          return obj;
+        }),
+        ...selectedMasterFields.map(f => {
+          const mf = masterFields.find(m => m.masterFieldId === f.masterFieldId);
+          const obj = { 
+            masterFieldId: f.masterFieldId, 
+            required: f.required || false 
+          };
+          if (mf?.options?.length) obj.options = mf.options;
+          return obj;
+        }),
+      ];
+      
+      // Delete existing and create new
+      await axiosInstance.delete(`/service/${serviceId}/input-fields`).catch(console.warn);
+      await axiosInstance.post(`/service/${serviceId}/input-fields`, { fields: payload })
+        .catch(console.warn);
+    }
+
+    // Update track steps
+    if (trackSteps.length > 0) {
+      await axiosInstance.delete(`/service/${serviceId}/track-steps`).catch(console.warn);
+      await axiosInstance.post(`/service/${serviceId}/track-steps`, {
+        steps: trackSteps.map(s => ({ 
+          title: s.title, 
+          description: s.description, 
+          order: s.order 
+        }))
+      }).catch(console.warn);
+    }
+
+    setSubmissionStatus('success');
+    setShowSuccessPopup(true);
+    
+  } catch (err) {
+    console.error(err);
+    // Enhanced error handling for axios
+    const errorMessage = err.response?.data?.error || 
+                        err.response?.data?.message || 
+                        err.message || 
+                        'Failed to update service. Please try again.';
+    setError(errorMessage);
+    setSubmissionStatus('error');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading && !basicInfo.name) {
     return (

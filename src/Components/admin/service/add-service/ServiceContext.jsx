@@ -5,7 +5,6 @@ const ServiceContext = createContext();
 
 export const useService = () => useContext(ServiceContext);
 
-const API_BASE = 'https://insightsconsult-backend.onrender.com';
 
 export const ServiceProvider = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -380,7 +379,6 @@ if (!employeeId) {
     fetchSubcategories,
     fetchMasterFields,
     uploadImage,
-    API_BASE,
     submissionStatus,
     setSubmissionStatus,
     showSuccessPopup,

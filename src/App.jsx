@@ -24,6 +24,8 @@ import UserPage    from './Components/user/UserPage';
 import AdminLogin  from './providers/Adminlogin';
 import UserLogin   from './providers/Userlogin';
 import NotFound    from './Components/NotFound';
+import UserRegister from './providers/UserRegister';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KNOWN ROUTE REGISTRY — audit every Route in every shell page here
@@ -37,28 +39,27 @@ import NotFound    from './Components/NotFound';
 const ADMIN_EXACT = [
   '/admin-dashboard',
   '/employees',
-  '/services',           // list
+  '/services-hub',           // list
   '/orders',             // list
   '/settings',           // payment settings
   '/customers',
   '/reports',
-  '/tasks',
-  '/compliance',
-  '/documents',
-  '/amendment'
+  '/amendment',
+  '/profile',
+  '/users'
 ];
 const ADMIN_PREFIX = [
   '/services/',   // /services/add  /services/bundle/add
                   // /services/:serviceId  /services/edit/:serviceId
   '/orders/',     // /orders/:applicationId
   '/settings/',   // /settings/general
-  '/services/edit/'
+  '/services/edit/',
+  '/reports/'
 ];
 
 /* ─── STAFF (StaffPage.jsx) ─────────────────────────────────────────────── */
 const STAFF_EXACT = [
   '/staff/dashboard',
-  '/services',           // list
   '/tasks',
   '/schedule',
   '/compliance',
@@ -70,6 +71,7 @@ const STAFF_EXACT = [
 const STAFF_PREFIX = [
   '/services/',   // /services/:applicationId
   '/staff/',      // /staff/dashboard (also covered by exact, belt-and-braces)
+  '/tasks/'
 ];
 
 /* ─── USER (UserPage.jsx) ───────────────────────────────────────────────── */
@@ -78,14 +80,12 @@ const USER_EXACT = [
   '/services',           // browse
   '/my-services',
   '/profile',
-  '/settings',
   '/documents',
-  '/messages',
-  '/billing',
-  '/notifications',
-  '/help',
 ];
-// No dynamic user routes currently — add prefixes here if needed
+
+const USER_PREFIX = [
+  '/my-service/view/',   // /my-service/:id
+];
 
 /* ─── LANDING (LandingPage.jsx) ─────────────────────────────────────────── */
 // Checked AFTER role routes so /services/add doesn't land here for an admin
@@ -99,7 +99,7 @@ const LANDING_EXACT = [
 ];
 const LANDING_PREFIX = [
   '/resource/',   // /resource/:slug
-  '/services/',   // /services/:catId/:subId  and  /services/:catId/:subId/:serviceId
+  '/our-services/',   // /services/:catId/:subId  and  /services/:catId/:subId/:serviceId
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -123,7 +123,7 @@ const RoleRouter = () => {
   if (role === 'STAFF' && matches(pathname, STAFF_EXACT, STAFF_PREFIX)) {
     return <StaffPage />;
   }
-  if (role === 'USER' && matches(pathname, USER_EXACT)) {
+  if (role === 'USER' && matches(pathname, USER_EXACT, USER_PREFIX)) {
     return <UserPage />;
   }
 
@@ -161,17 +161,21 @@ const ScrollToTop = () => {
    APP
    ═══════════════════════════════════════════════════════════════════════════ */
 const App = () => (
+<GoogleOAuthProvider clientId="659480152734-ilobqi94v9q57uu17vna6vmbmrgpb85t.apps.googleusercontent.com">
+  
   <BrowserRouter>
     <ScrollToTop />
     <Routes>
       {/* Standalone auth pages — no shell, no role required */}
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/login"       element={<UserLogin />} />
+      <Route path="/register"       element={<UserRegister/>} />
 
       {/* Everything else → RoleRouter decides */}
       <Route path="/*" element={<RoleRouter />} />
     </Routes>
   </BrowserRouter>
+ </GoogleOAuthProvider>
 );
 
 export default App;

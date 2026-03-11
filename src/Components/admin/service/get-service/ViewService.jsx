@@ -1,6 +1,9 @@
-// ViewService.jsx
+// ViewService.jsx — themed to match app.css (#6869AC periwinkle indigo)
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, FileText, CheckCircle, Clock, Package, Tag, DollarSign, Users, Shield, Layers } from 'lucide-react';
+import {
+  ArrowLeft, Calendar, FileText, CheckCircle, Clock,
+  Package, Tag, DollarSign, Users, Shield, Layers, Edit2, Trash2
+} from 'lucide-react';
 import axiosInstance from '@src/providers/axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -11,72 +14,42 @@ export default function ViewService() {
   const [service, setService] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchServiceDetails();
-  }, [serviceId]);
+  useEffect(() => { fetchServiceDetails(); }, [serviceId]);
 
   const fetchServiceDetails = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/service/${serviceId}`);
-      
-      if (response.data.success) {
-        setService(response.data.service);
-      } else {
-        setError('Service not found');
-      }
+      const r = await axiosInstance.get(`/service/${serviceId}`);
+      if (r.data.success) setService(r.data.service);
+      else setError('Service not found');
     } catch (err) {
-      console.error('Error fetching service details:', err);
       setError(err.response?.data?.message || 'Failed to load service details');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const formatDate = d => {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
   const getServiceTypeDisplay = () => {
-    switch(service?.serviceType) {
+    switch (service?.serviceType) {
       case 'ONE_TIME': return 'One Time Service';
       case 'RECURRING': return 'Recurring Service';
       default: return service?.serviceType || 'Standard Service';
     }
   };
 
-  const getFrequencyDisplay = () => {
-    if (!service?.frequency) return 'N/A';
-    
-    const freqMap = {
-      'DAILY': 'Daily',
-      'WEEKLY': 'Weekly',
-      'MONTHLY': 'Monthly',
-      'QUARTERLY': 'Quarterly',
-      'YEARLY': 'Yearly'
-    };
-    
-    return freqMap[service.frequency] || service.frequency;
-  };
+  const freqMap = { DAILY: 'Daily', WEEKLY: 'Weekly', MONTHLY: 'Monthly', QUARTERLY: 'Quarterly', YEARLY: 'Yearly' };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-12 h-12 border-4 border-primary border-opacity-20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading service details...</p>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-11 h-11 border-4 rounded-full animate-spin mx-auto mb-3" style={{ borderColor: 'var(--primary-100)', borderTopColor: 'var(--color-primary)' }} />
+          <p className="text-sm text-gray-400">Loading service details…</p>
         </div>
       </div>
     );
@@ -84,25 +57,24 @@ export default function ViewService() {
 
   if (error || !service) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Service Not Found</h3>
-              <p className="text-gray-600 text-sm mb-4 text-center">{error || 'The requested service does not exist'}</p>
-              <button
-                onClick={() => navigate('/service-hub')}
-                className="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary/90 transition-colors"
-              >
-                Back to Service List
-              </button>
-            </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl border border-gray-100 p-10 max-w-md w-full text-center" style={{ boxShadow: 'var(--shadow-lg)' }}>
+          <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
           </div>
+          <h3 className="text-base font-semibold text-gray-900 mb-1">Service Not Found</h3>
+          <p className="text-sm text-gray-500 mb-5">{error}</p>
+          <button
+            onClick={() => navigate('/service-hub')}
+            className="px-5 py-2.5 text-white rounded-lg text-sm font-medium transition-all"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
+          >
+            Back to Service List
+          </button>
         </div>
       </div>
     );
@@ -111,31 +83,39 @@ export default function ViewService() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/service-hub')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">{service.name}</h1>
-                <p className="text-sm text-gray-500">Service Details</p>
-              </div>
-            </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate(`/services/edit/${serviceId}`)}
-                className="px-4 py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors"
+                onClick={() => navigate('/service-hub')}
+                className="p-2 rounded-lg text-gray-400 transition-colors"
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.backgroundColor = 'var(--primary-50)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
-                Edit Service
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">{service.name}</h1>
+                <p className="text-xs text-gray-400">Service Details</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate(`/services/edit/${serviceId}`)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium border transition-all"
+                style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--primary-50)'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <Edit2 className="w-4 h-4" /> Edit Service
               </button>
               <button
                 onClick={() => navigate('/service-hub')}
-                className="px-4 py-2 rounded-lg text-white bg-primary hover:bg-primary/90 transition-colors"
+                className="px-3.5 py-2 text-white rounded-lg text-sm font-medium transition-all"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
               >
                 Back to List
               </button>
@@ -145,153 +125,135 @@ export default function ViewService() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Service Overview Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-start justify-between mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-5">
+            {/* Service Overview */}
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <div
+                className="px-5 py-4 border-b flex items-center justify-between"
+                style={{ borderColor: 'var(--primary-100)', background: 'linear-gradient(135deg, var(--primary-50) 0%, #fff 60%)' }}
+              >
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Service Overview</h2>
-                  <p className="text-sm text-gray-500 mt-1">Complete details about the service</p>
+                  <h2 className="text-sm font-semibold text-gray-900">Service Overview</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Complete details about the service</p>
                 </div>
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                  service.status === 'active' ? 'bg-green-100 text-green-800' :
-                  service.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
+                <span
+                  className="px-2.5 py-1 text-xs font-semibold rounded-full"
+                  style={service.status === 'active'
+                    ? { background: '#ecfdf5', color: '#047857', border: '1px solid #bbf7d0' }
+                    : { background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' }
+                  }
+                >
                   {service.status || 'active'}
                 </span>
               </div>
-
-              <div className="space-y-4">
+              <div className="p-5 space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Description</h3>
-                  <p className="text-gray-600">{service.description}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--primary-500)' }}>Description</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{service.description}</p>
                 </div>
-
                 {service.photoUrl && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Service Image</h3>
-                    <img 
-                      src={service.photoUrl} 
-                      alt={service.name}
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--primary-500)' }}>Service Image</p>
+                    <img src={service.photoUrl} alt={service.name} className="w-full h-56 object-cover rounded-lg" style={{ border: '1px solid var(--primary-100)' }} />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Pricing Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Pricing Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-primary/5 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10">
-                      <DollarSign className="w-5 h-5 text-primary" />
+            {/* Pricing */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <p className="text-sm font-semibold text-gray-900 mb-4">Pricing Details</p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg p-4 bg-gray-50 border border-gray-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--primary-100)' }}>
+                      <DollarSign className="w-3.5 h-3.5" style={{ color: 'var(--color-primary)' }} />
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-500">Base Price</div>
-                      <div className="text-lg font-bold text-gray-900">₹{service.individualPrice}</div>
-                    </div>
+                    <p className="text-xs text-gray-400">Base Price</p>
                   </div>
+                  <p className="text-xl font-bold text-gray-900">₹{service.individualPrice}</p>
                 </div>
-
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-100">
-                      <Tag className="w-5 h-5 text-green-600" />
+                <div className="rounded-lg p-4" style={{ background: '#ecfdf5', border: '1px solid #bbf7d0' }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
+                      <Tag className="w-3.5 h-3.5 text-green-600" />
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-500">Offer Price</div>
-                      <div className="text-lg font-bold text-gray-900">₹{service.offerPrice || service.individualPrice}</div>
-                    </div>
+                    <p className="text-xs text-gray-400">Offer Price</p>
                   </div>
+                  <p className="text-xl font-bold" style={{ color: '#047857' }}>₹{service.offerPrice || service.individualPrice}</p>
                 </div>
-
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-100">
-                      <Shield className="w-5 h-5 text-purple-600" />
+                <div className="rounded-lg p-4" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-200)' }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--primary-100)' }}>
+                      <Shield className="w-3.5 h-3.5" style={{ color: 'var(--color-primary)' }} />
                     </div>
-                    <div>
-                      <div className="text-xs text-gray-500">Final Price</div>
-                      <div className="text-lg font-bold text-gray-900">₹{service.finalIndividualPrice}</div>
-                    </div>
+                    <p className="text-xs text-gray-400">Final Price</p>
                   </div>
+                  <p className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>₹{service.finalIndividualPrice}</p>
                   {service.isGstApplicable === 'true' && (
-                    <div className="text-xs text-gray-500 mt-2">
-                      Includes {service.gstPercentage}% GST
-                    </div>
+                    <p className="text-xs mt-1" style={{ color: 'var(--primary-600)' }}>+{service.gstPercentage}% GST</p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Input Fields Card */}
-            {service.inputFields && service.inputFields.length > 0 && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Required Information</h2>
-                <div className="space-y-4">
-                  {service.inputFields.map((field, index) => (
-                    <div key={field.fieldId} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-medium text-gray-900">{field.label}</span>
+            {/* Input Fields */}
+            {service.inputFields?.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                <p className="text-sm font-semibold text-gray-900 mb-4">Required Information</p>
+                <div className="space-y-2.5">
+                  {service.inputFields.map(f => (
+                    <div key={f.fieldId} className="flex items-start justify-between p-3.5 rounded-lg border" style={{ borderColor: 'var(--primary-100)', backgroundColor: 'var(--primary-50)' }}>
+                      <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <FileText className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+                          <span className="text-sm font-medium text-gray-900">{f.label}</span>
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded ${
-                          field.required ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {field.required ? 'Required' : 'Optional'}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <div className="mb-1">Type: <span className="font-medium">{field.type}</span></div>
-                        {field.placeholder && (
-                          <div>Placeholder: <span className="font-medium">{field.placeholder}</span></div>
-                        )}
-                        {field.options && field.options.length > 0 && (
-                          <div className="mt-2">
-                            <div className="text-xs text-gray-500 mb-1">Options:</div>
-                            <div className="flex flex-wrap gap-2">
-                              {field.options.map((option, idx) => (
-                                <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                  {option}
-                                </span>
-                              ))}
-                            </div>
+                        <p className="text-xs text-gray-400 ml-5">Type: {f.type}{f.placeholder ? ` · ${f.placeholder}` : ''}</p>
+                        {f.options?.length > 0 && (
+                          <div className="ml-5 mt-1.5 flex flex-wrap gap-1">
+                            {f.options.map((o, i) => (
+                              <span key={i} className="px-2 py-0.5 bg-white rounded text-xs text-gray-600 border border-gray-200">{o}</span>
+                            ))}
                           </div>
                         )}
                       </div>
+                      <span
+                        className="text-xs px-2 py-0.5 rounded-md font-medium flex-shrink-0 ml-3"
+                        style={f.required
+                          ? { background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' }
+                          : { background: '#f9fafb', color: '#6b7280', border: '1px solid #e5e7eb' }
+                        }
+                      >
+                        {f.required ? 'Required' : 'Optional'}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Tracking Steps Card */}
-            {service.trackSteps && service.trackSteps.length > 0 && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Service Process Steps</h2>
-                <div className="space-y-4">
-                  {service.trackSteps.sort((a, b) => a.order - b.order).map((step, index) => (
-                    <div key={step.stepId} className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          index === 0 ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {index + 1}
+            {/* Track Steps */}
+            {service.trackSteps?.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                <p className="text-sm font-semibold text-gray-900 mb-4">Service Process Steps</p>
+                <div className="space-y-3">
+                  {[...service.trackSteps].sort((a, b) => a.order - b.order).map((step, i, arr) => (
+                    <div key={step.stepId} className="flex items-start gap-3">
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white"
+                          style={{ backgroundColor: i === 0 ? 'var(--color-primary)' : 'var(--primary-200)' }}
+                        >
+                          {i + 1}
                         </div>
-                        {index < service.trackSteps.length - 1 && (
-                          <div className="h-8 w-0.5 bg-gray-200 mx-auto"></div>
-                        )}
+                        {i < arr.length - 1 && <div className="w-0.5 h-6 mt-1" style={{ backgroundColor: 'var(--primary-100)' }} />}
                       </div>
-                      <div className="flex-1 pb-4">
-                        <h3 className="text-sm font-medium text-gray-900">{step.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{step.description}</p>
+                      <div className="flex-1 pb-2">
+                        <p className="text-sm font-medium text-gray-900">{step.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
                       </div>
                     </div>
                   ))}
@@ -300,115 +262,82 @@ export default function ViewService() {
             )}
           </div>
 
-          {/* Right Column - Sidebar Info */}
-          <div className="space-y-6">
-            {/* Service Type Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Service Information</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10">
-                    <Package className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Service Type</div>
-                    <div className="text-sm font-medium text-gray-900">{getServiceTypeDisplay()}</div>
-                  </div>
-                </div>
-
-                {service.serviceType === 'RECURRING' && (
-                  <>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50">
-                        <Clock className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500">Frequency</div>
-                        <div className="text-sm font-medium text-gray-900">{getFrequencyDisplay()}</div>
-                      </div>
+          {/* Right Sidebar */}
+          <div className="space-y-4">
+            {/* Service Info */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--primary-500)' }}>Service Information</p>
+              <div className="space-y-3">
+                {[
+                  { icon: <Package className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />, label: 'Service Type', value: getServiceTypeDisplay() },
+                  ...(service.serviceType === 'RECURRING' ? [
+                    { icon: <Clock className="w-4 h-4 text-blue-500" />, label: 'Frequency', value: freqMap[service.frequency] || service.frequency || '—' },
+                    ...(service.duration ? [{ icon: <Calendar className="w-4 h-4 text-green-500" />, label: 'Duration', value: `${service.duration} ${service.durationUnit?.toLowerCase() || 'months'}` }] : []),
+                  ] : []),
+                  { icon: <Layers className="w-4 h-4 text-purple-500" />, label: 'Documents Required', value: service.documentsRequired === 'true' ? 'Yes' : 'No' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--primary-50)' }}>
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0" style={{ border: '1px solid var(--primary-100)' }}>
+                      {item.icon}
                     </div>
-
-                    {service.duration && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-50">
-                          <Calendar className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500">Duration</div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {service.duration} {service.durationUnit?.toLowerCase() || 'months'}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-50">
-                    <Layers className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Documents Required</div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {service.documentsRequired === 'true' ? 'Yes' : 'No'}
+                    <div>
+                      <p className="text-xs text-gray-400">{item.label}</p>
+                      <p className="text-sm font-medium text-gray-900">{item.value}</p>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Timestamps Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Timestamps</h3>
+            {/* Timestamps */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--primary-500)' }}>Timestamps</p>
               <div className="space-y-3">
                 <div>
-                  <div className="text-xs text-gray-500">Created On</div>
-                  <div className="text-sm font-medium text-gray-900">{formatDate(service.createdAt)}</div>
+                  <p className="text-xs text-gray-400">Created On</p>
+                  <p className="text-sm font-medium text-gray-800">{formatDate(service.createdAt)}</p>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500">Last Updated</div>
-                  <div className="text-sm font-medium text-gray-900">{formatDate(service.updatedAt)}</div>
+                  <p className="text-xs text-gray-400">Last Updated</p>
+                  <p className="text-sm font-medium text-gray-800">{formatDate(service.updatedAt)}</p>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500">Service ID</div>
-                  <div className="text-sm font-mono text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                  <p className="text-xs text-gray-400 mb-1">Service ID</p>
+                  <p className="text-xs font-mono px-2 py-1.5 rounded-md" style={{ backgroundColor: 'var(--primary-50)', color: 'var(--primary-700)', border: '1px solid var(--primary-100)' }}>
                     {service.serviceId}
-                  </div>
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--primary-500)' }}>Quick Actions</p>
+              <div className="space-y-2">
                 <button
                   onClick={() => navigate(`/services/edit/${serviceId}`)}
-                  className="w-full px-4 py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors text-sm font-medium"
+                  className="w-full px-4 py-2.5 rounded-lg border text-sm font-medium transition-all"
+                  style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--primary-50)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   Edit Service Details
                 </button>
                 <button
                   onClick={() => navigate('/service-hub')}
-                  className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm font-medium"
+                  className="w-full px-4 py-2.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
                 >
                   Back to Service List
                 </button>
                 <button
                   onClick={() => {
-                    if (window.confirm(`Are you sure you want to delete "${service.name}"?`)) {
+                    if (window.confirm(`Delete "${service.name}"?`)) {
                       axiosInstance.delete(`/service/${serviceId}`)
-                        .then(() => {
-                          alert('Service deleted successfully!');
-                          navigate('/service-hub');
-                        })
-                        .catch(err => {
-                          alert(err.response?.data?.message || 'Error deleting service');
-                        });
+                        .then(() => navigate('/service-hub'))
+                        .catch(err => alert(err.response?.data?.message || 'Error deleting service'));
                     }
                   }}
-                  className="w-full px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium"
+                  className="w-full px-4 py-2.5 rounded-lg bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors"
                 >
                   Delete Service
                 </button>

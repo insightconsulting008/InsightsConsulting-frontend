@@ -10,198 +10,151 @@ export default function ServiceList({ services = [], categories = [], subcategor
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const navigate = useNavigate();
 
-  const filteredServices = services.filter(
-    (srv) =>
-      srv?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      srv?.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredServices = services.filter(srv =>
+    srv?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    srv?.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const formatDate = d => {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
-  const getSubcategoryName = (subCategoryId) => {
-    const subcategory = subcategories.find(sub => sub.subCategoryId === subCategoryId);
-    return subcategory ? subcategory.subCategoryName : '-';
+  const getSubcategoryName = id => subcategories.find(s => s.subCategoryId === id)?.subCategoryName || '—';
+  const getCategoryName = id => {
+    const sub = subcategories.find(s => s.subCategoryId === id);
+    if (!sub) return '—';
+    return categories.find(c => c.categoryId === sub.categoryId)?.categoryName || '—';
   };
 
-  const getCategoryName = (subCategoryId) => {
-    const subcategory = subcategories.find(sub => sub.subCategoryId === subCategoryId);
-    if (!subcategory) return '-';
-    
-    const category = categories.find(cat => cat.categoryId === subcategory.categoryId);
-    return category ? category.categoryName : '-';
-  };
-
-  const getServiceTypeDisplay = (service) => {
-    switch(service.serviceType) {
+  const getServiceTypeDisplay = s => {
+    switch (s.serviceType) {
       case 'ONE_TIME': return 'One Time';
       case 'RECURRING': return 'Recurring';
-      default: return service.serviceType || 'Standard';
+      default: return s.serviceType || 'Standard';
     }
   };
 
-  const getServiceStatus = (service) => {
-    return service.status || 'active';
-  };
+  const getServiceStatus = s => s.status || 'active';
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-red-100 text-red-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const getStatusStyle = status => {
+    switch (status) {
+      case 'active': return { background: '#ecfdf5', color: '#047857', border: '1px solid #bbf7d0' };
+      case 'inactive': return { background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' };
+      case 'draft': return { background: 'var(--warning-50)', color: 'var(--warning-700)', border: '1px solid var(--warning-100)' };
+      default: return { background: '#f9fafb', color: '#6b7280', border: '1px solid #e5e7eb' };
     }
   };
 
-  const handleEditService = (serviceId) => {
-    navigate(`/service/edit/${serviceId}`);
-  };
+  const handleEditService = id => navigate(`/service/edit/${id}`);
 
-  const handleDeleteService = async (serviceId, serviceName) => {
-    if (!window.confirm(`Are you sure you want to delete "${serviceName}"?`)) return;
-    
+  const handleDeleteService = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
     try {
       setActionLoading(true);
-      await axiosInstance.delete(`/service/${serviceId}`);
+      await axiosInstance.delete(`/service/${id}`);
       onRefresh();
-      alert('Service deleted successfully!');
     } catch (err) {
-      console.error('Error deleting service:', err);
       alert(err.response?.data?.message || 'Error deleting service');
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Service Detail Modal
   const ServiceDetailModal = () => {
     if (!showDetailsModal || !selectedService) return null;
-
-    const service = selectedService;
-
+    const s = selectedService;
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden" style={{ boxShadow: 'var(--shadow-2xl)' }}>
           {/* Header */}
-          <div className="border-b border-gray-200 p-6">
+          <div
+            className="px-6 py-4 border-b"
+            style={{ borderColor: 'var(--primary-100)', background: 'linear-gradient(135deg, var(--primary-50) 0%, #fff 100%)' }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {service.photoUrl && (
-                  <img 
-                    src={service.photoUrl} 
-                    alt={service.name}
-                    className="w-12 h-12 rounded-lg object-cover"
-                  />
+                {s.photoUrl && (
+                  <img src={s.photoUrl} alt={s.name} className="w-11 h-11 rounded-lg object-cover" style={{ border: '2px solid var(--primary-200)' }} />
                 )}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{service.name}</h3>
-                  <p className="text-sm text-gray-600 mt-0.5">
-                    ID: {service.serviceId} • Created: {formatDate(service.createdAt)}
+                  <h3 className="text-base font-semibold text-gray-900">{s.name}</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {s.serviceId} · Created {formatDate(s.createdAt)}
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => {
-                  setShowDetailsModal(false);
-                  setSelectedService(null);
-                }}
+                onClick={() => { setShowDetailsModal(false); setSelectedService(null); }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X size={24} className="text-gray-500" />
+                <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-            <div className="space-y-6">
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-76px)]">
+            <div className="space-y-5">
               {/* Description */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                <p className="text-gray-600">{service.description}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--primary-500)' }}>Description</p>
+                <p className="text-sm text-gray-600">{s.description}</p>
               </div>
 
-              {/* Service Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Package className="w-5 h-5 text-primary" />
-                    <div>
-                      <div className="text-sm text-gray-500">Service Type</div>
-                      <div className="font-medium text-gray-900">{getServiceTypeDisplay(service)}</div>
-                    </div>
-                  </div>
+              {/* Info grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg p-3.5" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
+                  <p className="text-xs text-gray-400 mb-0.5">Service Type</p>
+                  <p className="text-sm font-semibold text-gray-800">{getServiceTypeDisplay(s)}</p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    <div>
-                      <div className="text-sm text-gray-500">Category</div>
-                      <div className="font-medium text-gray-900">{getCategoryName(service.subCategoryId)}</div>
-                    </div>
-                  </div>
+                <div className="rounded-lg p-3.5" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
+                  <p className="text-xs text-gray-400 mb-0.5">Category</p>
+                  <p className="text-sm font-semibold text-gray-800">{getCategoryName(s.subCategoryId)}</p>
                 </div>
               </div>
 
               {/* Pricing */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-4">Pricing</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-sm text-gray-500 mb-1">Base Price</div>
-                    <div className="text-xl font-bold text-gray-900">₹{service.individualPrice}</div>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--primary-500)' }}>Pricing</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-lg p-3.5 border border-gray-100 bg-gray-50">
+                    <p className="text-xs text-gray-400 mb-0.5">Base Price</p>
+                    <p className="text-lg font-bold text-gray-900">₹{s.individualPrice}</p>
                   </div>
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <div className="text-sm text-gray-500 mb-1">Offer Price</div>
-                    <div className="text-xl font-bold text-green-700">₹{service.offerPrice || service.individualPrice}</div>
+                  <div className="rounded-lg p-3.5" style={{ background: '#ecfdf5', border: '1px solid #bbf7d0' }}>
+                    <p className="text-xs text-gray-400 mb-0.5">Offer Price</p>
+                    <p className="text-lg font-bold" style={{ color: '#047857' }}>₹{s.offerPrice || s.individualPrice}</p>
                   </div>
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <div className="text-sm text-gray-500 mb-1">Final Price</div>
-                    <div className="text-xl font-bold text-blue-700">₹{service.finalIndividualPrice}</div>
-                    {service.isGstApplicable === 'true' && (
-                      <div className="text-xs text-blue-600 mt-1">Includes {service.gstPercentage}% GST</div>
+                  <div className="rounded-lg p-3.5" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-200)' }}>
+                    <p className="text-xs text-gray-400 mb-0.5">Final Price</p>
+                    <p className="text-lg font-bold" style={{ color: 'var(--color-primary)' }}>₹{s.finalIndividualPrice}</p>
+                    {s.isGstApplicable === 'true' && (
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--primary-600)' }}>+{s.gstPercentage}% GST</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Input Fields */}
-              {service.inputFields && service.inputFields.length > 0 && (
+              {/* Input fields */}
+              {s.inputFields?.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-4">Required Information</h4>
-                  <div className="space-y-3">
-                    {service.inputFields.map((field) => (
-                      <div key={field.fieldId} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-gray-900">{field.label}</span>
-                          <span className={`px-2 py-1 text-xs rounded ${
-                            field.required ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {field.required ? 'Required' : 'Optional'}
-                          </span>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--primary-500)' }}>Required Fields</p>
+                  <div className="space-y-2">
+                    {s.inputFields.map(f => (
+                      <div key={f.fieldId} className="flex items-center justify-between px-3.5 py-2.5 rounded-lg border border-gray-100 bg-gray-50">
+                        <div>
+                          <span className="text-sm font-medium text-gray-800">{f.label}</span>
+                          <span className="text-xs text-gray-400 ml-2">({f.type})</span>
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Type: <span className="font-medium">{field.type}</span>
-                          {field.options && field.options.length > 0 && (
-                            <div className="mt-2">
-                              <div className="text-xs text-gray-500 mb-1">Options:</div>
-                              <div className="flex flex-wrap gap-2">
-                                {field.options.map((option, idx) => (
-                                  <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                    {option}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-md font-medium"
+                          style={f.required
+                            ? { background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' }
+                            : { background: '#f9fafb', color: '#6b7280', border: '1px solid #e5e7eb' }
+                          }
+                        >
+                          {f.required ? 'Required' : 'Optional'}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -209,18 +162,21 @@ export default function ServiceList({ services = [], categories = [], subcategor
               )}
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <div className="flex gap-3 pt-2 border-t border-gray-100">
                 <button
-                  onClick={() => handleEditService(service.serviceId)}
-                  className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                  onClick={() => handleEditService(s.serviceId)}
+                  className="flex-1 py-2.5 text-white rounded-lg text-sm font-semibold transition-all"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
                 >
                   Edit Service
                 </button>
                 <button
-                  onClick={() => handleDeleteService(service.serviceId, service.name)}
-                  className="flex-1 py-3 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors"
+                  onClick={() => handleDeleteService(s.serviceId, s.name)}
+                  className="flex-1 py-2.5 bg-red-50 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-100 transition-colors"
                 >
-                  Delete Service
+                  Delete
                 </button>
               </div>
             </div>
@@ -232,13 +188,12 @@ export default function ServiceList({ services = [], categories = [], subcategor
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-3 text-primary" />
-            <p className="text-gray-500 text-sm">Loading services...</p>
-          </div>
-        </div>
+      <div className="bg-white rounded-xl border border-gray-100 p-10 flex flex-col items-center justify-center" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div
+          className="w-10 h-10 border-4 rounded-full animate-spin mb-3"
+          style={{ borderColor: 'var(--primary-100)', borderTopColor: 'var(--color-primary)' }}
+        />
+        <p className="text-sm text-gray-400">Loading services…</p>
       </div>
     );
   }
@@ -247,151 +202,127 @@ export default function ServiceList({ services = [], categories = [], subcategor
     <>
       <ServiceDetailModal />
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        {/* Table Header */}
+        <div className="px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Service List</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Overview of all services and their key information
-              </p>
+              <h2 className="text-base font-semibold text-gray-900">Service List</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Overview of all services and key information</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search services by name, description..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search services…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none transition-all"
+              onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(104,105,172,0.12)'; }}
+              onBlur={e => { e.target.style.borderColor = '#e5e7eb'; e.target.style.boxShadow = 'none'; }}
+            />
           </div>
         </div>
 
+        {/* Table */}
         <div className="overflow-x-auto">
           {filteredServices.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-4">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <Package className="w-10 h-10 text-primary" />
+            <div className="flex flex-col items-center justify-center py-14 px-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ backgroundColor: 'var(--primary-50)' }}>
+                <Package className="w-7 h-7" style={{ color: 'var(--color-primary)' }} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Service found</h3>
-              <p className="text-gray-500 text-sm text-center">
-                {searchQuery
-                  ? 'No services match your search criteria'
-                  : 'It looks like there are no services added yet'}
+              <p className="text-sm font-semibold text-gray-700 mb-1">No Services Found</p>
+              <p className="text-xs text-gray-400 text-center">
+                {searchQuery ? 'No services match your search' : 'No services added yet'}
               </p>
             </div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Service Name
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Type
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Category
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Price
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Status
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Last Update
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
-                    Actions
-                  </th>
+                <tr style={{ backgroundColor: 'var(--primary-50)', borderBottom: '1px solid var(--primary-100)' }}>
+                  {['Service Name', 'Type', 'Category', 'Price', 'Status', 'Last Update', 'Actions'].map(h => (
+                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--primary-700)' }}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredServices.map((service) => (
+                {filteredServices.map(service => (
                   <tr
                     key={service.serviceId}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="border-b border-gray-50 transition-colors"
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--primary-50)')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
                     <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         {service.photoUrl && (
-                          <img 
-                            src={service.photoUrl} 
-                            alt={service.name}
-                            className="w-8 h-8 rounded object-cover"
-                          />
+                          <img src={service.photoUrl} alt={service.name} className="w-16 h-full rounded-md flex-shrink-0" style={{ border: '1px solid var(--primary-100)' }} />
                         )}
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{service.name}</div>
-                          <div className="text-xs text-gray-500 truncate max-w-xs">
-                            {service.description || '-'}
-                          </div>
+                          <p className="text-sm font-medium text-gray-900">{service.name}</p>
+                          <p className="text-xs text-gray-400 truncate max-w-[200px]">{service.description || '—'}</p>
                         </div>
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <span className="text-sm text-gray-700">
+                      <span
+                        className="text-xs px-2 py-1 rounded-md font-medium"
+                        style={{ backgroundColor: 'var(--primary-50)', color: 'var(--primary-700)', border: '1px solid var(--primary-200)' }}
+                      >
                         {getServiceTypeDisplay(service)}
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="text-sm text-gray-700">
-                        <div>{getCategoryName(service.subCategoryId)}</div>
-                        <div className="text-xs text-gray-500">
-                          {getSubcategoryName(service.subCategoryId)}
-                        </div>
-                      </div>
+                      <p className="text-sm text-gray-700">{getCategoryName(service.subCategoryId)}</p>
+                      <p className="text-xs text-gray-400">{getSubcategoryName(service.subCategoryId)}</p>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-gray-900">
-                          ₹{service.finalIndividualPrice || service.individualPrice || '0'}
-                        </span>
-                        {service.offerPrice && service.offerPrice !== service.individualPrice && (
-                          <span className="text-xs text-gray-500 line-through">
-                            ₹{service.individualPrice}
-                          </span>
-                        )}
-                      </div>
+                      <p className="text-sm font-semibold text-gray-900">₹{service.finalIndividualPrice || service.individualPrice || '0'}</p>
+                      {service.offerPrice && service.offerPrice !== service.individualPrice && (
+                        <p className="text-xs text-gray-400 line-through">₹{service.individualPrice}</p>
+                      )}
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(getServiceStatus(service))}`}>
+                      <span
+                        className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full"
+                        style={getStatusStyle(getServiceStatus(service))}
+                      >
                         {getServiceStatus(service)}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-500">
+                    <td className="py-3 px-4 text-xs text-gray-400">
                       {formatDate(service.updatedAt || service.createdAt)}
                     </td>
                     <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => {
-                            setSelectedService(service);
-                            setShowDetailsModal(true);
-                          }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-primary hover:opacity-90 transition-opacity"
+                          onClick={() => { setSelectedService(service); setShowDetailsModal(true); }}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white transition-all"
+                          style={{ backgroundColor: 'var(--color-primary)' }}
+                          onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+                          onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                          View
+                          <Eye className="w-3 h-3" /> View
                         </button>
                         <button
                           onClick={() => handleEditService(service.serviceId)}
-                          className="p-1.5 hover:bg-gray-100 rounded transition-colors group"
+                          className="p-1.5 rounded-lg text-gray-400 transition-colors"
+                          onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.backgroundColor = 'var(--primary-50)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                         >
-                          <Edit2 className="w-4 h-4 text-gray-500 group-hover:text-primary" />
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeleteService(service.serviceId, service.name)}
                           disabled={actionLoading}
-                          className="p-1.5 hover:bg-red-50 rounded transition-colors group"
+                          className="p-1.5 rounded-lg text-gray-400 transition-colors disabled:opacity-50"
+                          onMouseEnter={e => { e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.backgroundColor = '#fef2f2'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                         >
-                          <Trash2 className="w-4 h-4 text-gray-500 group-hover:text-red-600" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -403,11 +334,11 @@ export default function ServiceList({ services = [], categories = [], subcategor
         </div>
 
         {filteredServices.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <div className="text-sm text-gray-500">
-              Showing <span className="font-medium text-gray-900">{filteredServices.length}</span> of{' '}
-              <span className="font-medium text-gray-900">{services.length}</span> services
-            </div>
+          <div className="px-6 py-3 border-t border-gray-100" style={{ backgroundColor: 'var(--primary-50)' }}>
+            <p className="text-xs" style={{ color: 'var(--primary-700)' }}>
+              Showing <span className="font-semibold">{filteredServices.length}</span> of{' '}
+              <span className="font-semibold">{services.length}</span> services
+            </p>
           </div>
         )}
       </div>

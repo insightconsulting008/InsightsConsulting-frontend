@@ -45,29 +45,21 @@ const steps = [
 export default function StepIndicator() {
   const { currentStep, setCurrentStep } = useService();
 
-  const isCompleted = (stepId) => {
-    return currentStep > stepId;
-  };
-
-  const isActive = (stepId) => {
-    return currentStep === stepId;
-  };
-
-  const canNavigateTo = (stepId) => {
-    return currentStep > stepId;
-  };
+  const isCompleted = (stepId) => currentStep > stepId;
+  const isActive = (stepId) => currentStep === stepId;
+  const canNavigateTo = (stepId) => currentStep > stepId;
 
   return (
-    <div className="w-full mb-8">
+    <div className="w-full">
       <div className="flex flex-col relative">
         {/* Vertical progress line */}
-        <div className="absolute top-0 bottom-0 left-5 w-0.5 bg-gray-200 z-0"></div>
+        <div className="absolute top-0 bottom-0 left-5 w-0.5 bg-neutral-200 z-0"></div>
         <div 
-          className="absolute top-0 left-5 w-0.5 bg-red z-10 transition-all duration-300"
+          className="absolute top-0 left-5 w-0.5 bg-primary z-10 transition-all duration-300"
           style={{ height: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
         ></div>
 
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const IconComponent = step.icon;
           return (
             <div key={step.id} className="relative z-20 flex items-start mb-8 last:mb-0">
@@ -77,10 +69,10 @@ export default function StepIndicator() {
                   onClick={() => canNavigateTo(step.id) && setCurrentStep(step.id)}
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isActive(step.id)
-                      ? 'bg-red border-primary text-white'
+                      ? 'bg-primary border-primary text-white shadow-md shadow-primary/30'
                       : isCompleted(step.id)
-                      ? 'bg-red border-primary text-white'
-                      : 'bg-white border-gray-300 text-gray-500'
+                      ? 'bg-primary border-primary text-white'
+                      : 'bg-white border-neutral-300 text-neutral-500 hover:border-primary-300'
                   } ${canNavigateTo(step.id) ? 'cursor-pointer hover:scale-105' : 'cursor-default'}`}
                 >
                   {isCompleted(step.id) ? (
@@ -95,12 +87,12 @@ export default function StepIndicator() {
               <div className="flex-1">
                 <div className="flex flex-col">
                   <span className={`text-base font-semibold ${
-                    isActive(step.id) ? 'text-red' : 
-                    isCompleted(step.id) ? 'text-red' : 'text-gray-700'
+                    isActive(step.id) ? 'text-primary' : 
+                    isCompleted(step.id) ? 'text-primary' : 'text-neutral-700'
                   }`}>
                     {step.label}
                   </span>
-                  <span className="text-sm text-gray-500 mt-1">
+                  <span className="text-sm text-neutral-500 mt-1">
                     {step.description}
                   </span>
                 </div>

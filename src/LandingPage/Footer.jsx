@@ -36,9 +36,9 @@ const Footer = () => {
     {
       title: "Legal",
       links: [
-        { label: "Terms & Conditions", path: "/terms" },
-        { label: "Privacy Policy", path: "/privacy" },
-        { label: "Refund Policy", path: "/refund" },
+        { label: "Terms & Conditions", path: "/" },
+        { label: "Privacy Policy", path: "/" },
+        { label: "Refund Policy", path: "/" },
       ],
     },
   ];
@@ -54,11 +54,11 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-white antialiased font-inter">
+    <footer className="w-full bg-white container mx-auto antialiased font-inter">
 
 
-      <section className="w-full pt-[64px] pb-[48px]">
-        <div className=" lg:px-14 px-4 mx-auto ">
+      <section className="w-full pt-[64px] container pb-[48px]">
+        <div className=" lg:px-12 px-4 mx-auto ">
 
           <div className=" mx-auto flex flex-col lg:flex-row justify-between items-center lg:items-start gap-[32px]">
 
@@ -96,7 +96,7 @@ const Footer = () => {
 
       {/* Links */}
       <section className="w-full pt-[64px] pb-[48px]">
-        <div className=" mx-auto  md:px-14 px-4">
+        <div className=" mx-auto  lg:px-12 px-4">
           <div className=" mx-auto flex flex-col justify-between lg:flex-row gap-[48px] lg:gap-[64px] items-start">
 
 
@@ -141,7 +141,7 @@ const Footer = () => {
       </section>
 
 
-      <section className="w-full pb-[48px]">
+      {/* <section className="w-full pb-[48px]">
         <div className="max-w-[1280px] mx-auto px-[20px] lg:px-[32px]">
           <div className="max-w-[1216px] mx-auto h-[1px] bg-[#E9EAEB]"></div>
 
@@ -168,7 +168,7 @@ const Footer = () => {
 
           </div>
         </div>
-      </section>
+      </section> */}
     </footer>
   );
 };

@@ -3,7 +3,7 @@ import { FaStar, FaGift, FaBoxes, FaArrowUp } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Enquiryform from "./reusable/Enquiryform";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
 import ServiceContent from "./ServiceContent";
 
 
@@ -28,10 +28,6 @@ const ServiceCardSkeleton = () => {
 
 
 export const commonServiceHighlights = {
-
-
-
-
   support: {
     icon: <FaStar />,
     title: "Ongoing Support",
@@ -61,15 +57,56 @@ const data = commonServiceHighlights;
 
 /* ── SERVICE CARD CAROUSEL ── */
 const ServiceCarousel = ({ services, subCategoryName }) => {
+  const navigate = useNavigate(); // Added navigate hook
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
 
- useEffect(() => {
-  const updateVisible = () => {
-    setVisibleCount(window.innerWidth >= 1024 ? 4 : 1);
+  // Navigation handlers
+  const handleBuyNow = (service) => {
+    navigate('/register', { 
+      state: { 
+        serviceId: service.serviceId,
+        serviceName: service.name,
+        subCategoryName: subCategoryName,
+        action: 'buy' 
+      } 
+    });
   };
 
-  updateVisible(); // run on mount
+  const handleExploreService = (service) => {
+    navigate('/register', { 
+      state: { 
+        serviceId: service.serviceId,
+        serviceName: service.name,
+        subCategoryName: subCategoryName,
+        action: 'explore' 
+      } 
+    });
+  };
+
+  const handleMoreDetails = (service) => {
+    navigate('/register', { 
+      state: { 
+        serviceId: service.serviceId,
+        serviceName: service.name,
+        subCategoryName: subCategoryName,
+        action: 'details' 
+      } 
+    });
+  };
+
+ useEffect(() => {
+  const updateVisible = () => {
+    if (window.innerWidth >= 1024) {
+      setVisibleCount(4);        // Large screens
+    } else if (window.innerWidth >= 768) {
+      setVisibleCount(2);        // Medium screens ✅
+    } else {
+      setVisibleCount(1);        // Mobile
+    }
+  };
+
+  updateVisible();
   window.addEventListener("resize", updateVisible);
 
   return () => window.removeEventListener("resize", updateVisible);
@@ -109,7 +146,7 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
   return (
     <div className="relative">
       {/* Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-hidden">
         {visibleServices.map((service) => (
           <div
             key={service.serviceId}
@@ -119,7 +156,7 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
             <img
               src={service.photoUrl}
               alt={service.name}
-              className=" lg:w-96 p-4 rounded-3xl object-cover"
+              className=" w-full h-full p-2 rounded-3xl object-cover"
             />
 
             {/* Body */}
@@ -129,12 +166,12 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
                 <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
                   {subCategoryName || "GST SERVICE"}
                 </span>
-                <span
+                {/* <span
                   style={{ color: "#B8860B" }}
                   className="text-[9px] bg-amber-50 border border-amber-300 px-2 py-0.5 rounded font-bold tracking-widest uppercase"
                 >
                   STANDARD
-                </span>
+                </span> */}
               </div>
 
               {/* Title */}
@@ -143,14 +180,17 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
               </h3>
 
               {/* Description */}
-              <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed flex-1">
+              <p className="text-gray-400 text-sm mb-4 line-clamp-1 leading-relaxed flex-1">
                 {service.description}
               </p>
 
               {/* Need More Info / Explore Service row */}
               <div className="flex items-center justify-between border-t border-b border-gray-100 py-2.5 mb-3">
-                <span className="text-gray-400 text-sm">Need More Info?</span>
-                <button className="font-semibold text-sm text-gray-800 flex items-center gap-1 hover:text-blue-600 transition-colors">
+                <span className="text-gray-400  text-sm">Need More Info?</span>
+                <button 
+                  onClick={() => navigate('/servicehub') }
+                  className="font-semibold text-sm text-gray-800 flex items-center gap-1 hover:text-blue-600 transition-colors"
+                >
                   Explore Service
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M7 7h10v10" />
@@ -160,10 +200,16 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
 
               {/* Action buttons */}
               <div className="flex gap-2">
-                <button className="flex-1 bg-red  text-white text-sm font-semibold py-2.5 rounded-lg transition-colors">
+                <button 
+                  onClick={() => handleBuyNow(service)}
+                  className="flex-1 bg-red  text-white text-sm font-semibold py-2.5 rounded-lg transition-colors"
+                >
                   Buy Now
                 </button>
-                <button className="flex-1 bg-[#FAFCFF] border border-[#EAEAEA] text-gray-700 text-sm font-semibold py-2.5 rounded-lg transition-colors">
+                <button 
+                  onClick={() => handleMoreDetails(service)}
+                  className="flex-1 bg-[#FAFCFF] border border-[#EAEAEA] text-gray-700 text-sm font-semibold py-2.5 rounded-lg transition-colors"
+                >
                   More Details
                 </button>
               </div>
@@ -217,6 +263,7 @@ const ServiceCarousel = ({ services, subCategoryName }) => {
 const ServiceInfoSection = () => {
   const { categoryId, subCategoryId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate(); // Added navigate hook
 
   const categoryName = location.state?.categoryName;
   const subCategoryName = location.state?.subCategoryName;
@@ -226,6 +273,30 @@ const ServiceInfoSection = () => {
   const [services, setServices] = useState([]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [loadingServices, setLoadingServices] = useState(false);
+
+  // Handler for "View All Products" button
+  // const handleViewAllProducts = () => {
+  //   navigate('/servicehub', { 
+  //     state: { 
+  //       categoryId: categoryId,
+  //       categoryName: categoryName,
+  //       subCategoryId: subCategoryId,
+  //       subCategoryName: subCategoryName,
+  //       action: 'view_all' 
+  //     } 
+  //   });
+  // };
+
+  // Handler for CTA button
+  // const handleExploreServices = () => {
+  //   navigate('/servicehub', { 
+  //     state: { 
+  //       categoryId: categoryId,
+  //       categoryName: categoryName,
+  //       action: 'explore_services' 
+  //     } 
+  //   });
+  // };
 
   useEffect(() => {
     const fetchSubcategories = async () => {
@@ -281,7 +352,7 @@ const ServiceInfoSection = () => {
       >
         <div className="absolute inset-0 bg-white/90"></div>
 
-        <div className="relative px-4 lg:px-12 mx-auto py-20 grid lg:grid-cols-2 gap-15 xl:grid-cols-3 items-center">
+        <div className="relative px-4 lg:px-12 container mx-auto py-20 grid lg:grid-cols-2 gap-15 xl:grid-cols-3 items-center">
           {/* LEFT CONTENT */}
           <div className="xl:col-span-2 mx-auto">
             <p className="text-sm text-gray-400 mb-4">
@@ -310,9 +381,9 @@ const ServiceInfoSection = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center col-span-1 bg-yellow text-white rounded-2xl p-5 justify-end">
-                  <div className="text-right">
-                    <div className="flex items-center justify-end gap-3 mb-2">
+                <div className="flex items-center col-span-1 bg-yellow text-white rounded-2xl  lg:p-5 p-2 ">
+                  <div className="">
+                    <div className="flex items-center lg:justify-end  lg:gap-3 mb-2">
                       <h2 className="text-base lg:text-3xl font-semibold text-gray-800">
                         {data.experience.years}
                       </h2>
@@ -327,8 +398,8 @@ const ServiceInfoSection = () => {
 
               {/* Bottom Cards */}
               <div className="grid sm:grid-cols-2 gap-6 w-full">
-                <div className="bg-yellow-500 text-white rounded-2xl p-3 lg:p-6">
-                  <div className="bg-white/20 w-10 h-10 flex items-center justify-center rounded-full mb-3">
+                <div className="bg-yellow-500  rounded-2xl p-3 lg:p-6">
+                  <div className="bg-white/20 w-10 h-10 text-white flex items-center justify-center rounded-full mb-3">
                     {data.whoShouldRegister.icon}
                   </div>
                   <h3 className="font-semibold mb-1">{data.whoShouldRegister.title}</h3>
@@ -345,7 +416,10 @@ const ServiceInfoSection = () => {
               </div>
 
               {/* CTA */}
-              <button className="mt-4 bg-gray-900 text-white px-6 py-3 rounded-full flex items-center gap-2 hover:bg-black transition">
+              <button 
+                onClick={() => navigate('/servicehub')}
+                className="mt-4 bg-red text-white px-6 py-3 rounded-full flex items-center gap-2 transition"
+              >
                 {data.cta.label}
               </button>
             </div>
@@ -372,7 +446,10 @@ const ServiceInfoSection = () => {
               </p>
             </div>
 
-            <button className="bg-[#F8F8FF] border-[#DBDBFE] rounded-full px-5 py-3 text-sm transition">
+            <button 
+              onClick={() => navigate('/servicehub')}
+              className="bg-[#F8F8FF] border-[#DBDBFE] rounded-full px-5 py-3 text-sm transition"
+            >
               View All Products
             </button>
           </div>

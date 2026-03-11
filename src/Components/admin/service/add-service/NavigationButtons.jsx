@@ -17,14 +17,14 @@ export default function NavigationButtons() {
   };
 
   return (
-    <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+    <div className="flex justify-between mt-8 pt-6 border-t border-neutral-200">
       <button
         onClick={handlePrevious}
         disabled={currentStep === 1}
-        className={`px-6 py-2 rounded-lg font-medium ${
+        className={`px-6 py-2 rounded-lg font-medium transition-all ${
           currentStep === 1
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+            : 'bg-white text-neutral-700 border border-neutral-300 hover:border-primary hover:text-primary hover:bg-primary-50'
         }`}
       >
         Previous
@@ -32,10 +32,10 @@ export default function NavigationButtons() {
       <button
         onClick={handleNext}
         disabled={currentStep === 5}
-        className={`px-6 py-2 rounded-lg font-medium ${
+        className={`px-6 py-2 rounded-lg font-medium transition-all ${
           currentStep === 5
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-red text-white hover:opacity-90'
+            ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+            : 'bg-primary text-white hover:bg-primary-hover shadow-sm shadow-primary/30'
         }`}
       >
         Next

@@ -139,7 +139,7 @@ export default function Home() {
     },
     {
       icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(4).png?updatedAt=1771417293232',
-      title: "Recurring Compliance Mgmt",
+      title: "Recurring Compliance Management",
       desc: "Monthly and periodic compliances are proactively handled — renewals and filings stay on schedule.",
     },
   ];
@@ -375,7 +375,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         <div className="w-full px-4 py-3 flex items-center gap-6">
 
           {/* Left Title */}
-          <div className="flex items-center gap-2 text-sm hidden md:block text-gray-600 whitespace-nowrap">
+          <div className=" items-center gap-2 text-sm hidden md:flex text-gray-600 whitespace-nowrap">
             <span className="hidden md:block">Top Services Offered in</span>
             <span className=" text-blue-600 font-medium">
               Insight Consulting
@@ -495,7 +495,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
           {/* Features Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10 relative pt-5  md:pt-10">
-            <div className="border border-dashed hidden lg:block border-gray-300 absolute top-1/2 w-full "></div>
+            <div className="border border-dashed hidden lg:block border-gray-300 absolute top-[55%] w-full "></div>
             {features.map((item, index) => (
               <div key={index} className="flex gap-4 border-r border-[#EDEDED]">
 
@@ -584,13 +584,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   No <span className="text-blue-600">Chasing</span>
                 </h3>
                 <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                  We proactively manage follow-ups <br /> and renewals, so clients don’t have to <br /> remind us.
+                  We proactively manage <br  className="hidden lg:block xl:hidden" />follow-ups  and renewals, <br  className="hidden lg:block  xl:hidden" /> so clients don’t have to <br  className="hidden lg:block  xl:hidden" /> remind us.
                 </p>
 
                 <img
                   src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Adobe%20Express%20-%20file%20(2)%201.png"
                   alt="dummy"
-                  className="absolute bottom-0 md:h-40 h-28 right-4"
+                  className="absolute bottom-0 md:h-40 h-28 right-0"
                 />
               </div>
 
@@ -600,13 +600,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   Clear Ownership
                 </h3>
                 <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                  Every step and update is <br className="md:block hidden" /> communicated clearly no confusion, <br className="md:block hidden" />no surprises.
+                  Every step and update is <br className="md:block hidden  xl:hidden" /> communicated clearly no <br className="md:block hidden  xl:hidden" /> confusion, <br className="md:block hidden  xl:hidden" />no surprises.
                 </p>
 
                 <img
                   src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Untitled%20(3)%201.png"
                   alt="dummy"
-                  className="absolute bottom-0 md:h-40 h-28 right-4"
+                  className="absolute bottom-0 md:h-40 h-28 right-0"
                 />
               </div>
             </div>
@@ -636,29 +636,32 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         <div className="container  lg:px-12 px-4 mx-auto ">
 
           {/* Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
-            <div>
-              <p className="text-yellow-600 text-sm font-semibold mb-2">
-                HOW IT WORKS
-              </p>
+         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+  <div>
+    <p className="text-yellow-600 text-sm font-semibold mb-2">
+      HOW IT WORKS
+    </p>
 
-              <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
-                Simple Steps. Zero Stress.
-              </h2>
+    <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
+      Simple Steps. Zero Stress.
+    </h2>
 
-              <p className="text-gray-600 max-w-xl">
-                We built the process anyone can use it — no complexity, no
-                confusion, just a clear path to getting the compliance you need.
-              </p>
-            </div>
+    <p className="text-gray-600 max-w-xl">
+      We built the process anyone can use it — no complexity, no
+      confusion, just a clear path to getting the compliance you need.
+    </p>
+  </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium"  onClick={() => navigate("/servicehub")}>
-              Explore Service Hub &gt;&gt;
-            </button>
-          </div>
+  <button
+    className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
+    onClick={() => navigate("/servicehub")}
+  >
+    Explore Service Hub &gt;&gt;
+  </button>
+</div>
 
           {/* Steps */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
             {steps.map((step, index) => (
               <div
                 key={index}
@@ -670,8 +673,8 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 </div>
 
                 {/* Content */}
-                <div className=" relative  px-2 py-3">
-                  <img className="h-14 absolute -top-5 right-0 text-gray-700 mb-2 " src={step.icon} />
+                <div className=" relative  px-2 py-6">
+                  <img className="h-14 absolute -top-7 right-0 text-gray-700 mb-2 " src={step.icon} />
 
 
 
@@ -832,22 +835,25 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </p>
 
           {/* Heading */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2 gap-6">
-            <div>
-              <h2 className="text-2xl md:text-5xl font-semibold text-gray-900">
-                Everything You Need, Connected in One Place
-              </h2>
-              <p className="text-gray-500 mt-2 max-w-xl">
-                From communication to documents and follow-ups all managed within a single system.
-              </p>
-            </div>
+     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-2 gap-6">
+  <div>
+    <h2 className="text-2xl md:text-5xl font-semibold text-gray-900">
+      Everything You Need, Connected in One Place
+    </h2>
+    <p className="text-gray-500 mt-2 max-w-xl">
+      From communication to documents and follow-ups all managed within a single system.
+    </p>
+  </div>
 
-            <div className="flex items-center">
-              <button className="bg-red  text-white px-6 py-3 rounded-md font-medium transition"  onClick={() => navigate("/servicehub")}>
-                Explore Service Hub →
-              </button>
-            </div>
-          </div>
+  <div className="flex lg:w-80">
+    <button
+      className="bg-red text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
+      onClick={() => navigate("/servicehub")}
+    >
+      Explore Service Hub →
+    </button>
+  </div>
+</div>
 
           {/* Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
@@ -887,7 +893,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         <div className="lg:px-12 px-4 container  mx-auto text-center">
           {/* Icon */}
           <div className="flex justify-center mb-4">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#F7F8F8] text-red">
+            <div className="w-10 h-10 flex items-center   justify-center rounded-full bg-[#F7F8F8] text-red">
               <FaBolt />
             </div>
           </div>
@@ -923,18 +929,21 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </p>
 
           {/* Logos */}
-          <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
+
+        </div>
+      </section>
+                <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
   <div className="mx-auto">
 
 
     <div className="relative w-full overflow-hidden">
-      <div className="flex gap-[48px] animate-marquee">
+      <div className="flex lg:gap-12 gap-5 animate-marquee">
         {[...logos, ...logos, ...logos].map((logo, index) => (
-          <div key={index} className="flex items-center gap-[12px] flex-shrink-0">
+          <div key={index} className="flex items-center lg:gap-3  flex-shrink-0">
             <img
               src={logo.src}
               alt={`${logo.name} mark`}
-              className="w-[44px] h-[44px] object-contain"
+              className=" w-6 md:w-11 h-6 md:h-11 object-contain"
             />
             <span className="text-[24px] font-bold text-[#535862] tracking-tight">
               {logo.name}
@@ -959,11 +968,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
     `}
   </style>
 </section>
-        </div>
-      </section>
 
       <section className="bg-[#F4EBFF33] py-10 lg:py-16 ">
-        <div className="lg:px-12 px-4 mx-auto">
+        <div className="lg:px-12 px-4 container mx-auto">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="w-14 h-10 rounded-full bg-blue-50 flex items-center justify-center border border-[#3E72F9] text-blue-600">
@@ -1243,7 +1250,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
       </section>
 
       <section className="lg:py-15 py-10 bg-[#f5f6f7]">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="lg:px-12 mx-auto px-4">
 
           <div className="relative overflow-hidden rounded-2xl border border-[#E5EFFF] bg-white px-8 py-12 text-center">
 

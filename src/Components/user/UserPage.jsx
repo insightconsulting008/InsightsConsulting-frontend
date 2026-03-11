@@ -1,4 +1,16 @@
-// UserPage.jsx
+import React, { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import axiosInstance from "@src/providers/axiosInstance";
+import PhonePopup from "./PhonePopup";
+import UserNav from "./UserNav";
+import UserDashboard from "./UserDashboard";
+import GetService from "./service/GetService";
+import MyService from "./my-service/MyService";
+import "@src/App.css"
+import Documents from './documents/Documents';
+import Profile from './profile/Profile';
+import ServiceDetailPage from './my-service/ServiceDetailPage';
+
 // Route audit — every path here must have a matching entry in App.jsx USER_EXACT
 //
 //  /user-dashboard               → USER_EXACT ✓
@@ -12,34 +24,59 @@
 //  /notifications                → USER_EXACT ✓
 //  /help                         → USER_EXACT ✓
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import UserNav       from "./UserNav";
-import UserDashboard from "./UserDashboard";
-import GetService    from "./service/GetService";
-import MyService     from "./my-service/MyService";
-import "@src/App.css"
+const UserPage = () => {
+  const [user, setUser] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
-const UserPage = () => (
-  <>
-    <UserNav />
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        
+        const res = await axiosInstance.get(
+          "/user/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        setUser(res.data.data);
+        
+        if (!res.data.data.phoneNumber) {
+          setShowPopup(true);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
+    fetchUser();
+  }, []);
 
-    {/* Offset content from fixed sidebar (collapsed = 80px wide) */}
-    <div className="ml-20">
-      <Routes>
-        <Route path="/user-dashboard"  element={<UserDashboard />} />
-        <Route path="/services"        element={<GetService />} />
-        <Route path="/my-services"     element={<MyService />} />
-        <Route path="/profile"         element={<div className="p-8">Profile Page</div>} />
-        <Route path="/settings"        element={<div className="p-8">Settings Page</div>} />
-        <Route path="/documents"       element={<div className="p-8">Documents</div>} />
-        <Route path="/messages"        element={<div className="p-8">Messages</div>} />
-        <Route path="/billing"         element={<div className="p-8">Billing</div>} />
-        <Route path="/notifications"   element={<div className="p-8">Notifications</div>} />
-        <Route path="/help"            element={<div className="p-8">Help</div>} />
-      </Routes>
-    </div>
-  </>
-);
+  return (
+    <>
+      <UserNav />
+      
+      {/* Phone number popup */}
+      {showPopup && (
+        <PhonePopup onClose={() => setShowPopup(false)} />
+      )}
+
+      {/* Offset content from fixed sidebar (collapsed = 80px wide) */}
+      <div className="lg:ml-20 pb-16 md:pb-0">
+        <Routes>
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/services" element={<GetService />} />
+          <Route path="/my-services" element={<MyService />} />
+          <Route path="/documents" element={<Documents />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/my-service/view/:id" element={<ServiceDetailPage/>} />
+        </Routes>
+      </div>
+    </>
+  );
+};
 
 export default UserPage;

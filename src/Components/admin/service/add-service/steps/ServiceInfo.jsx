@@ -13,6 +13,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Cropper from "react-easy-crop";
+import axiosInstance from "@src/providers/axiosInstance";
 
 export default function ServiceInfo() {
   const {
@@ -22,7 +23,6 @@ export default function ServiceInfo() {
     filteredSubcategories,
     fetchCategories,
     fetchSubcategories,
-    API_BASE,
     setError,
     stepErrors,
     setStepErrors,
@@ -228,143 +228,120 @@ export default function ServiceInfo() {
     }
   };
 
-  const handleAddCategory = async () => {
-    if (!newCategoryName.trim()) return;
-    try {
-      const response = await fetch(`${API_BASE}/category`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ categoryName: newCategoryName }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        fetchCategories();
-        setNewCategoryName("");
-        setShowCategoryModal(false);
-      }
-    } catch (err) {
-      setError("Failed to add category");
-    }
-  };
 
-  const handleEditCategory = async (categoryId) => {
-    if (!newCategoryName.trim()) return;
-    try {
-      const response = await fetch(`${API_BASE}/category/${categoryId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ categoryName: newCategoryName }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        fetchCategories();
-        setShowEditModal(null);
-        setEditId(null);
-        setNewCategoryName("");
-        setShowCategoryDropdown(null);
-      }
-    } catch (err) {
-      setError("Failed to edit category");
-    }
-  };
-
-  const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
-      return;
-    try {
-      await fetch(`${API_BASE}/category/${categoryId}`, {
-        method: "DELETE",
-      });
+const handleAddCategory = async () => {
+  if (!newCategoryName.trim()) return;
+  try {
+    const response = await axiosInstance.post(`/category`, {
+      categoryName: newCategoryName
+    });
+    
+    if (response.data.success) {
       fetchCategories();
-      fetchSubcategories();
+      setNewCategoryName("");
+      setShowCategoryModal(false);
+    }
+  } catch (err) {
+    setError("Failed to add category");
+  }
+};
+
+const handleEditCategory = async (categoryId) => {
+  if (!newCategoryName.trim()) return;
+  try {
+    const response = await axiosInstance.put(`/category/${categoryId}`, {
+      categoryName: newCategoryName
+    });
+    
+    if (response.data.success) {
+      fetchCategories();
+      setShowEditModal(null);
+      setEditId(null);
+      setNewCategoryName("");
       setShowCategoryDropdown(null);
-      if (basicInfo.categoryId === categoryId) {
-        setBasicInfo((prev) => ({
-          ...prev,
-          categoryId: "",
-          subCategoryId: "",
-        }));
-      }
-    } catch (err) {
-      setError("Failed to delete category");
     }
-  };
+  } catch (err) {
+    setError("Failed to edit category");
+  }
+};
 
-  const handleAddSubcategory = async () => {
-    if (!newSubcategoryName.trim() || !basicInfo.categoryId) return;
-    try {
-      const response = await fetch(`${API_BASE}/subcategory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          categoryId: basicInfo.categoryId,
-          subCategoryName: newSubcategoryName,
-        }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        fetchSubcategories();
-        setNewSubcategoryName("");
-        setShowSubcategoryModal(false);
-      }
-    } catch (err) {
-      setError("Failed to add subcategory");
+const handleDeleteCategory = async (categoryId) => {
+  if (!window.confirm("Are you sure you want to delete this category?"))
+    return;
+  try {
+    await axiosInstance.delete(`/category/${categoryId}`);
+    
+    fetchCategories();
+    fetchSubcategories();
+    setShowCategoryDropdown(null);
+    if (basicInfo.categoryId === categoryId) {
+      setBasicInfo((prev) => ({
+        ...prev,
+        categoryId: "",
+        subCategoryId: "",
+      }));
     }
-  };
+  } catch (err) {
+    setError("Failed to delete category");
+  }
+};
 
-  const handleEditSubcategory = async (subCategoryId) => {
-    if (!newSubcategoryName.trim()) return;
-    try {
-      const response = await fetch(`${API_BASE}/subcategory/${subCategoryId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subCategoryName: newSubcategoryName,
-          categoryId: basicInfo.categoryId,
-        }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        fetchSubcategories();
-        setShowEditModal(null);
-        setEditId(null);
-        setNewSubcategoryName("");
-        setShowSubcategoryDropdown(null);
-      }
-    } catch (err) {
-      setError("Failed to edit subcategory");
-    }
-  };
-
-  const handleDeleteSubcategory = async (subCategoryId) => {
-    if (
-      !window.confirm("Are you sure you want to delete this subcategory?")
-    )
-      return;
-    try {
-      await fetch(`${API_BASE}/subcategory/${subCategoryId}`, {
-        method: "DELETE",
-      });
+const handleAddSubcategory = async () => {
+  if (!newSubcategoryName.trim() || !basicInfo.categoryId) return;
+  try {
+    const response = await axiosInstance.post(`/subcategory`, {
+      categoryId: basicInfo.categoryId,
+      subCategoryName: newSubcategoryName
+    });
+    
+    if (response.data.success) {
       fetchSubcategories();
-      setShowSubcategoryDropdown(null);
-      if (basicInfo.subCategoryId === subCategoryId) {
-        setBasicInfo((prev) => ({
-          ...prev,
-          subCategoryId: "",
-        }));
-      }
-    } catch (err) {
-      setError("Failed to delete subcategory");
+      setNewSubcategoryName("");
+      setShowSubcategoryModal(false);
     }
-  };
+  } catch (err) {
+    setError("Failed to add subcategory");
+  }
+};
+
+const handleEditSubcategory = async (subCategoryId) => {
+  if (!newSubcategoryName.trim()) return;
+  try {
+    const response = await axiosInstance.put(`/subcategory/${subCategoryId}`, {
+      subCategoryName: newSubcategoryName,
+      categoryId: basicInfo.categoryId
+    });
+    
+    if (response.data.success) {
+      fetchSubcategories();
+      setShowEditModal(null);
+      setEditId(null);
+      setNewSubcategoryName("");
+      setShowSubcategoryDropdown(null);
+    }
+  } catch (err) {
+    setError("Failed to edit subcategory");
+  }
+};
+
+const handleDeleteSubcategory = async (subCategoryId) => {
+  if (!window.confirm("Are you sure you want to delete this subcategory?"))
+    return;
+  try {
+    await axiosInstance.delete(`/subcategory/${subCategoryId}`);
+    
+    fetchSubcategories();
+    setShowSubcategoryDropdown(null);
+    if (basicInfo.subCategoryId === subCategoryId) {
+      setBasicInfo((prev) => ({
+        ...prev,
+        subCategoryId: "",
+      }));
+    }
+  } catch (err) {
+    setError("Failed to delete subcategory");
+  }
+};
 
   const openEditModal = (type, id, name) => {
     setShowEditModal(type);
@@ -493,13 +470,24 @@ export default function ServiceInfo() {
     handleRemoveImage();
   };
 
+    useEffect(() => {
+  const handleWheel = (e) => {
+    if (document.activeElement.type === "number") {
+      document.activeElement.blur();
+    }
+  };
+
+  window.addEventListener("wheel", handleWheel);
+  return () => window.removeEventListener("wheel", handleWheel);
+}, []);
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-neutral-900 mb-2">
           Service Information
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-neutral-500">
           Fill in the basic details about your service.
         </p>
       </div>
@@ -507,26 +495,26 @@ export default function ServiceInfo() {
       <div className="space-y-4">
         {/* Service Image Upload */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-800">
-            Service Image <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium mb-2 text-neutral-800">
+            Service Image <span className="text-error-500">*</span>
           </label>
           
           {/* Show 10MB size error prominently */}
           {sizeError && (
-            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800 font-medium">{sizeError}</p>
+            <div className="mb-3 p-3 bg-error-50 border border-error-200 rounded-lg">
+              <p className="text-sm text-error-800 font-medium">{sizeError}</p>
             </div>
           )}
           
           {/* Image Dimension Info - only show if we have dimensions and no crop modal */}
           {imageDimensions.width > 0 && imageDimensions.height > 0 && !showCropModal && (
-            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mb-3 p-3 bg-info-50 border border-info-200 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-800">
+                  <p className="text-sm font-medium text-info-800">
                     Image Dimensions: {imageDimensions.width} × {imageDimensions.height}px
                   </p>
-                  <p className="text-xs text-blue-600 mt-1">
+                  <p className="text-xs text-info-600 mt-1">
                     Recommended size: {TARGET_WIDTH} × {TARGET_HEIGHT}px (2:1 ratio)
                   </p>
                 </div>
@@ -540,7 +528,7 @@ export default function ServiceInfo() {
                 <img
                   src={basicInfo.photoUrl}
                   alt="Service preview"
-                  className="w-full h-auto max-h-96 object-contain rounded-lg border border-gray-300"
+                  className="w-full h-auto max-h-96 object-contain rounded-lg border border-neutral-300"
                   onError={(e) => {
                     console.error("Failed to load image:", e);
                     setError("Failed to display image. Please try uploading again.");
@@ -550,7 +538,7 @@ export default function ServiceInfo() {
                 <div className="absolute top-2 right-2 flex gap-2">
                   <button
                     onClick={handleRemoveImage}
-                    className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    className="p-2 bg-error-500 text-white rounded-full hover:bg-error-600 transition-colors"
                     type="button"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -560,10 +548,10 @@ export default function ServiceInfo() {
             ) : (
               <div
                 onClick={triggerFileInput}
-                className={`w-full max-w-md h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer ${
+                className={`w-full max-w-md h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${
                   stepErrors.photoUrl 
-                    ? "border-red-300 bg-red-50" 
-                    : "border-gray-300 hover:border-red"
+                    ? "border-error-300 bg-error-50" 
+                    : "border-neutral-300 hover:border-primary hover:bg-primary-50"
                 }`}
               >
                 <input
@@ -576,19 +564,19 @@ export default function ServiceInfo() {
                 />
                 {uploadingImage ? (
                   <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red"></div>
-                    <p className="mt-2 text-sm text-gray-600">Processing image...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary-200 border-t-primary"></div>
+                    <p className="mt-2 text-sm text-neutral-600">Processing image...</p>
                   </div>
                 ) : (
                   <>
-                    <Upload className="w-12 h-12 text-gray-400 mb-2" />
-                    <p className="text-sm font-medium text-gray-700">
+                    <Upload className="w-12 h-12 text-neutral-400 mb-2" />
+                    <p className="text-sm font-medium text-neutral-700">
                       Click to upload service image
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-neutral-500 mt-1">
                       PNG, JPG, WebP up to 10MB
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-neutral-400 mt-1">
                       Recommended: {TARGET_WIDTH} × {TARGET_HEIGHT}px
                     </p>
                   </>
@@ -598,7 +586,7 @@ export default function ServiceInfo() {
             
             {/* STEP ERRORS - Use stepErrors.photoUrl for validation errors */}
             {stepErrors.photoUrl && (
-              <p className="mt-1 text-sm text-red-600">{stepErrors.photoUrl}</p>
+              <p className="mt-1 text-sm text-error-600">{stepErrors.photoUrl}</p>
             )}
           </div>
         </div>
@@ -606,17 +594,17 @@ export default function ServiceInfo() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Service Type */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">
-              Service Type <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-2 text-neutral-800">
+              Service Type <span className="text-error-500">*</span>
             </label>
             <div className="relative">
               <select
                 value={basicInfo.serviceType || "ONE_TIME"}
                 onChange={(e) => handleServiceTypeChange(e.target.value)}
-                className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
+                className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-2 ${
                   stepErrors.serviceType
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-red focus:ring-red"
+                    ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                    : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                 }`}
               >
                 {serviceTypeOptions.map((option) => (
@@ -625,10 +613,10 @@ export default function ServiceInfo() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
             {stepErrors.serviceType && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-error-600">
                 {stepErrors.serviceType}
               </p>
             )}
@@ -636,8 +624,8 @@ export default function ServiceInfo() {
 
           {/* Category Selection */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">
-              Select Category <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-2 text-neutral-800">
+              Select Category <span className="text-error-500">*</span>
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -649,10 +637,10 @@ export default function ServiceInfo() {
                       categoryId: e.target.value,
                     }))
                   }
-                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-2 ${
                     stepErrors.categoryId
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-red focus:ring-red"
+                      ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                   }`}
                 >
                   <option value="">Select category</option>
@@ -662,23 +650,23 @@ export default function ServiceInfo() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               <button
                 onClick={() => setShowCategoryModal(true)}
-                className="px-3 py-2 rounded-lg text-white hover:opacity-90 bg-red"
+                className="px-3 py-2 rounded-lg text-white hover:opacity-90 transition-opacity bg-primary"
               >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
             {stepErrors.categoryId && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-error-600">
                 {stepErrors.categoryId}
               </p>
             )}
             {basicInfo.categoryId && (
               <div className="mt-2 relative">
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs sm:text-sm border border-gray-200">
+                <div className="flex items-center justify-between p-2 bg-neutral-50 rounded-lg text-xs sm:text-sm border border-neutral-200">
                   <span className="truncate">
                     {
                       categories.find(
@@ -695,12 +683,12 @@ export default function ServiceInfo() {
                             : basicInfo.categoryId
                         )
                       }
-                      className="p-1 hover:bg-gray-200 rounded"
+                      className="p-1 hover:bg-neutral-200 rounded transition-colors"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     {showCategoryDropdown === basicInfo.categoryId && (
-                      <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-20 text-sm">
+                      <div className="absolute right-0 mt-1 w-32 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 text-sm">
                         <button
                           onClick={() => {
                             const cat = categories.find(
@@ -713,7 +701,7 @@ export default function ServiceInfo() {
                                 cat.categoryName
                               );
                           }}
-                          className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 hover:bg-neutral-100 flex items-center gap-2"
                         >
                           <Edit2 className="w-3 h-3" />
                           Edit
@@ -722,7 +710,7 @@ export default function ServiceInfo() {
                           onClick={() =>
                             handleDeleteCategory(basicInfo.categoryId)
                           }
-                          className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-error-600 hover:bg-error-50 flex items-center gap-2"
                         >
                           <Trash2 className="w-3 h-3" />
                           Delete
@@ -739,8 +727,8 @@ export default function ServiceInfo() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Subcategory Selection */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">
-              Select Sub Category <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-2 text-neutral-800">
+              Select Sub Category <span className="text-error-500">*</span>
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -752,10 +740,10 @@ export default function ServiceInfo() {
                       subCategoryId: e.target.value,
                     }))
                   }
-                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-2 ${
                     stepErrors.subCategoryId
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-red focus:ring-red"
+                      ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                   }`}
                   disabled={!basicInfo.categoryId}
                 >
@@ -766,24 +754,24 @@ export default function ServiceInfo() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               <button
                 onClick={() => setShowSubcategoryModal(true)}
                 disabled={!basicInfo.categoryId}
-                className="px-3 py-2 rounded-lg text-white hover:opacity-90 disabled:bg-gray-300 disabled:cursor-not-allowed bg-red"
+                className="px-3 py-2 rounded-lg text-white hover:opacity-90 disabled:bg-neutral-300 disabled:cursor-not-allowed transition-opacity bg-primary"
               >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
             {stepErrors.subCategoryId && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-error-600">
                 {stepErrors.subCategoryId}
               </p>
             )}
             {basicInfo.subCategoryId && (
               <div className="mt-2 relative">
-                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs sm:text-sm border border-gray-200">
+                <div className="flex items-center justify-between p-2 bg-neutral-50 rounded-lg text-xs sm:text-sm border border-neutral-200">
                   <span className="truncate">
                     {
                       filteredSubcategories.find(
@@ -800,12 +788,12 @@ export default function ServiceInfo() {
                             : basicInfo.subCategoryId
                         )
                       }
-                      className="p-1 hover:bg-gray-200 rounded"
+                      className="p-1 hover:bg-neutral-200 rounded transition-colors"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     {showSubcategoryDropdown === basicInfo.subCategoryId && (
-                      <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-20 text-sm">
+                      <div className="absolute right-0 mt-1 w-32 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 text-sm">
                         <button
                           onClick={() => {
                             const sub = filteredSubcategories.find(
@@ -818,7 +806,7 @@ export default function ServiceInfo() {
                                 sub.subCategoryName
                               );
                           }}
-                          className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 hover:bg-neutral-100 flex items-center gap-2"
                         >
                           <Edit2 className="w-3 h-3" />
                           Edit
@@ -827,7 +815,7 @@ export default function ServiceInfo() {
                           onClick={() =>
                             handleDeleteSubcategory(basicInfo.subCategoryId)
                           }
-                          className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-error-600 hover:bg-error-50 flex items-center gap-2"
                         >
                           <Trash2 className="w-3 h-3" />
                           Delete
@@ -843,10 +831,10 @@ export default function ServiceInfo() {
           {/* Documents Required - Only for RECURRING services */}
           {basicInfo.serviceType === "RECURRING" && (
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
+              <label className="block text-sm font-medium mb-2 text-neutral-800">
                 Documents Required
               </label>
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors hover:bg-gray-50 border-gray-200 group">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors hover:bg-neutral-50 border-neutral-200 group">
                 <div className="relative flex items-center">
                   <input
                     type="checkbox"
@@ -863,12 +851,12 @@ export default function ServiceInfo() {
                         setRequiredDocuments([{ id: Date.now(), documentName: "", inputType: "file" }]);
                       }
                     }}
-                    className="w-4 h-4 rounded border-gray-300 accent-red cursor-pointer"
+                    className="w-4 h-4 rounded border-neutral-300 text-primary focus:ring-primary cursor-pointer"
                   />
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-800">Service requires document upload</span>
-                  <p className="text-xs text-gray-500 mt-0.5">Clients must submit documents to proceed</p>
+                  <span className="text-sm font-medium text-neutral-800">Service requires document upload</span>
+                  <p className="text-xs text-neutral-500 mt-0.5">Clients must submit documents to proceed</p>
                 </div>
               </label>
             </div>
@@ -877,15 +865,15 @@ export default function ServiceInfo() {
 
         {/* Required Documents List — shown only for RECURRING + documentsRequired */}
         {basicInfo.serviceType === "RECURRING" && basicInfo.documentsRequired && (
-          <div className="border border-dashed border-red/40 rounded-xl bg-red/5 p-5">
+          <div className="border border-dashed border-primary/40 rounded-xl bg-primary/5 p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-red text-white">
+                <div className="p-1.5 rounded-lg bg-primary text-white">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Required Documents</h3>
-                  <p className="text-xs text-gray-500">Define what clients must upload or fill</p>
+                  <h3 className="text-sm font-semibold text-neutral-900">Required Documents</h3>
+                  <p className="text-xs text-neutral-500">Define what clients must upload or fill</p>
                 </div>
               </div>
               <button
@@ -896,7 +884,7 @@ export default function ServiceInfo() {
                     { id: Date.now(), documentName: "", inputType: "file" },
                   ])
                 }
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red text-white hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white hover:opacity-90 transition-opacity"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Document
@@ -904,14 +892,14 @@ export default function ServiceInfo() {
             </div>
 
             {stepErrors.requiredDocuments && (
-              <div className="mb-3 flex items-center gap-2 bg-red/10 border border-red/30 rounded-lg px-3 py-2">
-                <AlertCircle className="w-4 h-4 text-red flex-shrink-0" />
-                <p className="text-xs text-red font-medium">{stepErrors.requiredDocuments}</p>
+              <div className="mb-3 flex items-center gap-2 bg-error/10 border border-error/30 rounded-lg px-3 py-2">
+                <AlertCircle className="w-4 h-4 text-error flex-shrink-0" />
+                <p className="text-xs text-error font-medium">{stepErrors.requiredDocuments}</p>
               </div>
             )}
 
             {requiredDocuments.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+              <div className="flex flex-col items-center justify-center py-6 text-neutral-400">
                 <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
                 <p className="text-sm">No documents added yet. Click "Add Document" to start.</p>
               </div>
@@ -920,17 +908,17 @@ export default function ServiceInfo() {
                 {requiredDocuments.map((doc, idx) => (
                   <div
                     key={doc.id}
-                    className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm"
+                    className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white border border-neutral-200 rounded-lg px-4 py-3 shadow-sm"
                   >
                     {/* Index badge */}
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-yellow text-gray-900 text-xs font-bold flex items-center justify-center">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-warning-500 text-neutral-900 text-xs font-bold flex items-center justify-center">
                       {idx + 1}
                     </span>
 
                     {/* Document name */}
                     <div className="flex-1 min-w-0">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Document Name <span className="text-red">*</span>
+                      <label className="block text-xs font-medium text-neutral-600 mb-1">
+                        Document Name <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -947,23 +935,23 @@ export default function ServiceInfo() {
                           }
                         }}
                         placeholder="e.g. sales_report, aadhar_card"
-                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 placeholder-gray-400 ${
+                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 placeholder-neutral-400 ${
                           stepErrors[`doc_${idx}_name`]
-                            ? "border-red focus:ring-red focus:border-red"
-                            : "border-gray-300 focus:ring-red focus:border-red"
+                            ? "border-error focus:ring-error/20 focus:border-error"
+                            : "border-neutral-300 focus:ring-primary/20 focus:border-primary"
                         }`}
                       />
                       {stepErrors[`doc_${idx}_name`] && (
-                        <p className="mt-1 text-xs text-red">{stepErrors[`doc_${idx}_name`]}</p>
+                        <p className="mt-1 text-xs text-error">{stepErrors[`doc_${idx}_name`]}</p>
                       )}
                     </div>
 
                     {/* Input type */}
                     <div className="w-full sm:w-40 flex-shrink-0">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <label className="block text-xs font-medium text-neutral-600 mb-1">
                         Input Type
                       </label>
-                      <div className="flex rounded-lg border border-gray-300 overflow-hidden text-xs font-medium">
+                      <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-xs font-medium">
                         <button
                           type="button"
                           onClick={() =>
@@ -975,8 +963,8 @@ export default function ServiceInfo() {
                           }
                           className={`flex-1 flex items-center justify-center gap-1 py-2 transition-colors ${
                             doc.inputType === "file"
-                              ? "bg-red text-white"
-                              : "bg-white text-gray-600 hover:bg-gray-50"
+                              ? "bg-primary text-white"
+                              : "bg-white text-neutral-600 hover:bg-neutral-50"
                           }`}
                         >
                           <Upload className="w-3 h-3" />
@@ -991,10 +979,10 @@ export default function ServiceInfo() {
                               )
                             )
                           }
-                          className={`flex-1 flex items-center justify-center gap-1 py-2 border-l border-gray-300 transition-colors ${
+                          className={`flex-1 flex items-center justify-center gap-1 py-2 border-l border-neutral-300 transition-colors ${
                             doc.inputType === "text"
-                              ? "bg-red text-white"
-                              : "bg-white text-gray-600 hover:bg-gray-50"
+                              ? "bg-primary text-white"
+                              : "bg-white text-neutral-600 hover:bg-neutral-50"
                           }`}
                         >
                           <Type className="w-3 h-3" />
@@ -1009,7 +997,7 @@ export default function ServiceInfo() {
                       onClick={() =>
                         setRequiredDocuments((prev) => prev.filter((d) => d.id !== doc.id))
                       }
-                      className="flex-shrink-0 p-2 rounded-lg text-red hover:bg-red/10 transition-colors mt-4 sm:mt-0"
+                      className="flex-shrink-0 p-2 rounded-lg text-error hover:bg-error/10 transition-colors mt-4 sm:mt-0"
                       title="Remove document"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -1021,20 +1009,20 @@ export default function ServiceInfo() {
 
             {/* Preview summary */}
             {requiredDocuments.some((d) => d.documentName.trim()) && (
-              <div className="mt-4 pt-3 border-t border-red/20">
-                <p className="text-xs font-medium text-gray-600 mb-2">Preview:</p>
+              <div className="mt-4 pt-3 border-t border-primary/20">
+                <p className="text-xs font-medium text-neutral-600 mb-2">Preview:</p>
                 <div className="flex flex-wrap gap-2">
                   {requiredDocuments
                     .filter((d) => d.documentName.trim())
                     .map((d) => (
                       <span
                         key={d.id}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-700"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-neutral-200 text-neutral-700"
                       >
                         {d.inputType === "file" ? (
-                          <Upload className="w-3 h-3 text-red" />
+                          <Upload className="w-3 h-3 text-primary" />
                         ) : (
-                          <Type className="w-3 h-3 text-yellow" />
+                          <Type className="w-3 h-3 text-warning-500" />
                         )}
                         {d.documentName}
                       </span>
@@ -1047,11 +1035,11 @@ export default function ServiceInfo() {
 
         {/* Recurring Service Fields - Conditionally shown */}
         {basicInfo.serviceType === "RECURRING" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4 border-neutral-200">
             {/* Frequency Field */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                Frequency <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium mb-2 text-neutral-800">
+                Frequency <span className="text-error-500">*</span>
               </label>
               <div className="relative">
                 <select
@@ -1062,10 +1050,10 @@ export default function ServiceInfo() {
                       frequency: e.target.value,
                     }))
                   }
-                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-2 ${
                     stepErrors.frequency
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-red focus:ring-red"
+                      ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                   }`}
                 >
                   <option value="">Select frequency</option>
@@ -1075,10 +1063,10 @@ export default function ServiceInfo() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               {stepErrors.frequency && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-error-600">
                   {stepErrors.frequency}
                 </p>
               )}
@@ -1086,8 +1074,8 @@ export default function ServiceInfo() {
 
             {/* Duration Unit Field */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                Duration Unit <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium mb-2 text-neutral-800">
+                Duration Unit <span className="text-error-500">*</span>
               </label>
               <div className="relative">
                 <select
@@ -1098,10 +1086,10 @@ export default function ServiceInfo() {
                       durationUnit: e.target.value,
                     }))
                   }
-                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-2 ${
                     stepErrors.durationUnit
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-red focus:ring-red"
+                      ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                      : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                   }`}
                 >
                   <option value="">Select unit</option>
@@ -1111,10 +1099,10 @@ export default function ServiceInfo() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               {stepErrors.durationUnit && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-error-600">
                   {stepErrors.durationUnit}
                 </p>
               )}
@@ -1122,8 +1110,8 @@ export default function ServiceInfo() {
 
             {/* Duration Value Field */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                Duration Value <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium mb-2 text-neutral-800">
+                Duration Value <span className="text-error-500">*</span>
               </label>
               <input
                 type="number"
@@ -1136,14 +1124,14 @@ export default function ServiceInfo() {
                   }))
                 }
                 placeholder="e.g., 12"
-                className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+                className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
                   stepErrors.duration
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-red focus:ring-red"
+                    ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                    : "border-neutral-300 focus:border-primary focus:ring-primary/20"
                 }`}
               />
               {stepErrors.duration && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-error-600">
                   {stepErrors.duration}
                 </p>
               )}
@@ -1152,8 +1140,8 @@ export default function ServiceInfo() {
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-800">
-            Service Name <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium mb-2 text-neutral-800">
+            Service Name <span className="text-error-500">*</span>
           </label>
           <input
             type="text"
@@ -1165,20 +1153,20 @@ export default function ServiceInfo() {
               }))
             }
             placeholder="New GST Registration – Your Business"
-            className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+            className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
               stepErrors.name
-                ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:border-red focus:ring-red"
+                ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                : "border-neutral-300 focus:border-primary focus:ring-primary/20"
             }`}
           />
           {stepErrors.name && (
-            <p className="mt-1 text-sm text-red-600">{stepErrors.name}</p>
+            <p className="mt-1 text-sm text-error-600">{stepErrors.name}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-800">
-            Description <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium mb-2 text-neutral-800">
+            Description <span className="text-error-500">*</span>
           </label>
           <textarea
             value={basicInfo.description || ""}
@@ -1189,14 +1177,15 @@ export default function ServiceInfo() {
               }))
             }
             placeholder="Register your business with GST and get your GSTIN issued to legally sell goods or services in India."
-            className={`w-full px-4 py-2 border rounded-lg h-32 resize-none text-sm focus:outline-none focus:ring-1 ${
+            rows={4}
+            className={`w-full px-4 py-2 border rounded-lg resize-none text-sm focus:outline-none focus:ring-2 ${
               stepErrors.description
-                ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:border-red focus:ring-red"
+                ? "border-error-300 focus:border-error-500 focus:ring-error-500/20"
+                : "border-neutral-300 focus:border-primary focus:ring-primary/20"
             }`}
           />
           {stepErrors.description && (
-            <p className="mt-1 text-sm text-red-600">
+            <p className="mt-1 text-sm text-error-600">
               {stepErrors.description}
             </p>
           )}
@@ -1204,21 +1193,21 @@ export default function ServiceInfo() {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6 border-t border-gray-200">
+      <div className="flex justify-between pt-6 border-t border-neutral-200">
         <button
           onClick={goToPreviousStep}
           disabled={currentStep === 1}
-          className={`px-6 py-2 rounded-lg font-medium ${
+          className={`px-6 py-2 rounded-lg font-medium transition-all ${
             currentStep === 1
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+              ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+              : "bg-white text-neutral-700 border border-neutral-300 hover:border-primary hover:text-primary hover:bg-primary-50"
           }`}
         >
           Previous
         </button>
         <button
           onClick={goToNextStep}
-          className="px-6 py-2 rounded-lg font-medium bg-red text-white hover:opacity-90"
+          className="px-6 py-2 rounded-lg font-medium bg-primary text-white hover:opacity-90 transition-opacity shadow-sm"
         >
           Next
         </button>
@@ -1229,33 +1218,33 @@ export default function ServiceInfo() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Crop Image to 1024×512</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">Crop Image to 1024×512</h3>
               <button
                 onClick={handleCancelCrop}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-neutral-100 rounded transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-neutral-500" />
               </button>
             </div>
             
             {/* Show image dimensions in crop modal */}
             {imageDimensions.width > 0 && imageDimensions.height > 0 && (
-              <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="mb-3 p-3 bg-info-50 rounded-lg border border-info-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-blue-800">
+                    <p className="text-sm font-medium text-info-800">
                       Original: {imageDimensions.width} × {imageDimensions.height}px
                     </p>
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-xs text-info-600 mt-1">
                       Target: {TARGET_WIDTH} × {TARGET_HEIGHT}px (2:1 ratio)
                     </p>
                   </div>
                   {imageDimensions.width < TARGET_WIDTH || imageDimensions.height < TARGET_HEIGHT ? (
-                    <div className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                    <div className="px-3 py-1 bg-warning-100 text-warning-800 text-xs font-medium rounded-full">
                       Small Image
                     </div>
                   ) : (
-                    <div className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                    <div className="px-3 py-1 bg-success-100 text-success-800 text-xs font-medium rounded-full">
                       Good Size
                     </div>
                   )}
@@ -1286,7 +1275,7 @@ export default function ServiceInfo() {
             </div>
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
                   Zoom
                 </label>
                 <input
@@ -1296,9 +1285,9 @@ export default function ServiceInfo() {
                   step="0.1"
                   value={zoom}
                   onChange={(e) => setZoom(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="flex justify-between text-xs text-neutral-500 mt-1">
                   <span>1x</span>
                   <span>2x</span>
                   <span>3x</span>
@@ -1309,11 +1298,11 @@ export default function ServiceInfo() {
               <button
                 onClick={handleCropComplete}
                 disabled={uploadingImage}
-                className="flex-1 py-3 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed bg-red"
+                className="flex-1 py-3 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-opacity bg-primary"
               >
                 {uploadingImage ? (
                   <span className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                     Processing...
                   </span>
                 ) : (
@@ -1322,7 +1311,7 @@ export default function ServiceInfo() {
               </button>
               <button
                 onClick={handleCancelCrop}
-                className="px-6 py-3 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50"
+                className="px-6 py-3 rounded-lg border border-neutral-300 text-sm font-medium hover:bg-neutral-50 transition-colors"
               >
                 Cancel
               </button>
@@ -1336,14 +1325,14 @@ export default function ServiceInfo() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-neutral-900">
                 Add New Category
               </h3>
               <button
                 onClick={() => setShowCategoryModal(false)}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-neutral-100 rounded transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-neutral-500" />
               </button>
             </div>
             <input
@@ -1351,18 +1340,18 @@ export default function ServiceInfo() {
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Category name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-red focus:ring-1 focus:ring-red"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleAddCategory}
-                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 bg-red"
+                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity bg-primary"
               >
                 Add Category
               </button>
               <button
                 onClick={() => setShowCategoryModal(false)}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50"
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-sm hover:bg-neutral-50 transition-colors"
               >
                 Cancel
               </button>
@@ -1376,21 +1365,21 @@ export default function ServiceInfo() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-neutral-900">
                 Add New Subcategory
               </h3>
               <button
                 onClick={() => setShowSubcategoryModal(false)}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-neutral-100 rounded transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-neutral-500" />
               </button>
             </div>
             <div className="mb-4">
-              <label className="block text-xs font-medium mb-1 text-gray-700">
+              <label className="block text-xs font-medium mb-1 text-neutral-700">
                 Selected Category
               </label>
-              <div className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-800">
+              <div className="px-4 py-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-800">
                 {categories.find((c) => c.categoryId === basicInfo.categoryId)
                   ?.categoryName || "No category selected"}
               </div>
@@ -1400,19 +1389,19 @@ export default function ServiceInfo() {
               value={newSubcategoryName}
               onChange={(e) => setNewSubcategoryName(e.target.value)}
               placeholder="Subcategory name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-red focus:ring-1 focus:ring-red"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleAddSubcategory}
                 disabled={!basicInfo.categoryId}
-                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed bg-red"
+                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-opacity bg-primary"
               >
                 Add Subcategory
               </button>
               <button
                 onClick={() => setShowSubcategoryModal(false)}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50"
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-sm hover:bg-neutral-50 transition-colors"
               >
                 Cancel
               </button>
@@ -1426,7 +1415,7 @@ export default function ServiceInfo() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-neutral-900">
                 Edit {showEditModal === "category" ? "Category" : "Subcategory"}
               </h3>
               <button
@@ -1434,14 +1423,14 @@ export default function ServiceInfo() {
                   setShowEditModal(null);
                   setEditId(null);
                 }}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-neutral-100 rounded transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-neutral-500" />
               </button>
             </div>
             {showEditModal === "subcategory" && (
               <div className="mb-4">
-                <label className="block text-xs font-medium mb-1 text-gray-700">
+                <label className="block text-xs font-medium mb-1 text-neutral-700">
                   Category
                 </label>
                 <div className="relative">
@@ -1453,7 +1442,7 @@ export default function ServiceInfo() {
                         categoryId: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:border-red focus:ring-1 focus:ring-red"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
@@ -1462,7 +1451,7 @@ export default function ServiceInfo() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
             )}
@@ -1483,7 +1472,7 @@ export default function ServiceInfo() {
                   ? "Category name"
                   : "Subcategory name"
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-red focus:ring-1 focus:ring-red"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg mb-4 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
             <div className="flex gap-2">
               <button
@@ -1495,7 +1484,7 @@ export default function ServiceInfo() {
                 disabled={
                   showEditModal === "subcategory" && !basicInfo.categoryId
                 }
-                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed bg-red"
+                className="flex-1 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-opacity bg-primary"
               >
                 Save Changes
               </button>
@@ -1504,7 +1493,7 @@ export default function ServiceInfo() {
                   setShowEditModal(null);
                   setEditId(null);
                 }}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50"
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-sm hover:bg-neutral-50 transition-colors"
               >
                 Cancel
               </button>

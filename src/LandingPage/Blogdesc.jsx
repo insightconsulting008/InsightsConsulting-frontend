@@ -8,17 +8,25 @@ export default function Blogdesc() {
   const [blog, setBlog] = useState(null);
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const isClickScrolling = React.useRef(false);
 
   // 👉 fetch blog
   useEffect(() => {
     const fetchBlog = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const res = await axios.get(
           `https://insightsconsult-backend.onrender.com/blogs/${slug}`
         );
         setBlog(res.data);
       } catch (err) {
         console.error(err);
+        setError(err.response?.data?.message || "Failed to load blog post. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchBlog();
@@ -56,19 +64,25 @@ export default function Blogdesc() {
     if (!headings.length) return;
 
     const handleScroll = () => {
+      if (isClickScrolling.current) return; // 🚫 prevent override
+
       let current = null;
 
-      headings.forEach((heading) => {
-        const el = document.getElementById(heading.id);
-        if (!el) return;
+      for (let i = 0; i < headings.length; i++) {
+        const el = document.getElementById(headings[i].id);
+        if (!el) continue;
 
         const rect = el.getBoundingClientRect();
-        if (rect.top <= 120) {
-          current = heading.id;
-        }
-      });
 
-      setActiveId(current);
+        if (rect.top <= 160 && rect.bottom >= 160) {
+          current = headings[i].id;
+          break;
+        }
+      }
+
+      if (current) {
+        setActiveId(current);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -108,7 +122,156 @@ export default function Blogdesc() {
     return doc.body.innerHTML;
   };
 
-  if (!blog) return <div className="p-10">Loading...</div>;
+  // Loading Skeleton
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        {/* Hero Section Skeleton */}
+        <div className="grid md:grid-cols-2 gap-10 items-center relative">
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-20 h-6 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-24 h-6 bg-gray-200 rounded-full animate-pulse"></div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse w-3/4"></div>
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse w-2/3"></div>
+            </div>
+            
+            <div className="h-16 bg-gray-200 rounded-lg animate-pulse mt-4 w-full"></div>
+            
+            <div className="flex items-center gap-3 mt-6">
+              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-24"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="w-full h-[280px] sm:h-[400px] md:h-[520px] bg-gray-200 rounded-2xl animate-pulse"></div>
+        </div>
+
+        {/* Content Section Skeleton */}
+        <div className="grid md:grid-cols-4 gap-10 mt-14">
+          {/* TOC Skeleton */}
+          <aside className="md:col-span-1">
+            <div className="h-8 bg-gray-200 rounded animate-pulse w-48 mb-4"></div>
+            <div className="space-y-3 border-l pl-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-6 bg-gray-200 rounded animate-pulse w-40"></div>
+              ))}
+            </div>
+            
+            {/* Tags Skeleton */}
+            <div className="mt-8">
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-16 mb-2"></div>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-8 bg-gray-200 rounded-full animate-pulse w-16"></div>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Blog Body Skeleton */}
+          <article className="md:col-span-3">
+            <div className="space-y-6">
+              <div className="h-8 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              <div className="h-8 bg-gray-200 rounded animate-pulse w-2/3"></div>
+              <div className="h-64 bg-gray-200 rounded-2xl animate-pulse w-full"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6"></div>
+              </div>
+              <div className="h-8 bg-gray-200 rounded animate-pulse w-2/3"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="text-center">
+          <div className="mb-6">
+            <svg 
+              className="mx-auto h-24 w-24 text-red-500" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+              />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Oops! Something went wrong
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No Data State (if blog is null but no error)
+  if (!blog) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="text-center">
+          <div className="mb-6">
+            <svg 
+              className="mx-auto h-24 w-24 text-gray-400" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+              />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Blog Post Not Found
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            The blog post you're looking for doesn't exist or has been removed.
+          </p>
+          <a
+            href="/blogs"
+            className="inline-block bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Back to Blogs
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -172,11 +335,37 @@ export default function Blogdesc() {
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className={`transition ${
-                    activeId === item.id
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    const el = document.getElementById(item.id);
+                    if (!el) return;
+
+                    isClickScrolling.current = true; // 🚀 block scroll override
+
+                    const yOffset = -150;
+                    const y =
+                      el.getBoundingClientRect().top +
+                      window.pageYOffset +
+                      yOffset;
+
+                    window.scrollTo({
+                      top: y,
+                      behavior: "smooth",
+                    });
+
+                    // ✅ highlight instantly
+                    setActiveId(item.id);
+
+                    // ⏳ allow scroll detection again after animation
+                    setTimeout(() => {
+                      isClickScrolling.current = false;
+                    }, 500);
+                  }}
+                  className={`transition ${activeId === item.id
                       ? "text-red-500 font-semibold border-l-2 border-red-500 pl-2"
                       : "text-gray-600 hover:text-black"
-                  }`}
+                    }`}
                 >
                   {item.text}
                 </a>

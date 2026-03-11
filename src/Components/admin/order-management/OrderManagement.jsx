@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  Search, 
-  ChevronLeft, 
-  ChevronRight, 
-  X, 
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
   ExternalLink,
   Package,
   Clock,
@@ -70,33 +70,34 @@ export default function OrderManagement() {
   const [popupMessage, setPopupMessage] = useState('');
   const [showReassignConfirm, setShowReassignConfirm] = useState(false);
   const [reassignData, setReassignData] = useState(null);
+  
   const itemsPerPage = 50;
   const employeeItemsPerPage = 100;
   const navigate = useNavigate();
 
   // Status colors
   const statusColors = {
-    PENDING: { 
-      bg: "bg-amber-50", 
-      text: "text-amber-800", 
-      border: "border-amber-200", 
-      icon: Clock, 
+    PENDING: {
+      bg: "bg-amber-50",
+      text: "text-amber-800",
+      border: "border-amber-200",
+      icon: Clock,
       iconColor: "text-amber-600",
       label: "Unassigned"
     },
-    ASSIGNED: { 
-      bg: "bg-primary-50", 
-      text: "text-primary-800", 
-      border: "border-primary-200", 
-      icon: UserCheck, 
+    ASSIGNED: {
+      bg: "bg-primary-50",
+      text: "text-primary-800",
+      border: "border-primary-200",
+      icon: UserCheck,
       iconColor: "text-primary-600",
       label: "Assigned"
     },
-    COMPLETED: { 
-      bg: "bg-emerald-50", 
-      text: "text-emerald-800", 
-      border: "border-emerald-200", 
-      icon: CheckCircle, 
+    COMPLETED: {
+      bg: "bg-emerald-50",
+      text: "text-emerald-800",
+      border: "border-emerald-200",
+      icon: CheckCircle,
       iconColor: "text-emerald-600",
       label: "Completed"
     }
@@ -113,7 +114,7 @@ export default function OrderManagement() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get('https://insightsconsult-backend.onrender.com/applications');
+      const response = await axiosInstance.get('/applications');
       if (response.data.success) {
         setApplications(response.data.applications);
       }
@@ -139,7 +140,7 @@ export default function OrderManagement() {
   const fetchEmployees = useCallback(async (search = '', department = 'All', page = 1, isInitial = false) => {
     try {
       setEmployeeLoading(true);
-      
+
       // Build query parameters
       let queryParams = `?page=${page}&limit=${employeeItemsPerPage}`;
       
@@ -148,7 +149,7 @@ export default function OrderManagement() {
       }
       
       const response = await axiosInstance.get(
-        `https://insightsconsult-backend.onrender.com/admin/employees/assignable${queryParams}`
+        `/admin/employees/assignable${queryParams}`
       );
       
       if (response.data.success) {
@@ -274,16 +275,16 @@ export default function OrderManagement() {
   const executeReassign = async () => {
     setReassigning(true);
     setAssignError('');
-    
+
     try {
       const response = await axiosInstance.post(
-        `https://insightsconsult-backend.onrender.com/admin/applications/${reassignData.order.applicationId}/assign`,
+        `/admin/applications/${reassignData.order.applicationId}/assign`,
         {
           employeeId: reassignData.employee.employeeId,
           adminNote: reassignData.remarks || "Reassigned order."
         }
       );
-
+      
       if (response.data.success) {
         showSuccess(`Order reassigned to ${reassignData.employee.name} successfully!`);
         setShowReassignSection(false);
@@ -307,7 +308,7 @@ export default function OrderManagement() {
       setAssignError('Please select an employee');
       return;
     }
-    
+
     if (!selectedOrder) {
       setAssignError('No order selected');
       return;
@@ -334,10 +335,10 @@ export default function OrderManagement() {
       };
 
       const response = await axiosInstance.post(
-        `https://insightsconsult-backend.onrender.com/admin/applications/${selectedOrder.applicationId}/assign`,
+        `/admin/applications/${selectedOrder.applicationId}/assign`,
         assignmentData
       );
-
+      
       if (response.data.success) {
         showSuccess(`Order assigned to ${selectedEmployee.name} successfully!`);
         setShowAssignPanel(false);
@@ -371,12 +372,15 @@ export default function OrderManagement() {
   // Filtering Logic
   const filteredApplications = applications.filter(app => {
     const matchesSearch = app.serviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.applicationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (app.clientName && app.clientName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         (app.employeeName && app.employeeName.toLowerCase().includes(searchTerm.toLowerCase()));
+      app.applicationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.userName && app.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (app.phoneNumber && app.phoneNumber.includes(searchTerm)) ||
+      (app.employeeName && app.employeeName.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     const matchesStatus = statusFilter === 'All' || 
-                         (statusFilter === 'Unassigned' && app.status === 'PENDING') ||
-                         (statusFilter === 'Assigned' && app.status === 'ASSIGNED');
+      (statusFilter === 'Unassigned' && app.status === 'PENDING') ||
+      (statusFilter === 'Assigned' && app.status === 'ASSIGNED');
+    
     return matchesSearch && matchesStatus;
   });
 
@@ -407,10 +411,10 @@ export default function OrderManagement() {
   const formatTime = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
@@ -429,7 +433,7 @@ export default function OrderManagement() {
   const StatusBadge = ({ status }) => {
     const statusConfig = statusColors[status] || statusColors.PENDING;
     const Icon = statusConfig.icon;
-    
+
     return (
       <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border ${statusConfig.border} ${statusConfig.bg}`}>
         <Icon size={14} className={statusConfig.iconColor} />
@@ -477,7 +481,7 @@ export default function OrderManagement() {
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">Confirm Reassignment</h3>
               </div>
-              
+
               <div className="space-y-4 mb-6">
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                   <p className="text-sm text-amber-800">
@@ -749,7 +753,7 @@ export default function OrderManagement() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" size={20} />
                   <input
                     type="text"
-                    placeholder="Search orders by service, ID, client, or assigned employee..."
+                    placeholder="Search orders by service, ID, user, phone, or assigned employee..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2.5 border border-gray-300 bg-white text-sm rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-full sm:w-64 transition-all"
@@ -872,7 +876,6 @@ export default function OrderManagement() {
                     <ChevronLeft size={18} />
                     <span className="hidden sm:inline">Previous</span>
                   </button>
-
                   <div className="flex items-center gap-1">
                     {(() => {
                       const pages = [];
@@ -913,7 +916,6 @@ export default function OrderManagement() {
                       ));
                     })()}
                   </div>
-
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
@@ -931,68 +933,35 @@ export default function OrderManagement() {
             </div>
           )}
         </div>
-
-        {/* Support Section */}
-        {!loading && filteredApplications.length > 0 && (
-          <div className="mt-8">
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-primary-50 rounded-lg">
-                      <Users size={24} className="text-primary" />
-                    </div>
-                    <div className="max-w-2xl">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Need Help with Order Assignment?</h3>
-                      <p className="text-gray-600 mb-4 text-sm sm:text-base">
-                        Our team is here to help you manage and assign orders efficiently. 
-                        Get instant support via chat or phone.
-                      </p>
-                      <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                          <span>Average response time: <span className="font-semibold">2 minutes</span></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-primary rounded-full"></div>
-                          <span>Satisfaction rate: <span className="font-semibold">98%</span></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors flex items-center justify-center gap-2">
-                      <MessageSquare size={20} />
-                      Chat Now
-                    </button>
-                    <button className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                      <HelpCircle size={20} />
-                      Help Center
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
-// Order Card Component
+{/* Order Card Component */}
 function OrderCard({ application, onAssign, onReassign, onView, statusColors, formatDate, formatTime, getEmployeeInitials }) {
   const statusConfig = statusColors[application.status] || statusColors.PENDING;
   const Icon = statusConfig.icon;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl px-4 py-4 sm:px-6 hover:border-gray-300 transition">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 items-start sm:items-center gap-4 md:gap-6">
-
-        {/* ICON + SERVICE - Full width on mobile, 2 cols on sm, 2 cols on lg */}
-        <div className="col-span-1 sm:col-span-2 lg:col-span-2 flex items-center gap-3">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 bg-primary-50 rounded-full flex items-center justify-center shrink-0">
-            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+      <div className="bg-white border border-gray-200 rounded-xl px-4 py-4 sm:px-6 hover:border-gray-300 transition">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-10 items-start sm:items-center gap-4 md:gap-6">
+        {/* ICON + SERVICE - 3 columns */}
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex items-center gap-3">
+          {application.servicePhoto ? (
+            <img 
+              src={application.servicePhoto} 
+              alt={application.serviceName}
+              className="w-20 h-full rounded-md md:w-24"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div className="w-16 h-16 bg-primary-50 rounded-md flex items-center justify-center shrink-0" style={{ display: application.servicePhoto ? 'none' : 'flex' }}>
+            <Package className="w-6 h-6 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
@@ -1000,37 +969,38 @@ function OrderCard({ application, onAssign, onReassign, onView, statusColors, fo
             </p>
             <button
               onClick={() => onView(application)}
-              className="text-primary text-xs font-medium hover:underline flex items-center gap-1 mt-0.5"
+              className="text-primary text-xs font-medium hover:underline flex items-center gap-1 mt-1"
             >
               <Eye size={12} />
-              View Order
+              View Details
             </button>
           </div>
         </div>
 
-        {/* ORDER ID - Full width on mobile, 1 col on sm, 2 cols on lg */}
+        {/* USER NAME - 2 columns */}
         <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-          <p className="text-xs text-gray-500 mb-1">Order ID</p>
-          <p className="font-medium text-gray-900 text-sm truncate" title={application.applicationId}>
-            <span className="hidden sm:inline">
-              {application.applicationId}
-            </span>
-            <span className="sm:hidden">
-              {application.applicationId.slice(0, 8)}...
-            </span>
-          </p>
+          <p className="text-xs text-gray-500 mb-1">User Name</p>
+          <div className="flex items-center gap-1">
+            <User size={14} className="text-gray-400" />
+            <p className="font-medium text-gray-900 text-sm truncate" title={application.userName}>
+              {application.userName || 'N/A'}
+            </p>
+          </div>
         </div>
 
-        {/* CLIENT - Full width on mobile, 1 col on sm, 2 cols on lg */}
+        {/* PHONE NUMBER - 2 columns */}
         <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-          <p className="text-xs text-gray-500 mb-1">Client Name</p>
-          <p className="font-medium text-gray-900 text-sm truncate">
-            {application.clientName || 'Aswinth R'}
-          </p>
+          <p className="text-xs text-gray-500 mb-1">Phone Number</p>
+          <div className="flex items-center gap-1">
+            <Phone size={14} className="text-gray-400" />
+            <p className="font-medium text-gray-900 text-sm" title={application.phoneNumber}>
+              {application.phoneNumber || 'N/A'}
+            </p>
+          </div>
         </div>
 
-        {/* DATE & TIME - Full width on mobile, 2 cols on sm, 3 cols on lg */}
-        <div className="col-span-1 sm:col-span-2 lg:col-span-3">
+        {/* DATE & TIME - 2 columns */}
+        <div className="col-span-1 sm:col-span-2 lg:col-span-2">
           <p className="text-xs text-gray-500 mb-1">Date & Time</p>
           <p className="font-medium text-gray-900 text-sm">
             <span className="block sm:inline">{formatDate(application.createdAt)}</span>
@@ -1039,16 +1009,8 @@ function OrderCard({ application, onAssign, onReassign, onView, statusColors, fo
           </p>
         </div>
 
-        {/* ORDER VALUE - Full width on mobile, 1 col on sm, 1 col on lg */}
-        <div className="col-span-1 sm:col-span-1 lg:col-span-1">
-          <p className="text-xs text-gray-500 mb-1">Order Value</p>
-          <p className="font-semibold text-gray-900 text-sm sm:text-base">
-            ₹{application.amount || '590.00'}
-          </p>
-        </div>
-
-        {/* ACTIONS - Full width on mobile, 2 cols on sm, 1 col on lg */}
-        <div className="col-span-1 sm:col-span-2 lg:col-span-2 lg:justify-self-end">
+        {/* ACTIONS - 1 column */}
+        <div className="col-span-1 sm:col-span-2 lg:col-span-1 lg:justify-self-end">
           {application.status === 'PENDING' && (
             <button
               onClick={() => onAssign(application)}
@@ -1057,16 +1019,11 @@ function OrderCard({ application, onAssign, onReassign, onView, statusColors, fo
               Assign Order
             </button>
           )}
-
           {application.status === 'ASSIGNED' && (
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden shrink-0">
                 {application.employeePhoto ? (
-                  <img 
-                    src={application.employeePhoto} 
-                    alt={application.employeeName}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={application.employeePhoto} alt={application.employeeName} className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-primary font-semibold text-sm">
                     {getEmployeeInitials(application.employeeName)}
@@ -1080,7 +1037,7 @@ function OrderCard({ application, onAssign, onReassign, onView, statusColors, fo
               </div>
               <button
                 onClick={() => onReassign(application)}
-                className="text-primary hover:text-primary-dark shrink-0"
+                className="text-primary hover:text-primary-dark shrink-0 ml-1"
                 title="Reassign"
               >
                 <Edit size={16} />
@@ -1088,17 +1045,16 @@ function OrderCard({ application, onAssign, onReassign, onView, statusColors, fo
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
 }
 
 // Assign Order Panel Component
-function AssignOrderPanel({ 
-  order, 
-  employees, 
-  employeeSearch, 
+function AssignOrderPanel({
+  order,
+  employees,
+  employeeSearch,
   setEmployeeSearch,
   selectedDepartment,
   setSelectedDepartment,
@@ -1107,7 +1063,7 @@ function AssignOrderPanel({
   setSelectedEmployee,
   remarks,
   setRemarks,
-  onAssign, 
+  onAssign,
   onClose,
   assigning,
   assignError,
@@ -1129,7 +1085,7 @@ function AssignOrderPanel({
 
     const handleScroll = () => {
       if (
-        listElement.scrollTop + listElement.clientHeight >= 
+        listElement.scrollTop + listElement.clientHeight >=
         listElement.scrollHeight - 50 &&
         !employeeLoading &&
         hasMoreEmployees
@@ -1146,14 +1102,13 @@ function AssignOrderPanel({
     <>
       <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="flex items-center justify-between p-4">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-primary font-medium text-sm hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors"
+          <button 
+            onClick={onClose} 
+            className="flex items-center gap-2 text-primary font-medium text-sm hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors" 
           >
             <X size={20} />
             Close
           </button>
-
           <button className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-dark border border-primary shadow-sm transition-colors">
             <Phone size={16} />
             Call Expert
@@ -1169,9 +1124,9 @@ function AssignOrderPanel({
                 <Package size={20} className="text-gray-500" />
                 <span className="text-sm font-medium text-gray-700">Order Details</span>
               </div>
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50`}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50">
                 <Clock size={14} className="text-amber-600" />
-                <span className={`text-xs font-semibold text-amber-800`}>
+                <span className="text-xs font-semibold text-amber-800">
                   Unassigned
                 </span>
               </div>
@@ -1181,23 +1136,27 @@ function AssignOrderPanel({
             </p>
           </div>
 
-
           <div className="space-y-3">
             <h2 className="text-2xl font-bold text-gray-900">
               {order?.serviceName}
             </h2>
-            <p className="text-gray-600">
-              Client: {order?.clientName || 'Aswinth R'}
-            </p>
             
+            {/* User Details */}
+            <div className="space-y-2">
+              <p className="text-gray-600 flex items-center gap-2">
+                <User size={14} className="text-gray-400" />
+                <span className="font-medium">User:</span> {order?.userName || 'N/A'}
+              </p>
+              <p className="text-gray-600 flex items-center gap-2">
+                <Phone size={14} className="text-gray-400" />
+                <span className="font-medium">Phone:</span> {order?.phoneNumber || 'N/A'}
+              </p>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <div className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium border border-gray-200 flex items-center gap-1">
                 <Calendar size={12} />
                 {formatDate(order?.createdAt)} • {formatTime(order?.createdAt)}
-              </div>
-              <div className="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-medium border border-primary-200 flex items-center gap-1">
-                <DollarSign size={12} />
-                ₹{order?.amount || '590.00'}
               </div>
             </div>
           </div>
@@ -1391,11 +1350,11 @@ function AssignOrderPanel({
 }
 
 // Ticket Info Panel Component - Updated for Reassign
-function TicketInfoPanel({ 
-  order, 
-  onClose, 
-  statusColors, 
-  formatDate, 
+function TicketInfoPanel({
+  order,
+  onClose,
+  statusColors,
+  formatDate,
   formatTime,
   showReassignSection,
   setShowReassignSection,
@@ -1428,7 +1387,7 @@ function TicketInfoPanel({
 
     const handleScroll = () => {
       if (
-        listElement.scrollTop + listElement.clientHeight >= 
+        listElement.scrollTop + listElement.clientHeight >=
         listElement.scrollHeight - 50 &&
         !employeeLoading &&
         hasMoreEmployees
@@ -1445,14 +1404,13 @@ function TicketInfoPanel({
     <>
       <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="flex items-center justify-between p-4">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-primary font-medium text-sm hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors"
+          <button 
+            onClick={onClose} 
+            className="flex items-center gap-2 text-primary font-medium text-sm hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors" 
           >
             <X size={20} />
             Close
           </button>
-
           <button className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-dark border border-primary shadow-sm transition-colors">
             <Phone size={16} />
             Call Expert
@@ -1480,24 +1438,27 @@ function TicketInfoPanel({
             </p>
           </div>
 
-         
-
           <div className="space-y-3">
             <h2 className="text-2xl font-bold text-gray-900">
               {order?.serviceName}
             </h2>
-            <p className="text-gray-600">
-              Client: {order?.clientName || 'Aswinth R'}
-            </p>
             
+            {/* User Details */}
+            <div className="space-y-2">
+              <p className="text-gray-600 flex items-center gap-2">
+                <User size={14} className="text-gray-400" />
+                <span className="font-medium">User:</span> {order?.userName || 'N/A'}
+              </p>
+              <p className="text-gray-600 flex items-center gap-2">
+                <Phone size={14} className="text-gray-400" />
+                <span className="font-medium">Phone:</span> {order?.phoneNumber || 'N/A'}
+              </p>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <div className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium border border-gray-200 flex items-center gap-1">
                 <Calendar size={12} />
                 {formatDate(order?.createdAt)} • {formatTime(order?.createdAt)}
-              </div>
-              <div className="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-medium border border-primary-200 flex items-center gap-1">
-                <DollarSign size={12} />
-                ₹{order?.amount || '590.00'}
               </div>
             </div>
           </div>
@@ -1728,18 +1689,8 @@ function TicketInfoPanel({
 // Missing ChevronDown icon component
 function ChevronDown({ className = "w-5 h-5" }) {
   return (
-    <svg 
-      className={className} 
-      fill="none" 
-      stroke="currentColor" 
-      viewBox="0 0 24 24"
-    >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
-        d="M19 9l-7 7-7-7" 
-      />
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
   );
 }

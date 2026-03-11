@@ -11,6 +11,9 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Contact = () => {
+  const [loading, setLoading] = useState(false);
+const [success, setSuccess] = useState(false);
+const [errorMsg, setErrorMsg] = useState("");
   const navigate=useNavigate()
  const cards = [
   {
@@ -45,40 +48,58 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await axios.post(
-        "https://insightsconsult-backend.onrender.com/contact",
-        formData
-      );
+  setLoading(true);
+  setErrorMsg("");
+  setSuccess(false);
 
-      console.log("Response:", res.data);
-      alert("Message sent successfully ✅");
+  try {
+    const res = await axios.post(
+      "https://insightsconsult-backend.onrender.com/contact",
+      formData
+    );
 
-      // reset form
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong ❌");
-    }
-  };
+    // console.log("Response:", res.data);
+
+    setSuccess(true);
+
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      message: "",
+    });
+
+    // ✅ reset success message after 3 seconds
+    setTimeout(() => {
+      setSuccess(false);
+    }, 3000);
+
+  } catch (error) {
+    console.error(error);
+    setErrorMsg("Something went wrong. Please try again.");
+
+    // ❌ remove error message after 3 seconds
+    setTimeout(() => {
+      setErrorMsg("");
+    }, 3000);
+
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="flex flex-col items-center w-full overflow-x-hidden bg-white">
 
       {/* SECTION ONE: Contact Header */}
-      <section className="mt-[60px] relative bg-[#FCFCFD]  border-[4px] md:border-[6px] flex flex-col lg:flex-row justify-around border-black/5  px-4 md:px-12   rounded-[16px] p-8 md:p-18  gap-10">
+      <section className="mt-[60px] relative bg-[#FCFCFD]  border-[4px] md:border-[6px] flex flex-col lg:flex-row justify-around border-black/5  px-4 lg:mx-20 mx-4 lg:px-12   rounded-[16px] p-8 md:p-18  gap-10">
         <img src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Abstract%20Design.png" className=' absolute top-0 left-0 w-16' alt="" />
         {/* Red Badge Section */}
-        <div className='flex flex-col items-center lg:items-start relative shrink-0'>
-          <div className='bg-[#D11C16] px-6 py-3 rounded-[14px] text-white font-semibold text-[18px] md:text-4xl whitespace-nowrap shadow-sm'>
+        <div className='flex flex-col items-center lg:items-start relative  shrink-0'>
+          <div className='bg-[#D11C16] px-6 py-3 mt-5 lg:mt-0 rounded-[14px] text-white font-semibold text-[18px] md:text-4xl whitespace-nowrap shadow-sm'>
            we would love to hear
 
           </div>
@@ -105,7 +126,7 @@ const Contact = () => {
       </section>
 
       {/* SECTION TWO: Info Cards */}
-      <section className='mt-[60px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[20px] md:px-12 px-4 w-full'>
+      <section className='mt-[60px] container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[20px] lg:px-12 px-4 w-full'>
         {[
           { label: "Address", value: "Somewhere in the World" },
           { label: "Email Here", value: "support@forhelp.com" },
@@ -120,8 +141,9 @@ const Contact = () => {
       </section>
 
       {/* SECTION THREE: Form Section */}
-      <section className="w-full bg-gray-50 flex px-4 md:px-12 items-center justify-center md:py-20 mt-[60px]">
-        <div className="bg-white rounded-3xl p-6 md:p-12  w-full flex flex-col md:flex-row justify-center   gap-8 shadow-sm border border-gray-100">
+      <section className="w-full bg-gray-50  flex  px-4 lg:px-12 items-center justify-center md:py-20 mt-[60px]">
+       <div className='container mx-auto  '>
+         <div className="bg-white rounded-3xl   lg:p-12 p-4 w-full flex flex-col md:flex-row justify-center   gap-8 shadow-sm border border-gray-100">
 
           {/* Left Side */}
           <div className="w-full md:w-2/5 flex flex-col gap-4">
@@ -151,6 +173,7 @@ const Contact = () => {
                     type="text"
                     name="firstName"
                     value={formData.firstName}
+                    required
                     onChange={handleChange}
                     placeholder="First Name"
                     className="w-full p-4 bg-[#fcfcfc] border border-gray-100 rounded-xl text-sm focus:ring-1 focus:ring-yellow-500 outline-none"
@@ -164,6 +187,7 @@ const Contact = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
+                    required
                     placeholder="Last Name"
                     className="w-full p-4 bg-[#fcfcfc] border border-gray-100 rounded-xl text-sm focus:ring-1 focus:ring-yellow-500 outline-none"
                   />
@@ -180,6 +204,7 @@ const Contact = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    required
                     placeholder="Email"
                     className="w-full p-4 bg-[#fcfcfc] border border-gray-100 rounded-xl text-sm focus:ring-1 focus:ring-yellow-500 outline-none"
                   />
@@ -191,6 +216,7 @@ const Contact = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
+                    required
                     placeholder="Phone"
                     className="w-full p-4 bg-[#fcfcfc] border border-gray-100 rounded-xl text-sm focus:ring-1 focus:ring-yellow-500 outline-none"
                   />
@@ -204,9 +230,16 @@ const Contact = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
+                  required
                   placeholder="Your Message"
+                  
                   className="w-full p-4 bg-[#fcfcfc] border border-gray-100 rounded-xl text-sm focus:ring-1 focus:ring-yellow-500 outline-none resize-none"
                 />
+                {errorMsg && (
+  <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-2 rounded-lg">
+    {errorMsg}
+  </div>
+)}
               </div>
 
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pt-2">
@@ -216,17 +249,32 @@ const Contact = () => {
                     I agree with <span className="underline">Terms</span> and <span className="underline">Privacy</span>
                   </label>
                 </div>
-                <button  className="w-full lg:w-auto bg-[#1a1a1a] text-white px-8 py-3 rounded-full font-medium hover:bg-black transition-colors">
-          Request Consultation
-                </button>
+             <button
+  disabled={loading}
+  className={`w-full lg:w-auto px-8 py-3 rounded-full font-medium transition-colors
+  ${
+    success
+      ? "bg-green-600 text-white"
+      : loading
+      ? "bg-gray-400 text-white cursor-not-allowed"
+      : "bg-[#1a1a1a] text-white hover:bg-black"
+  }`}
+>
+  {loading
+    ? "Requesting..."
+    : success
+    ? "Sent Successfully ✓"
+    : "Request Consultation"}
+</button>
               </div>
             </form>
           </div>
         </div>
+       </div>
       </section>
 
       {/* SECTION FOUR: Volunteer & Donation Cards */}
-      <section className="w-full px-4 md:px-12 p-5 mt-5 lg:mt-10">
+      <section className="w-full px-4 container mx-auto lg:px-12  mt-5 lg:mt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {cards.map((card, index) => (
             <div key={index} className="bg-[#FCFCFD] w-full rounded-[1.5rem] md:rounded-[2rem] p-8 md:p-12 border border-black/5 border-[2px] flex flex-col items-start justify-between min-h-fit">
@@ -246,7 +294,7 @@ const Contact = () => {
       </section>
 
       {/* SECTION FIVE: Final CTA */}
-      <section className="w-full px-4 md:px-12 mt-12  mb-[60px]">
+      <section className="w-full px-4 lg:px-12 container mx-auto mt-12  mb-[60px]">
         <div className="relative w-full min-h-[400px] rounded-[2rem] overflow-hidden flex flex-col items-center justify-center p-6 md:p-12 text-center border border-gray-100 bg-gradient-to-br from-[#E2E8F0] via-[#F8FAFC] to-[#F1F5F9]">
 
           {/* Decorative Patterns (Hidden on very small screens for cleaner UI) */}
@@ -268,7 +316,7 @@ const Contact = () => {
 
             </p>
 
-            <div className="lg:bg-white rounded-full lg:p-2 lg:pl-6  flex items-center justify-center lg:justify-between shadow-xl border border-white w-auto  lg:max-w-xl">
+            <div className="md:bg-white rounded-full md:p-2  flex items-center justify-center lg:justify-between shadow-xl border border-white w-auto  lg:max-w-xl">
               <span className="text-[13px] md:text-[15px] px-4 font-medium text-[#1A1A1A] hidden md:block">
                    Get started with professional assistance
               </span>

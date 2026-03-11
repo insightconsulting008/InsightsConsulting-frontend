@@ -11,6 +11,8 @@ const Enquiryform = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -20,35 +22,48 @@ const Enquiryform = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+  setSuccess(false);
+  setErrorMsg("");
 
-    try {
-      const res = await axios.post(
-        "https://insightsconsult-backend.onrender.com/enquiry",
-        formData
-      );
+  try {
+    const res = await axios.post(
+      "https://insightsconsult-backend.onrender.com/enquiry",
+      formData
+    );
 
-      if (res.status === 200 || res.status === 201) {
-        alert("Enquiry submitted successfully ✅");
+    if (res.status === 200 || res.status === 201) {
+      setSuccess(true);
 
-        setFormData({
-          fullName: "",
-          email: "",
-          phone: "",
-          serviceRequired: "",
-          comments: "",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      alert(
-        error.response?.data?.message || "Failed to submit enquiry ❌"
-      );
-    } finally {
-      setLoading(false);
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        serviceRequired: "",
+        comments: "",
+      });
+
+      // ✅ Reset success message after 4 seconds
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
     }
-  };
+  } catch (error) {
+    console.error(error);
+
+    setErrorMsg(
+      error.response?.data?.message || "Failed to submit enquiry"
+    );
+
+    // ❌ Reset error message after 4 seconds
+    setTimeout(() => {
+      setErrorMsg("");
+    }, 4000);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex w-auto justify-center lg:justify-end">
@@ -126,6 +141,7 @@ const Enquiryform = () => {
               className="mt-1 w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
+
           <div>
             <label className="text-sm text-gray-600">Comments</label>
             <textarea
@@ -138,13 +154,38 @@ const Enquiryform = () => {
             />
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-red text-white py-3 rounded-xl font-semibold text-lg shadow-sm disabled:opacity-60"
+            className={`w-full py-3 rounded-xl font-semibold text-lg shadow-sm transition
+              ${
+                loading
+                  ? "bg-gray-400"
+                  : success
+                  ? "bg-green-600"
+                  : "bg-red hover:bg-red-700"
+              } text-white`}
           >
-            {loading ? "Submitting..." : "Enquire Now"}
+            {loading
+              ? "Submitting..."
+              : success
+              ? "Submitted Successfully ✓"
+              : "Enquire Now"}
           </button>
+
+          {/* Messages */}
+          {success && (
+            <p className="text-green-600 text-sm text-center">
+              Your enquiry was submitted successfully.
+            </p>
+          )}
+
+          {errorMsg && (
+            <p className="text-red-600 text-sm text-center">
+              {errorMsg}
+            </p>
+          )}
         </div>
       </form>
     </div>

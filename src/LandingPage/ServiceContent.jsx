@@ -8,8 +8,10 @@ import {
 } from "react-icons/fa";
 import { FaStar, FaArrowLeft, FaArrowRight, FaQuoteRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const ServiceContent = () => {
+  const navigate = useNavigate()
   const [isStickyActive, setIsStickyActive] = useState(true);
 
   const sections = [
@@ -304,26 +306,38 @@ const ServiceContent = () => {
     setIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  const getVisibleCards = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
+const getVisibleCards = () => {
+  if (typeof window !== "undefined") {
+    if (window.innerWidth < 768) {
+      // Mobile
       return [testimonials[index]];
+    } else if (window.innerWidth >= 768 && window.innerWidth < 1024) {
+      // Medium screens
+      return [
+        testimonials[index],
+        testimonials[(index + 1) % testimonials.length],
+      ];
+    } else {
+      // Large screens
+      return [
+        testimonials[index],
+        testimonials[(index + 1) % testimonials.length],
+        testimonials[(index + 2) % testimonials.length],
+      ];
     }
-    return [
-      testimonials[index],
-      testimonials[(index + 1) % testimonials.length],
-      testimonials[(index + 2) % testimonials.length],
-    ];
-  };
+  }
+  return [testimonials[index]];
+};
 
   const visibleCards = getVisibleCards();
 
 
 
   return (
-    <div>
+    <div className="container mx-auto">
       <div className="px-4 flex lg:flex-row flex-col justify-between lg:px-12 mx-auto py-4  lg:pt-12 p-5   lg:pb-5">
           <h2 className="text-2xl lg:text-4xl font-semibold mb-2 lg:mb-4">
-            PROFESSIONAL BUSINESS SERVICES  <br />
+            PROFESSIONAL BUSINESS SERVICES  <br className="hidden lg:block" />
             EVERYTHING YOU NEED TO KNOW
           </h2>
 
@@ -332,7 +346,7 @@ const ServiceContent = () => {
               Simplifying Compliance & Financial Processes
             </p>
 
-            <p className="text-gray-500 max-w-md">
+            <p className="text-gray-500 lg:max-w-md">
               Explore detailed insights into our services, including key benefits,
               documentation requirements, processes, and frequently asked questions —
               designed to help you make informed decisions with confidence.
@@ -342,7 +356,7 @@ const ServiceContent = () => {
       {/* Sticky Navigation - Now with conditional sticky class */}
       <div
         ref={tabsRef}
-       className={`${isStickyActive ? 'md:sticky md:top-33' : ''} z-30 bg-white`}
+       className={`${isStickyActive ? 'md:sticky md:top-31' : ''} z-30 bg-white`}
       >
         
 
@@ -469,7 +483,7 @@ const ServiceContent = () => {
       </div>
 
       <section className="bg-gray-50 py-16 ">
-        <div className="md:px-12 px-4 mx-auto">
+        <div className="lg:px-12 px-4 mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-6">
             <div>
               <p className="text-xs tracking-widest text-gray-400 mb-2">
@@ -485,7 +499,7 @@ const ServiceContent = () => {
               </p>
             </div>
 
-            <button className="bg-red text-white px-6 py-3 rounded-full hover:bg-red-700 transition whitespace-nowrap">
+            <button onClick={() => navigate("/contact")} className="bg-red text-white px-6 py-3 rounded-full hover:bg-red-700 transition whitespace-nowrap">
               Get Started Today
             </button>
           </div>
@@ -493,12 +507,12 @@ const ServiceContent = () => {
           <div className="relative bg-[#FCFCFD] rounded-2xl border border-gray-200 p-3 lg:p-8">
             <button
               onClick={prev}
-              className="absolute -left-5 top-1/2 -translate-y-1/2 bg-white border rounded-full p-3 shadow hover:bg-gray-100 z-10"
+              className="absolute lg:-left-5 -left-4 top-1/2 -translate-y-1/2 bg-white border rounded-full p-3 shadow hover:bg-gray-100 z-10"
             >
               <FaArrowLeft />
             </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-hidden">
               <AnimatePresence mode="wait">
                 {visibleCards.map((t, i) => (
                   <motion.div
@@ -536,7 +550,7 @@ const ServiceContent = () => {
 
             <button
               onClick={next}
-              className="absolute -right-5 top-1/2 -translate-y-1/2 bg-black text-white rounded-full p-3 shadow hover:bg-gray-800 z-10"
+              className="absolute md:-right-5 -right-2 top-1/2 -translate-y-1/2 bg-black text-white rounded-full p-3 shadow hover:bg-gray-800 z-10"
             >
               <FaArrowRight />
             </button>
