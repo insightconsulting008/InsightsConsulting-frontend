@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FiSearch, FiArrowUpRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import Footerctn from "./reusable/Footerctn";
 
 // Skeleton Card Component
 const BlogCardSkeleton = () => (
@@ -228,6 +229,7 @@ export default function Blog() {
           )}
         </div>
       </div>
+      <Footerctn/>
     </section>
   );
 }

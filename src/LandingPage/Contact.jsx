@@ -15,20 +15,20 @@ const Contact = () => {
 const [success, setSuccess] = useState(false);
 const [errorMsg, setErrorMsg] = useState("");
   const navigate=useNavigate()
- const cards = [
+const cards = [
   {
     title: "Book a Consultation",
     description:
-      "Have questions about GST registration, filings, or compliance? Speak directly with our experts and get clear, practical guidance tailored to your business.",
+      "Have questions about GST registration, filings, or compliance? Speak directly with our team and get clear, practical guidance tailored to your business.",
     buttonText: "Schedule a Call",
-    link: "/"
+    link: "/contact"
   },
   {
-    title: "Explore Our Services",
+    title: "Learn More About Us",
     description:
-      "Discover our complete range of GST and business compliance solutions, designed to simplify regulations, reduce risk, and keep your business running smoothly.",
-    buttonText: "View Services",
-    link: "/servicehub"
+      "Discover who we are, our experience in GST and business compliance, and how we help businesses stay legally compliant and financially organized.",
+    buttonText: "About Us",
+    link: "/about"
   }
 ];
 
@@ -310,7 +310,7 @@ const [errorMsg, setErrorMsg] = useState("");
                Get Your Registrations & Compliance Handled by Professionals
             </h2>
             <p className="text-[#4C4C4D] text-[15px] md:text-[16px] max-w-2xl">
-               Avoid delays, errors, and regulatory stress. Our experts ensure a smooth, accurate, and hassle-free process for your business.
+               Avoid delays, errors, and regulatory stress. Our team ensure a smooth, accurate, and hassle-free process for your business.
 
 
 
@@ -321,7 +321,7 @@ const [errorMsg, setErrorMsg] = useState("");
                    Get started with professional assistance
               </span>
               <button onClick={()=>navigate('/')} className="flex items-center gap-3 bg-[#D11C16] hover:bg-red-700 text-white px-5 md:px-8 py-3 rounded-full transition-all  ">
-                <span className="text-[14px]">Get Expert Assistance</span>
+                <span className="text-[14px]">Get Your Assistance</span>
                 <ArrowUpRight className='bg-white text-black rounded-full p-1' size={20} />
               </button>
             </div>

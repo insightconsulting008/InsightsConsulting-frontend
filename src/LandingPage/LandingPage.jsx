@@ -24,12 +24,12 @@ const LandingPage = () => {
         <Route path="/resource/:slug" element={<Blogdesc />} />
         <Route path="/add-blog" element={<Addblog />} />
         <Route path="/our-services/:categoryId/:subCategoryId" element={<ServiceInfoSection />} />
-        <Route
+     <Route
   path="/our-services/:categoryId/:subCategoryId/:serviceId"
   element={<ServiceInfoSection />}
 />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/company" element={<About />} />
+        <Route path="/about" element={<About />} />
         <Route path="/servicehub" element={<Servicehub />} />
         <Route path="/terms&conditions" element={<Terms />} />
       </Routes>

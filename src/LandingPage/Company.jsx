@@ -5,6 +5,7 @@ import { AiOutlineRise } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import { FaRegFlag } from "react-icons/fa";
 import { RiFlashlightLine } from "react-icons/ri";
+import Footerctn from "./reusable/Footerctn";
 const About = () => {
   
   //Team Members
@@ -77,9 +78,9 @@ const values = [
   Building Reliable Business Solutions
 </h1>
 
-<p className="text-[18px] leading-[28px] lg:text-[20px] lg:leading-[30px] font-normal text-[#535862]">
+{/* <p className="text-[18px] leading-[28px] lg:text-[20px] lg:leading-[30px] font-normal text-[#535862]">
   We help businesses navigate compliance, taxation, and financial processes with clarity, confidence, and consistency.
-</p>
+</p> */}
 </div>
         </div>
       </section>
@@ -373,6 +374,8 @@ const values = [
           </div>
         </div>
       </section>
+
+      <Footerctn/>
 
 
 

@@ -356,12 +356,12 @@ const getVisibleCards = () => {
       {/* Sticky Navigation - Now with conditional sticky class */}
       <div
         ref={tabsRef}
-       className={`${isStickyActive ? 'md:sticky md:top-31' : ''} z-30 bg-white`}
+       className={`${isStickyActive ? 'md:sticky md:top-26' : ''} z-30 bg-white`}
       >
         
 
         <div className="px-4 lg:px-12 mx-auto">
-          <div className="flex flex-wrap md:flex-nowrap border-[#EEF3F6] md:border-20 border-14 px- rounded-2xl gap-2 py-2 md:overflow-x-auto">
+          <div className="flex flex-wrap md:flex-nowrap border-[#EEF3F6] md:border-20 border-14  rounded-lg gap-2 py-2 md:overflow-x-auto">
             {sections.map((tabItem) => (
               <button
                 key={tabItem.id}
@@ -389,7 +389,7 @@ const getVisibleCards = () => {
             className="min-h-[40vh] pt-10 pb-6 scroll-mt-14"
           >
             {sec.id !== "faq" && (
-              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3 lg:p-8 shadow-sm">
+              <div className="lg:bg-gray-50 border border-gray-200 rounded-2xl px-4 py-6 lg:p-8 shadow-sm">
 
                 <span className="inline-block text-xs font-bold tracking-widest text-yellow uppercase mb-6 bg-yellow-50 border border-yellow-200 px-3 py-1 rounded-full">
                   {sec.tag}
@@ -421,7 +421,7 @@ const getVisibleCards = () => {
             )}
 
             {sec.id === "faq" && (
-              <div className="bg-gray-100  rounded-2xl p-3 lg:p-8">
+              <div className="lg:bg-gray-100  rounded-2xl px-3 py-6 lg:p-8">
                 <p className="text-xs text-red-500 font-semibold mb-2">FAQ</p>
                 <h3 className="text-2xl font-semibold mb-8">
                   FREQUENTLY ASKED QUESTIONS

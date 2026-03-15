@@ -32,6 +32,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoPlay } from "react-icons/io5";
 import Enquiryform from "./reusable/Enquiryform";
 import { useNavigate } from "react-router-dom";
+import EnquiryPopup from "./reusable/Popup.jsx";
 
 
 const steps = [
@@ -63,7 +64,7 @@ const steps = [
 
 
 export default function Home() {
-
+  const [openPopup, setOpenPopup] = useState(false);
    const navigate = useNavigate();
 
 
@@ -104,11 +105,11 @@ export default function Home() {
       title: "No Clear Ownership",
       desc: "Clients didn’t know who was handling their service, and teams lacked visibility into task status.",
     },
-    {
-      icon: <FaLayerGroup />,
-      title: "Scaling Became Difficult",
-      desc: "As the number of clients grew, managing services consistently became increasingly complex.",
-    },
+    // {
+    //   icon: <FaLayerGroup />,
+    //   title: "Scaling Became Difficult",
+    //   desc: "As the number of clients grew, managing services consistently became increasingly complex.",
+    // },
     {
       icon: <FaSyncAlt />,
       title: "Recurring Compliance Was Reactive",
@@ -117,11 +118,11 @@ export default function Home() {
   ];
 
   const features = [
-    {
-      icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container.png?updatedAt=1771417293358',
-      title: "Buy Services Online",
-      desc: "Browse, select, and purchase compliance services directly — with clear pricing, guided onboarding, and no manual follow-ups.",
-    },
+    // {
+    //   icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container.png?updatedAt=1771417293358',
+    //   title: "Buy Services Online",
+    //   desc: "Browse, select, and purchase compliance services directly — with clear pricing, guided onboarding, and no manual follow-ups.",
+    // },
     {
       icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(1).png?updatedAt=1771417293237',
       title: "Dedicated Service Ownership",
@@ -325,7 +326,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </p>
 
             <h1 className="text-2xl md:text-5xl font-semibold text-gray-800 leading-tight">
-              Compliance Made  Simple by Experts{" "}
+              Compliance Made Simple for{" "}
               <span className="text-green-600 font-bold">
                 <Typewriter
                   words={[
@@ -351,10 +352,10 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </p>
 
            <button
-      onClick={() => navigate("/servicehub")}
+      onClick={() => navigate("/contact")}
       className="mt-6 bg-red text-white px-6 py-3 rounded-lg font-medium shadow"
     >
-      Explore Service Hub
+      Get started
     </button>
           </div>
 
@@ -370,11 +371,11 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
       </section>
 
-      <section className="bg-white mt-14 border-t  border-b border-gray-200 overflow-hidden w-full">
+      {/* <section className="bg-white mt-14 border-t  border-b border-gray-200 overflow-hidden w-full">
 
         <div className="w-full px-4 py-3 flex items-center gap-6">
 
-          {/* Left Title */}
+         
           <div className=" items-center gap-2 text-sm hidden md:flex text-gray-600 whitespace-nowrap">
             <span className="hidden md:block">Top Services Offered in</span>
             <span className=" text-blue-600 font-medium">
@@ -382,10 +383,10 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </span>
           </div>
 
-          {/* Divider */}
+         
           <div className="hidden lg:block h-5 border-l border-gray-300"></div>
 
-          {/* Marquee */}
+         
           <div className="relative flex-1 overflow-hidden">
 
             <div className="flex w-max gap-2 animate-[marquee_30s_linear_infinite]">
@@ -402,7 +403,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </div>
         </div>
 
-        {/* INTERNAL KEYFRAMES */}
+       
         <style>
           {`
           @keyframes marquee {
@@ -411,51 +412,59 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           }
         `}
         </style>
-      </section>
+      </section> */}
 
-      <section className="bg-[#05070c] text-white  py-10 lg:py-20">
+      <section className="bg-[#05070c] text-white mt-10  py-10 lg:py-20">
         <div className=" container mx-auto">
           <div className=" lg:px-12 px-4  mx-auto ">
 
           {/* Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-            <div>
-              <p className="text-yellow text-sm tracking-widest mb-3">
-                WHY WE EXIST
-              </p>
-              <h2 className="text-2xl md:text-5xl font-semibold mb-4">
-                Built From Real Compliance Challenges
-              </h2>
-              <p className="text-gray-400 max-w-2xl">
-                Working closely with businesses, we noticed that compliance
-                failures rarely happen due to lack of intent — but due to poor
-                tracking, manual follow-ups, and fragmented processes.
-              </p>
-            </div>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+  <div>
+    <h2 className="text-2xl md:text-5xl font-semibold mb-4">
+      Built From Real Compliance Challenges
+    </h2>
 
-            <button className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"  onClick={() => navigate("/contact")}>
-              Enquire Now &gt;&gt;
-            </button>
-          </div>
+    <p className="text-gray-400 max-w-2xl">
+      Working closely with businesses, we noticed that compliance
+      failures rarely happen due to lack of intent but due to poor
+      tracking, manual follow-ups, and fragmented processes.
+    </p>
+  </div>
+
+  <button
+    className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"
+    onClick={() => setOpenPopup(true)}
+  >
+    Enquire Now &gt;&gt;
+  </button>
+</div>
+
+<EnquiryPopup
+  open={openPopup}
+  onClose={() => setOpenPopup(false)}
+/>
 
           {/* Cards Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {challenges.map((item, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-[#0b0f17] to-[#0a0d14] border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-white/10 transition"
-              >
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 text-white text-xl mb-4">
-                  {item.icon}
-                </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-6">
+  {challenges.map((item, index) => (
+    <div
+      key={index}
+      className={`bg-gradient-to-br from-[#0b0f17] to-[#0a0d14] border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-white/10 transition
+      ${index >= challenges.length - 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
+    >
+      <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 text-white text-xl mb-4">
+        {item.icon}
+      </div>
 
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-[#797C86]  leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
+      <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+
+      <p className="text-[#797C86] leading-relaxed">
+        {item.desc}
+      </p>
+    </div>
+  ))}
+</div>
         </div>
         </div>
       </section>
@@ -476,15 +485,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 A Smarter Way To Manage Compliance
               </h2>
 
-              <p className="text-gray-600 max-w-xl">
+              {/* <p className="text-gray-600 max-w-xl">
                 We built a structured system that simplifies compliance management,
                 improves visibility, and ensures nothing is missed — for both
                 clients and our internal teams.
-              </p>
+              </p> */}
             </div>
 
             {/* Right Image */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center  lg:justify-end">
               <img
                 src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Image.png"
                 alt="illustration"
@@ -494,10 +503,11 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </div>
 
           {/* Features Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10 relative pt-5  md:pt-10">
+         <div className="flex  w-full h-auto">
+           <div className="grid sm:grid-cols-2  gap-x-12 gap-y-10 relative pt-5  md:pt-10">
             <div className="border border-dashed hidden lg:block border-gray-300 absolute top-[55%] w-full "></div>
             {features.map((item, index) => (
-              <div key={index} className="flex gap-4 border-r border-[#EDEDED]">
+              <div key={index} className="flex gap-4 ">
 
                 <img src={item.icon} className="w-10 h-9 flex items-center justify-center " />
 
@@ -515,17 +525,20 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             ))}
 
             {/* CTA block */}
-            <div className="lg:col-span-1 flex flex-col md:items-end items-center justify-center">
-              <p className="  text-center md:text-right italic mb-4">
+
+          </div>
+                      <div className="lg:col-span-1  border border-gray-300 p-3 rounded-md border-dashed flex flex-col  items-center justify-center">
+              <p className="  text-center  italic mb-4">
                 Compliance services, available when you need them without{" "}
                 <span className="font-semibold">Manual Coordination</span>
               </p>
 
-              <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max"  onClick={() => navigate("/servicehub")}>
-                Explore Service Hub &gt;&gt;
+              <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max"  onClick={() => setOpenPopup(true)}>
+                Enquire Now &gt;&gt;
               </button>
+     
             </div>
-          </div>
+         </div>
         </div>
         </div>
       </section>
@@ -549,7 +562,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               experience compliance, communication, and follow-ups.
             </p>
 
-            <button className="bg-red  text-white px-5 py-2 rounded-lg font-medium"  onClick={() => navigate("/company")}>
+            <button className="bg-red  text-white px-5 py-2 rounded-lg font-medium"  onClick={() => setOpenPopup(true)}>
               Enquire Now &gt;&gt;
             </button>
           </div>
@@ -654,9 +667,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
   <button
     className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
-    onClick={() => navigate("/servicehub")}
+   onClick={() => setOpenPopup(true)}
   >
-    Explore Service Hub &gt;&gt;
+    Enquire Now &gt;&gt;
   </button>
 </div>
 
@@ -750,7 +763,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   </div>
                 </div>
 
-                <button className="bg-red pl-2 pr-4 py-2 flex gap-2 rounded-full w-max"  onClick={() => navigate("/contact")}>
+                <button className="bg-red pl-2 pr-4 py-2 flex items-center gap-2 rounded-full w-max" onClick={() => setOpenPopup(true)}>
                   < HiArrowRight size={10} className="w-8 h-8 p-2 text-black bg-white rounded-full" /> Enquire Now
                 </button>
               </div>
@@ -848,9 +861,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
   <div className="flex lg:w-80">
     <button
       className="bg-red text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
-      onClick={() => navigate("/servicehub")}
+     onClick={() => setOpenPopup(true)}
     >
-      Explore Service Hub →
+      Enquire Now →
     </button>
   </div>
 </div>
@@ -1058,7 +1071,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </p>
             </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition"  onClick={() => navigate("/contact")}>
+            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition"  onClick={() => setOpenPopup(true)}>
               Enquire Now ››
             </button>
           </div>
@@ -1210,7 +1223,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
               {/* Button */}
               <button  onClick={() => navigate("/contact")} className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
-                Meet the Partner
+                Contact us
               </button>
             </div>
 
@@ -1249,12 +1262,12 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         </div>
       </section>
 
-      <section className="lg:py-15 py-10 bg-[#f5f6f7]">
+      {/* <section className="lg:py-15 py-10 bg-[#f5f6f7]">
         <div className="lg:px-12 mx-auto px-4">
 
           <div className="relative overflow-hidden rounded-2xl border border-[#E5EFFF] bg-white px-8 py-12 text-center">
 
-            {/* LEFT BG ILLUSTRATION */}
+           
             <div
               className="absolute left-0 top-0 w-96 h-96 opacity-90 bg-no-repeat bg-contain"
               style={{
@@ -1263,7 +1276,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               }}
             />
 
-            {/* RIGHT BG ILLUSTRATION */}
+          
             <div
               className="absolute -right-50 bottom-0  w-96 h-96 opacity-90 bg-no-repeat bg-contain"
               style={{
@@ -1272,15 +1285,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               }}
             />
 
-            {/* CONTENT */}
+         
           <div className="relative z-10 max-w-2xl mx-auto">
 
-        {/* Subheading */}
+       
         <p className="text-gray-400 text-xs tracking-widest mb-3">
           BUSINESS COMPLIANCE MADE SIMPLE
         </p>
 
-        {/* Heading */}
+      
         <h2 className="text-3xl md:text-4xl font-semibold text-gray-800 leading-snug">
           Start Your Business Journey With <br />
           <span className="underline decoration-gray-300">
@@ -1288,13 +1301,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </span>
         </h2>
 
-        {/* Description */}
+       
         <p className="text-gray-500 mt-4 text-sm">
           From registrations to filings, Insight Consulting helps you navigate
           regulatory requirements with ease, accuracy, and complete peace of mind.
         </p>
 
-        {/* Buttons */}
+      
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
           <button  onClick={() => navigate("/servicehub")} className="bg-red text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
             Explore Our Services
@@ -1305,7 +1318,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </button>
         </div>
 
-        {/* Note */}
+      
         <p className="text-gray-400 text-xs mt-3">
           *Quick, simple & hassle-free process
         </p>
@@ -1313,7 +1326,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
       </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
     </>
   );

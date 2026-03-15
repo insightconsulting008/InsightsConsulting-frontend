@@ -74,7 +74,7 @@ const SuccessPopup = ({ isOpen, onClose, employeeData, departmentData, mode = 'a
           </div>
           {mode === 'add' ? (
             <>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">'{employeeData?.name} | {employeeData?.employeeId}'</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">'{employeeData?.name} | {employeeData?.designation}'</h2>
               <p className="text-gray-700 mb-1">has been added to the '{departmentData?.label}' team.</p>
               <p className="text-sm text-gray-500">You can now view this employee under the assigned department.</p>
             </>
@@ -481,11 +481,11 @@ const EmployeeModal = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">Employee Name <span className="text-rose-500">*</span></label>
               <input type="text" placeholder="Rahul A" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClass} required />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID</label>
               <input type="text" placeholder="EMP012 (optional)" value={formData.employeeId} onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })} className={inputClass} />
               <p className="text-xs text-gray-500 mt-1">If left blank, the server may generate one.</p>
-            </div>
+            </div> */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address <span className="text-rose-500">*</span></label>
               <input type="email" placeholder="rahul@companyname.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputClass} required />

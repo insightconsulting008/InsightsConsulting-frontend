@@ -80,7 +80,7 @@ const Enquiryform = () => {
           />
           <div>
             <h3 className="font-semibold text-gray-800">
-              Get Expert Compliance Support
+              Get Your Compliance Support
             </h3>
             <p className="text-sm text-gray-600">
               We’re here to assist you quickly ⚡

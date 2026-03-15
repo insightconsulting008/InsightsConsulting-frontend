@@ -94,7 +94,7 @@ const LANDING_EXACT = [
   '/resource',
   '/add-blog',
   '/contact',
-  '/company',
+  '/about',
   '/servicehub',
 ];
 const LANDING_PREFIX = [
