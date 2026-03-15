@@ -14,192 +14,183 @@ const ServiceContent = () => {
   const navigate = useNavigate()
   const [isStickyActive, setIsStickyActive] = useState(true);
 
-  const sections = [
-    {
-      id: "overview",
-      label: "Overview",
-      icon: <FaInfoCircle />,
-      tag: "Overview",
+ const sections = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: <FaInfoCircle />,
+    tag: "Overview",
 
-      items: [
-        {
-          title: "Business Registration & GST",
-          desc1:
-            "Business registration and GST registration are essential compliance steps for operating legally and building credibility.",
-          desc2:
-            "GST registration enables businesses to collect tax, claim input tax credits, and participate seamlessly in the formal economy.",
-        },
-        {
-          title: "Book Keeping",
-          desc1:
-            "Book keeping ensures accurate tracking of financial transactions, income, and expenses for better financial clarity.",
-          desc2:
-            "Well-maintained records support tax filings, audits, funding opportunities, and strategic decision-making.",
-        },
-        {
-          title: "GST Filing",
-          desc1:
-            "GST filing is a mandatory compliance requirement ensuring uninterrupted tax credit benefits and regulatory safety.",
-          desc2:
-            "Accurate filings reduce penalties, improve transparency, and ensure smooth business operations.",
-        },
-        {
-          title: "TDS Payment",
-          desc1:
-            "Tax Deducted at Source (TDS) is a statutory compliance mechanism applicable to specified financial transactions.",
-          desc2:
-            "Timely deduction and payment prevent penalties, interest liabilities, and compliance risks.",
-        },
-      ],
-    },
+    items: [
+      {
+        title: "Professional Business Support",
+        desc1:
+          "We provide end-to-end support for essential business compliance, registrations, and financial processes required for smooth operations.",
+        desc2:
+          "Our approach focuses on simplifying complex procedures so businesses can stay compliant while focusing on growth.",
+      },
+      {
+        title: "Reliable Documentation Handling",
+        desc1:
+          "Accurate documentation and structured record management are critical for maintaining regulatory compliance and financial transparency.",
+        desc2:
+          "Our team ensures that all required documents are organized and prepared according to official requirements.",
+      },
+      {
+        title: "Compliance & Filing Services",
+        desc1:
+          "Businesses must regularly submit filings and maintain statutory records as per regulatory guidelines.",
+        desc2:
+          "Timely filings help prevent penalties, ensure operational continuity, and maintain credibility with authorities.",
+      },
+      {
+        title: "Our Guidance & Assistance",
+        desc1:
+          "Our professionals guide businesses through every step of compliance, registration, and reporting procedures.",
+        desc2:
+          "This ensures faster processing, reduced errors, and a smoother overall experience.",
+      },
+    ],
+  },
 
-    {
-      id: "documents",
-      label: "Documents Required",
-      icon: <FaFileAlt />,
-      tag: "Documents Required",
+  {
+    id: "documents",
+    label: "Documents Required",
+    icon: <FaFileAlt />,
+    tag: "Documents Required",
 
-      items: [
-        {
-          title: "Business Registration & GST",
-          desc1:
-            "PAN, Aadhaar, address proof, bank details, and business information are typically required.",
-          desc2:
-            "Additional documents vary depending on business structure and operational model.",
-        },
-        {
-          title: "Book Keeping",
-          desc1:
-            "Bank statements, invoices, expense records, payroll data, and GST credentials are needed.",
-          desc2:
-            "Operational data like assets, suppliers, and customers may also be required.",
-        },
-        {
-          title: "GST Filing",
-          desc1:
-            "Sales invoices, purchase bills, GST certificate, and bank statements are commonly required.",
-          desc2:
-            "HSN/SAC codes and adjustments may apply based on business activity.",
-        },
-        {
-          title: "TDS Payment",
-          desc1:
-            "Payment records, deductee details, PAN information, and transaction data are required.",
-          desc2:
-            "Accurate documentation ensures proper deduction and reporting.",
-        },
-      ],
-    },
+    items: [
+      {
+        title: "Basic Identity Documents",
+        desc1:
+          "Identity proof, address proof, and PAN/Aadhaar details are commonly required for most registrations.",
+        desc2:
+          "Additional identification documents may be required depending on the business structure.",
+      },
+      {
+        title: "Business Information",
+        desc1:
+          "Basic business details such as address, bank information, and operational information are required.",
+        desc2:
+          "These details help authorities verify the authenticity and nature of business operations.",
+      },
+      {
+        title: "Financial Records",
+        desc1:
+          "Invoices, transaction details, bank statements, and financial records are required for compliance and filing purposes.",
+        desc2:
+          "Maintaining accurate records helps ensure smooth filings and audit readiness.",
+      },
+      {
+        title: "Additional Supporting Documents",
+        desc1:
+          "Depending on the service, supporting documents like agreements, ownership proof, or licenses may be required.",
+        desc2:
+          "Our team will guide you on the exact documents required for your specific case.",
+      },
+    ],
+  },
 
-    {
-      id: "process",
-      label: "Registration Process",
-      icon: <FaListOl />,
-      tag: "Process",
+  {
+    id: "process",
+    label: "Registration Process",
+    icon: <FaListOl />,
+    tag: "Process",
 
-      items: [
-        {
-          title: "Business Registration & GST",
-          desc1:
-            "The process involves preparing documents, submitting applications, and completing verification.",
-          desc2:
-            "Accurate filings significantly reduce approval delays and rejections.",
-        },
-        {
-          title: "Book Keeping",
-          desc1:
-            "Financial data is collected, categorized, reconciled, and maintained in structured ledgers.",
-          desc2:
-            "Regular updates ensure compliance and reporting readiness.",
-        },
-        {
-          title: "GST Filing",
-          desc1:
-            "Data reconciliation, tax computation, return preparation, and portal submission are involved.",
-          desc2:
-            "Consistent compliance prevents penalties and credit mismatches.",
-        },
-        {
-          title: "TDS Payment",
-          desc1:
-            "TDS applicability is evaluated, tax is deducted, challans generated, and payments remitted.",
-          desc2:
-            "Timely filings ensure full regulatory compliance.",
-        },
-      ],
-    },
+    items: [
+      {
+        title: "Step 1 – Initial Consultation",
+        desc1:
+          "We begin by understanding your business needs and identifying the compliance or registration requirements.",
+        desc2:
+          "This helps us recommend the correct process and required documentation.",
+      },
+      {
+        title: "Step 2 – Document Collection",
+        desc1:
+          "Required documents and business information are collected and verified for accuracy.",
+        desc2:
+          "Proper documentation significantly reduces processing delays.",
+      },
+      {
+        title: "Step 3 – Application & Processing",
+        desc1:
+          "Applications are prepared and submitted through the appropriate government or regulatory portals.",
+        desc2:
+          "Our team carefully monitors the progress and manages communication if additional information is required.",
+      },
+      {
+        title: "Step 4 – Completion & Compliance Support",
+        desc1:
+          "Once the process is completed, confirmation and required certificates or approvals are provided.",
+        desc2:
+          "We also guide businesses on maintaining ongoing compliance when required.",
+      },
+    ],
+  },
 
-    {
-      id: "faq",
-      label: "FAQ",
-      icon: <FaQuestionCircle />,
-      tag: "FAQ",
-      title: "Frequently Asked Questions",
-    },
-  ];
+  {
+    id: "faq",
+    label: "FAQ",
+    icon: <FaQuestionCircle />,
+    tag: "FAQ",
+    title: "Frequently Asked Questions",
+  },
+];
 
   const tabs = [
-    "ALL",
-    "GST REGISTRATION",
-    "BOOK KEEPING",
-    "GST FILING",
-    "TDS PAYMENT",
-  ];
+  "ALL",
+  "REGISTRATION",
+  "DOCUMENTS",
+  "PROCESS",
+  "SUPPORT",
+];
 
   const faqData = [
-    // GST REGISTRATION
-    {
-      service: "GST REGISTRATION",
-      q: "Who is required to obtain GST registration?",
-      a: "Businesses exceeding prescribed turnover thresholds or engaged in specific taxable activities must obtain GST registration.",
-    },
-    {
-      service: "GST REGISTRATION",
-      q: "What documents are required for GST registration?",
-      a: "PAN, Aadhaar, address proof, bank details, and entity-specific documents are typically required.",
-    },
-    {
-      service: "GST REGISTRATION",
-      q: "How long does GST registration take?",
-      a: "Most applications are processed within a few working days, subject to verification.",
-    },
+  {
+    service: "REGISTRATION",
+    q: "Why is business registration important?",
+    a: "Business registration establishes legal identity and enables businesses to operate within regulatory frameworks.",
+  },
+  {
+    service: "REGISTRATION",
+    q: "How long does a registration process usually take?",
+    a: "Processing time varies depending on the type of registration and verification requirements.",
+  },
 
-    // BOOK KEEPING
-    {
-      service: "BOOK KEEPING",
-      q: "Why is book keeping important for businesses?",
-      a: "Proper records ensure financial clarity, compliance readiness, and smoother tax filings.",
-    },
-    {
-      service: "BOOK KEEPING",
-      q: "What records are required for book keeping?",
-      a: "Invoices, expense records, bank statements, payroll data, and tax documents.",
-    },
+  {
+    service: "DOCUMENTS",
+    q: "What documents are generally required?",
+    a: "Most processes require identity proof, address proof, PAN details, and basic business information.",
+  },
+  {
+    service: "DOCUMENTS",
+    q: "Do document requirements change based on business type?",
+    a: "Yes. The required documents may vary depending on whether the business is a proprietorship, partnership, or company.",
+  },
 
-    // GST FILING
-    {
-      service: "GST FILING",
-      q: "Is GST return filing mandatory?",
-      a: "Yes. All registered taxpayers must file GST returns within prescribed timelines.",
-    },
-    {
-      service: "GST FILING",
-      q: "What happens if GST returns are delayed?",
-      a: "Delayed filings may result in penalties, interest, and late fees.",
-    },
+  {
+    service: "PROCESS",
+    q: "What steps are involved in the process?",
+    a: "The process typically includes consultation, document collection, application submission, and verification.",
+  },
+  {
+    service: "PROCESS",
+    q: "Will I receive updates during the process?",
+    a: "Yes. Our team keeps clients informed about the progress and any additional requirements.",
+  },
 
-    // TDS PAYMENT
-    {
-      service: "TDS PAYMENT",
-      q: "What is TDS?",
-      a: "Tax Deducted at Source (TDS) is a mechanism where tax is deducted at the time of payment.",
-    },
-    {
-      service: "TDS PAYMENT",
-      q: "What are risks of delayed TDS payment?",
-      a: "Delayed payments may attract penalties and interest liabilities.",
-    },
-  ];
+  {
+    service: "SUPPORT",
+    q: "Do you provide assistance after completion?",
+    a: "Yes. We provide guidance for maintaining ongoing compliance and handling future filings when required.",
+  },
+  {
+    service: "SUPPORT",
+    q: "Can I get help if I am unsure about the right service?",
+    a: "Absolutely. Our team helps identify the correct solution based on your business needs.",
+  },
+];
 
   const testimonials = [
     {
@@ -334,8 +325,8 @@ const getVisibleCards = () => {
 
 
   return (
-    <div className="container mx-auto">
-      <div className="px-4 flex lg:flex-row flex-col justify-between lg:px-12 mx-auto py-4  lg:pt-12 p-5   lg:pb-5">
+    <div className="">
+      <div className="px-4 container  flex md:flex-row flex-col justify-between lg:px-12 mx-auto py-4  lg:pt-12 p-5   lg:pb-5">
           <h2 className="text-2xl lg:text-4xl font-semibold mb-2 lg:mb-4">
             PROFESSIONAL BUSINESS SERVICES  <br className="hidden lg:block" />
             EVERYTHING YOU NEED TO KNOW
@@ -356,12 +347,12 @@ const getVisibleCards = () => {
       {/* Sticky Navigation - Now with conditional sticky class */}
       <div
         ref={tabsRef}
-       className={`${isStickyActive ? 'md:sticky md:top-26' : ''} z-30 bg-white`}
+       className={`${isStickyActive ? 'md:sticky md:top-26' : ''} z-30 hidden md:block bg-white py-6`}
       >
         
 
-        <div className="px-4 lg:px-12 mx-auto">
-          <div className="flex flex-wrap md:flex-nowrap border-[#EEF3F6] md:border-20 border-14  rounded-lg gap-2 py-2 md:overflow-x-auto">
+        <div className="px-4 lg:px-12  ">
+          <div className="flex flex-wrap container mx-auto md:flex-nowrap border-[#EEF3F6] md:border-20 border-14  rounded-lg gap-2 py-2 md:overflow-x-auto">
             {sections.map((tabItem) => (
               <button
                 key={tabItem.id}
@@ -381,12 +372,12 @@ const getVisibleCards = () => {
       </div>
 
       {/* ── CONTENT ── */}
-      <div ref={contentContainerRef} className="px-4 lg:px-12 mx-auto py-8">
+      <div ref={contentContainerRef} className="px-4 container  lg:px-12  mx-auto  md:py-8">
         {sections.map((sec) => (
           <div
             key={sec.id}
             ref={(el) => (sectionRefs.current[sec.id] = el)}
-            className="min-h-[40vh] pt-10 pb-6 scroll-mt-14"
+            className="min-h-[40vh] pt-10 pb-6 md:scroll-mt-14"
           >
             {sec.id !== "faq" && (
               <div className="lg:bg-gray-50 border border-gray-200 rounded-2xl px-4 py-6 lg:p-8 shadow-sm">
@@ -421,7 +412,7 @@ const getVisibleCards = () => {
             )}
 
             {sec.id === "faq" && (
-              <div className="lg:bg-gray-100  rounded-2xl px-3 py-6 lg:p-8">
+              <div className="lg:bg-gray-100  rounded-2xl   lg:p-8">
                 <p className="text-xs text-red-500 font-semibold mb-2">FAQ</p>
                 <h3 className="text-2xl font-semibold mb-8">
                   FREQUENTLY ASKED QUESTIONS
@@ -482,8 +473,8 @@ const getVisibleCards = () => {
         ))}
       </div>
 
-      <section className="bg-gray-50 py-16 ">
-        <div className="lg:px-12 px-4 mx-auto">
+      <section className="bg-gray-50 py-10 lg:py-16 ">
+        <div className="lg:px-12 px-4 container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-6">
             <div>
               <p className="text-xs tracking-widest text-gray-400 mb-2">

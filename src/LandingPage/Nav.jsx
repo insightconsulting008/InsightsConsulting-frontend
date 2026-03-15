@@ -201,22 +201,29 @@ export default function Nav() {
         }
       `}</style>
 
-      <header className="w-full sticky top-0 bg-white shadow-sm z-40">
+      <header className="w-full sticky top-0  bg-white shadow-sm z-40">
         {/* Top Bar */}
-        <div className="bg-neutral-900 text-white text-sm py-2 px-4 flex items-center justify-between flex-wrap">
-          <span className="hidden md:block">
-            Looking For The Right{" "}
+        <div className="bg-neutral-900  text-white text-sm py-2 px-4 flex items-center justify-center lg:justify-between flex-wrap">
+          <span className="hidden lg:block">
+            Reliable solutions for{" "}
             <span className="text-yellow-400 font-semibold">
-              Compliance & Registration Services
+              compliance, filings, and regulatory requirements
             </span>{" "}
-            | Get A Quick Guidance From Our Team
+            supporting businesses at every stage.
           </span>
 
-          <span className="md:hidden">
-            Get expert <span className="text-yellow-400 font-semibold">guidance</span>
-          </span>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <span className="lg:hidden">
+            Get the right  <span className="text-yellow-400 font-semibold"> compliance guidance</span>
+          </span>
+          <button
+            onClick={() => navigate("/contact")}
+            className="ml-2 block bg-red-600  lg:hidden  hover:bg-red-700 px-4 py-1 rounded t font-semibold"
+          >
+            Enquire Now
+          </button>
+
+          <div className="hidden lg:flex items-center cursor-pointer gap-2">
             {NAV_ITEMS.map(({ label, to }) => (
               <NavLink
                 key={label}
@@ -232,13 +239,9 @@ export default function Nav() {
               </NavLink>
             ))}
 
-            {/* <button
-              onClick={() => navigate("/contact")}
-              className="ml-2 bg-red-600 hover:bg-red-700 px-6 py-2 rounded t font-semibold"
-            >
-              Enquire Now
-            </button> */}
+
           </div>
+
         </div>
 
         {/* Main Nav */}
@@ -252,7 +255,7 @@ export default function Nav() {
           </Link>
 
           {/* Desktop */}
-          <nav className="hidden lg:flex items-center gap-5">
+          <nav className="hidden lg:flex items-center  gap-5">
             {loadingCat
               ? [...Array(5)].map((_, i) => (
                 <div
@@ -278,7 +281,7 @@ export default function Nav() {
                     onMouseLeave={scheduleClose}
                   >
                     <button
-                      className={`flex items-center gap-1 font-medium transition-colors ${isCategoryActive
+                      className={`flex items-center gap-1  cursor-pointer font-medium transition-colors ${isCategoryActive
                         ? "text-red-600"
                         : "text-gray-700 hover:text-red-500"
                         }`}
@@ -303,7 +306,7 @@ export default function Nav() {
 
                         {/* Dropdown - Always positioned to the right */}
                         <div
-                          className="absolute top-full mt-2.5 bg-white rounded-xl border border-gray-100 overflow-hidden"
+                          className="absolute  top-full mt-2.5 bg-white rounded-xl border border-gray-100 overflow-hidden"
                           style={{
                             width: "520px",
                             maxHeight: "420px",
@@ -324,7 +327,7 @@ export default function Nav() {
                           ) : subcatWithServices.length === 0 ? (
                             <ErrorState message="No services available" />
                           ) : (
-                            <div className={`grid ${subcatWithServices.length === 1
+                            <div className={`grid  ${subcatWithServices.length === 1
                               ? "grid-cols-1"
                               : "grid-cols-2"
                               } gap-0 divide-x divide-gray-100`}>
@@ -342,7 +345,7 @@ export default function Nav() {
                                     <div className="flex items-center gap-2 mb-3">
                                       <span className="w-1 h-4 bg-red-500 rounded-full flex-shrink-0" />
                                       <button
-                                        className={`text-[13px] font-bold transition-colors ${isSubActive
+                                        className={` font-bold transition-colors ${isSubActive
                                           ? "text-red-600"
                                           : "text-gray-900 hover:text-red-600"
                                           }`}
@@ -365,9 +368,9 @@ export default function Nav() {
                                                 onClick={() =>
                                                   navigateToService(cat.categoryId, sub, service)
                                                 }
-                                                className={`block w-full text-left text-[13px] px-2 py-1 rounded transition-colors ${isServiceActive
+                                                className={`block w-full text-left  px-2 py-1 rounded transition-colors ${isServiceActive
                                                   ? "text-red-600 bg-red-50 font-medium"
-                                                  : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                                  : "text-gray-600 cursor-pointer hover:text-red-600 hover:bg-red-50"
                                                   }`}
                                               >
                                                 {service.name}
@@ -393,7 +396,7 @@ export default function Nav() {
               onClick={() => navigate("/login")}
               className="ml-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold"
             >
-              Login / Signup
+              Login
             </button>
           </nav>
 
@@ -557,7 +560,7 @@ export default function Nav() {
                 onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}
                 className="flex-1 border border-red-600 text-red-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-red-50 transition-colors"
               >
-                Login / Signup
+                Login
               </button>
               <button
                 onClick={() => { setMobileMenuOpen(false); navigate("/contact"); }}

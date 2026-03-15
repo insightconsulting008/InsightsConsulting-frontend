@@ -65,10 +65,10 @@ const steps = [
 
 export default function Home() {
   const [openPopup, setOpenPopup] = useState(false);
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
 
-  
+
   const services = [
     "GST Registration",
     "GST Filing",
@@ -296,7 +296,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
       }
     ]
   };
- const logos = [
+  const logos = [
     { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png", name: "Layers" },
     { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png", name: "Sisyphus" },
     { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png", name: "Circooles" },
@@ -326,7 +326,8 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </p>
 
             <h1 className="text-2xl md:text-5xl font-semibold text-gray-800 leading-tight">
-              Compliance Made Simple for{" "}
+              Compliance Made Simple for{" "} <br />
+
               <span className="text-green-600 font-bold">
                 <Typewriter
                   words={[
@@ -351,12 +352,12 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               across multiple regulatory requirements.
             </p>
 
-           <button
-      onClick={() => navigate("/contact")}
-      className="mt-6 bg-red text-white px-6 py-3 rounded-lg font-medium shadow"
-    >
-      Get started
-    </button>
+            <button
+              onClick={() => navigate("/contact")}
+              className="mt-6 bg-red text-white px-6 py-3 rounded-lg font-medium shadow"
+            >
+              Get started
+            </button>
           </div>
 
           {/* RIGHT FORM */}
@@ -418,260 +419,263 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         <div className=" container mx-auto">
           <div className=" lg:px-12 px-4  mx-auto ">
 
-          {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-  <div>
-    <h2 className="text-2xl md:text-5xl font-semibold mb-4">
-      Built From Real Compliance Challenges
-    </h2>
+            {/* Header */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+              <div>
+                <h2 className="text-2xl md:text-5xl font-semibold mb-4">
+                  Built From Real Compliance Challenges
+                </h2>
 
-    <p className="text-gray-400 max-w-2xl">
-      Working closely with businesses, we noticed that compliance
-      failures rarely happen due to lack of intent but due to poor
-      tracking, manual follow-ups, and fragmented processes.
-    </p>
-  </div>
+                <p className="text-gray-400 max-w-2xl">
+                  Working closely with businesses, we noticed that compliance
+                  failures rarely happen due to lack of intent but due to poor
+                  tracking, manual follow-ups, and fragmented processes.
+                </p>
+              </div>
 
-  <button
-    className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"
-    onClick={() => setOpenPopup(true)}
-  >
-    Enquire Now &gt;&gt;
-  </button>
-</div>
+              <button
+                className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"
+                onClick={() => navigate("/about")}
+              >
+                Know More &gt;&gt;
+              </button>
+            </div>
 
-<EnquiryPopup
-  open={openPopup}
-  onClose={() => setOpenPopup(false)}
-/>
+            <EnquiryPopup
+              open={openPopup}
+              onClose={() => setOpenPopup(false)}
+            />
 
-          {/* Cards Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-6">
-  {challenges.map((item, index) => (
-    <div
-      key={index}
-      className={`bg-gradient-to-br from-[#0b0f17] to-[#0a0d14] border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-white/10 transition
+            {/* Cards Grid */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-6">
+              {challenges.map((item, index) => (
+                <div
+                  key={index}
+                  className={`bg-gradient-to-br from-[#0b0f17] to-[#0a0d14] border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-white/10 transition
       ${index >= challenges.length - 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
-    >
-      <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 text-white text-xl mb-4">
-        {item.icon}
-      </div>
+                >
+                  <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 text-white text-xl mb-4">
+                    {item.icon}
+                  </div>
 
-      <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
 
-      <p className="text-[#797C86] leading-relaxed">
-        {item.desc}
-      </p>
-    </div>
-  ))}
-</div>
-        </div>
+                  <p className="text-[#797C86] leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
       <section className="bg-[#f5f6f7]  py-10 lg:py-20">
         <div className="container mx-auto">
           <div className="lg:px-12 px-4 mx-auto ">
 
-          {/* Top Row */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
+            {/* Top Row */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
 
-            {/* Left Content */}
-            <div>
-              <p className="text-yellow-600 text-sm font-semibold mb-3">
-                HOW WE SOLVE IT
-              </p>
+              {/* Left Content */}
+              <div>
+                <p className="text-yellow-600 text-sm font-semibold mb-3">
+                  HOW WE SOLVE IT
+                </p>
 
-              <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-4">
-                A Smarter Way To Manage Compliance
-              </h2>
+                <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-4">
+                  A Smarter Way To Manage Compliance
+                </h2>
 
-              {/* <p className="text-gray-600 max-w-xl">
+                {/* <p className="text-gray-600 max-w-xl">
                 We built a structured system that simplifies compliance management,
                 improves visibility, and ensures nothing is missed — for both
                 clients and our internal teams.
               </p> */}
-            </div>
-
-            {/* Right Image */}
-            <div className="flex justify-center  lg:justify-end">
-              <img
-                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Image.png"
-                alt="illustration"
-                className="w-full max-w-md"
-              />
-            </div>
-          </div>
-
-          {/* Features Grid */}
-         <div className="flex  w-full h-auto">
-           <div className="grid sm:grid-cols-2  gap-x-12 gap-y-10 relative pt-5  md:pt-10">
-            <div className="border border-dashed hidden lg:block border-gray-300 absolute top-[55%] w-full "></div>
-            {features.map((item, index) => (
-              <div key={index} className="flex gap-4 ">
-
-                <img src={item.icon} className="w-10 h-9 flex items-center justify-center " />
-
-
-
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-800 mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600  leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
               </div>
-            ))}
 
-            {/* CTA block */}
-
-          </div>
-                      <div className="lg:col-span-1  border border-gray-300 p-3 rounded-md border-dashed flex flex-col  items-center justify-center">
-              <p className="  text-center  italic mb-4">
-                Compliance services, available when you need them without{" "}
-                <span className="font-semibold">Manual Coordination</span>
-              </p>
-
-              <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max"  onClick={() => setOpenPopup(true)}>
-                Enquire Now &gt;&gt;
-              </button>
-     
+              {/* Right Image */}
+              <div className="flex justify-center  lg:justify-end">
+                <img
+                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Image.png"
+                  alt="illustration"
+                  className="w-full max-w-md"
+                />
+              </div>
             </div>
-         </div>
-        </div>
+
+            {/* Features Grid */}
+            <div className="flex flex-col lg:flex-row  w-full h-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2  gap-x-12 gap-y-10 relative pt-5  md:pt-10">
+                <div className="border border-dashed hidden lg:block border-gray-300 absolute top-[55%] w-full "></div>
+                {features.map((item, index) => (
+                  <div key={index} className="flex gap-4 ">
+
+                    <img src={item.icon} className="w-10 h-9 flex items-center justify-center " />
+
+
+
+                    <div>
+                      <h3 className="font-semibold text-lg text-gray-800 mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600  leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+
+                {/* CTA block */}
+
+              </div>
+              <div className="lg:col-span-1  border border-gray-300 p-3 rounded-md border-dashed flex flex-col mt-5 lg:mt-0  items-center justify-center">
+                <p className="  text-center  italic mb-4">
+                  Compliance services, available when you need them without{" "}
+                  <span className="font-semibold">Manual Coordination</span>
+                </p>
+
+                <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max" onClick={() => navigate("/contact")}>
+                  Talk to Our Team &gt;&gt;
+                </button>
+
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="bg-[#FFFAF1]   py-10 lg:py-20">
-       <div className="mx-auto container">
-         <div className=" px-4 lg:px-12 mx-auto ">
+        <div className="mx-auto container">
+          <div className=" px-4 lg:px-12 mx-auto ">
 
-          {/* Header */}
-          <div className="text-center mb-12">
-            <p className="text-yellow text-sm font-semibold mb-2">
-              WHY INSIGHT CONSULTING
-            </p>
-
-            <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
-              Where Compliance Feels Simple
-            </h2>
-
-            <p className="text-gray-600 max-w-2xl mx-auto mb-6">
-              We don’t just deliver compliance services — we change how businesses
-              experience compliance, communication, and follow-ups.
-            </p>
-
-            <button className="bg-red  text-white px-5 py-2 rounded-lg font-medium"  onClick={() => setOpenPopup(true)}>
-              Enquire Now &gt;&gt;
-            </button>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid lg:grid-cols-3 gap-6">
-
-            {/* Left Card */}
-            <div className="relative bg-[#E6F3DA] rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
-              <h3 className="text-xl  font-semibold text-green-600 ">
-                Hassle Free
-              </h3>
-              <h4 className="font-semibold text-xl text-gray-800 mb-4 ">Process</h4>
-              <p className="text-gray-600 text-sm max-w-xs">
-                Simple steps, clear communication, and minimal back-and-forth throughout the service.
+            {/* Header */}
+            <div className="text-center mb-12">
+              <p className="text-yellow text-sm font-semibold mb-2">
+                WHY INSIGHT CONSULTING
               </p>
 
-              {/* Dummy Image */}
-              <img
-                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/handsome-man-making-no-gesture%201.png"
-                alt="dummy"
-                className="absolute bottom-0 left-1/2 md:h-72 h-46 -translate-x-1/2"
-              />
+              <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
+                Where Compliance Feels Simple
+              </h2>
+
+              <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+                We don’t just deliver compliance services — we change how businesses
+                experience compliance, communication, and follow-ups.
+              </p>
+
+              <button
+                className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
+                onClick={() => navigate('/resource')}
+              >
+                Learn From Our Blog &gt;&gt;
+              </button>
             </div>
 
-            {/* Middle Column */}
-            <div className="flex flex-col gap-6">
+            {/* Cards Grid */}
+            <div className="grid lg:grid-cols-3 gap-6">
 
-              {/* Card 2 */}
-              <div className="relative bg-[#E9EEF2] rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
+              {/* Left Card */}
+              <div className="relative bg-[#E6F3DA] rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
+                <h3 className="text-xl  font-semibold text-green-600 ">
+                  Hassle Free
+                </h3>
+                <h4 className="font-semibold text-xl text-gray-800 mb-4 ">Process</h4>
+                <p className="text-gray-600 text-sm max-w-xs">
+                  Simple steps, clear communication, and minimal back-and-forth throughout the service.
+                </p>
+
+                {/* Dummy Image */}
+                <img
+                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/handsome-man-making-no-gesture%201.png"
+                  alt="dummy"
+                  className="absolute bottom-0 left-1/2 md:h-72 h-46 -translate-x-1/2"
+                />
+              </div>
+
+              {/* Middle Column */}
+              <div className="flex flex-col gap-6">
+
+                {/* Card 2 */}
+                <div className="relative bg-[#E9EEF2] rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    No <span className="text-blue-600">Chasing</span>
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-2 max-w-xs">
+                    We proactively manage <br className="hidden lg:block xl:hidden" />follow-ups  and renewals, <br className="hidden lg:block  xl:hidden" /> so clients don’t have to <br className="hidden lg:block  xl:hidden" /> remind us.
+                  </p>
+
+                  <img
+                    src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Adobe%20Express%20-%20file%20(2)%201.png"
+                    alt="dummy"
+                    className="absolute bottom-0 md:h-40 h-28 right-0"
+                  />
+                </div>
+
+                {/* Card 3 */}
+                <div className="relative bg-[#FFF6D7] rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
+                  <h3 className="text-xl font-semibold text-yellow-600">
+                    Clear Ownership
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-2 max-w-xs">
+                    Every step and update is <br className="md:block hidden  xl:hidden" /> communicated clearly no <br className="md:block hidden  xl:hidden" /> confusion, <br className="md:block hidden  xl:hidden" />no surprises.
+                  </p>
+
+                  <img
+                    src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Untitled%20(3)%201.png"
+                    alt="dummy"
+                    className="absolute bottom-0 md:h-40 h-28 right-0"
+                  />
+                </div>
+              </div>
+
+              {/* Right Card */}
+              <div className="relative bg-[#F3EBED] rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
                 <h3 className="text-xl font-semibold text-gray-800">
-                  No <span className="text-blue-600">Chasing</span>
+                  Human <span className="text-pink-600">Support</span>
                 </h3>
                 <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                  We proactively manage <br  className="hidden lg:block xl:hidden" />follow-ups  and renewals, <br  className="hidden lg:block  xl:hidden" /> so clients don’t have to <br  className="hidden lg:block  xl:hidden" /> remind us.
+                  Real people who understand your business handle your compliance.
                 </p>
 
                 <img
-                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Adobe%20Express%20-%20file%20(2)%201.png"
+                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/portrait-man-working-as-telemarketer%201.png"
                   alt="dummy"
-                  className="absolute bottom-0 md:h-40 h-28 right-0"
+                  className="absolute bottom-0 h-46 md:h-72 right-4"
                 />
               </div>
 
-              {/* Card 3 */}
-              <div className="relative bg-[#FFF6D7] rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
-                <h3 className="text-xl font-semibold text-yellow-600">
-                  Clear Ownership
-                </h3>
-                <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                  Every step and update is <br className="md:block hidden  xl:hidden" /> communicated clearly no <br className="md:block hidden  xl:hidden" /> confusion, <br className="md:block hidden  xl:hidden" />no surprises.
-                </p>
-
-                <img
-                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Untitled%20(3)%201.png"
-                  alt="dummy"
-                  className="absolute bottom-0 md:h-40 h-28 right-0"
-                />
-              </div>
             </div>
-
-            {/* Right Card */}
-            <div className="relative bg-[#F3EBED] rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Human <span className="text-pink-600">Support</span>
-              </h3>
-              <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                Real people who understand your business handle your compliance.
-              </p>
-
-              <img
-                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/portrait-man-working-as-telemarketer%201.png"
-                alt="dummy"
-                className="absolute bottom-0 h-46 md:h-72 right-4"
-              />
-            </div>
-
           </div>
         </div>
-       </div>
       </section>
 
       <section className="bg-[#f5f6f7]  py-10 md:py-16">
         <div className="container  lg:px-12 px-4 mx-auto ">
 
           {/* Header */}
-         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
-  <div>
-    <p className="text-yellow-600 text-sm font-semibold mb-2">
-      HOW IT WORKS
-    </p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+            <div>
+              <p className="text-yellow-600 text-sm font-semibold mb-2">
+                HOW IT WORKS
+              </p>
 
-    <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
-      Simple Steps. Zero Stress.
-    </h2>
+              <h2 className="text-2xl md:text-5xl font-semibold text-gray-800 mb-3">
+                Simple Steps. Zero Stress.
+              </h2>
 
-    <p className="text-gray-600 max-w-xl">
-      We built the process anyone can use it — no complexity, no
-      confusion, just a clear path to getting the compliance you need.
-    </p>
-  </div>
+              <p className="text-gray-600 max-w-xl">
+                We built the process anyone can use it — no complexity, no
+                confusion, just a clear path to getting the compliance you need.
+              </p>
+            </div>
 
-  <button
-    className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
-   onClick={() => setOpenPopup(true)}
-  >
-    Enquire Now &gt;&gt;
-  </button>
-</div>
+            <button
+              className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
+              onClick={() => setOpenPopup(true)}
+            >
+              Enquire Now &gt;&gt;
+            </button>
+          </div>
 
           {/* Steps */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
@@ -763,18 +767,18 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   </div>
                 </div>
 
-                <button className="bg-red pl-2 pr-4 py-2 flex items-center gap-2 rounded-full w-max" onClick={() => setOpenPopup(true)}>
-                  < HiArrowRight size={10} className="w-8 h-8 p-2 text-black bg-white rounded-full" /> Enquire Now
+                <button className="bg-red pl-2 pr-4 py-2 flex items-center gap-2 rounded-full w-max" onClick={() => navigate('/about')}>
+                  < HiArrowRight size={10} className="w-8 h-8 p-2 text-black bg-white rounded-full" /> Explore Our Story
                 </button>
               </div>
             </div>
 
             {/* RIGHT FEATURES (CENTERED) */}
-            <div className="lg:col-span-2 h-full bg-white rounded-3xl flex items-center">
+            <div className="lg:col-span-2 h-full mb-4  rounded-3xl flex items-center">
               <div className="grid lg:grid-cols-2 w-full">
 
                 {/* Item 1 */}
-                <div className="flex gap-4  p-3 lg:p-6 md:border-b lg:border-r border-gray-200">
+                <div className="flex gap-4   lg:p-6 md:border-b lg:border-r border-gray-200">
                   <div className="w-10 h-10 p-2 rounded-full bg-yellow flex items-center justify-center text-white">
                     <LuShieldCheck size={22} />
                   </div>
@@ -789,7 +793,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 </div>
 
                 {/* Item 2 */}
-                <div className="flex gap-4 p-3 lg:p-6 lg:border-b border-gray-200">
+                <div className="flex gap-4 lg:p-6 mb-4 lg:border-b border-gray-200">
                   <div className="w-10 h-10 p-2 rounded-full bg-yellow flex items-center justify-center text-white">
                     <BiChalkboard size={22} />
                   </div>
@@ -804,7 +808,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 </div>
 
                 {/* Item 3 */}
-                <div className="flex gap-4 p-3 lg:p-6 border-r border-gray-200">
+                <div className="flex gap-4 lg:p-6 mb-4 border-r border-gray-200">
                   <div className="w-10 h-10 p-2 rounded-full bg-yellow flex items-center justify-center text-white">
                     <FaUserGroup size={22} />
                   </div>
@@ -819,7 +823,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 </div>
 
                 {/* Item 4 */}
-                <div className="flex gap-4 p-3 lg:p-6">
+                <div className="flex gap-4 mb-4 lg:p-6">
                   <div className="w-10 h-10 p-2 rounded-full bg-yellow flex items-center justify-center text-white">
                     <IoFlagSharp size={22} />
                   </div>
@@ -848,25 +852,25 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </p>
 
           {/* Heading */}
-     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-2 gap-6">
-  <div>
-    <h2 className="text-2xl md:text-5xl font-semibold text-gray-900">
-      Everything You Need, Connected in One Place
-    </h2>
-    <p className="text-gray-500 mt-2 max-w-xl">
-      From communication to documents and follow-ups all managed within a single system.
-    </p>
-  </div>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-2 gap-6">
+            <div>
+              <h2 className="text-2xl md:text-5xl font-semibold text-gray-900">
+                Everything You Need, Connected in One Place
+              </h2>
+              <p className="text-gray-500 mt-2 max-w-xl">
+                From communication to documents and follow-ups all managed within a single system.
+              </p>
+            </div>
 
-  <div className="flex lg:w-80">
-    <button
-      className="bg-red text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
-     onClick={() => setOpenPopup(true)}
-    >
-      Enquire Now →
-    </button>
-  </div>
-</div>
+            <div className="flex lg:w-80">
+              <button
+                className="bg-red text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
+                onClick={() => setOpenPopup(true)}
+              >
+                Enquire Now →
+              </button>
+            </div>
+          </div>
 
           {/* Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
@@ -945,30 +949,30 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
         </div>
       </section>
-                <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
-  <div className="mx-auto">
+      <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
+        <div className="mx-auto">
 
 
-    <div className="relative w-full overflow-hidden">
-      <div className="flex lg:gap-12 gap-5 animate-marquee">
-        {[...logos, ...logos, ...logos].map((logo, index) => (
-          <div key={index} className="flex items-center lg:gap-3  flex-shrink-0">
-            <img
-              src={logo.src}
-              alt={`${logo.name} mark`}
-              className=" w-6 md:w-11 h-6 md:h-11 object-contain"
-            />
-            <span className="text-[24px] font-bold text-[#535862] tracking-tight">
-              {logo.name}
-            </span>
+          <div className="relative w-full overflow-hidden">
+            <div className="flex lg:gap-12 gap-5 animate-marquee">
+              {[...logos, ...logos, ...logos].map((logo, index) => (
+                <div key={index} className="flex items-center lg:gap-3  flex-shrink-0">
+                  <img
+                    src={logo.src}
+                    alt={`${logo.name} mark`}
+                    className=" w-6 md:w-11 h-6 md:h-11 object-contain"
+                  />
+                  <span className="text-[24px] font-bold text-[#535862] tracking-tight">
+                    {logo.name}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
+        </div>
 
-  <style>
-    {`
+        <style>
+          {`
       @keyframes marquee {
         from { transform: translateX(0); }
         to { transform: translateX(-50%); }
@@ -979,8 +983,8 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         animation: marquee 35s linear infinite;
       }
     `}
-  </style>
-</section>
+        </style>
+      </section>
 
       <section className="bg-[#F4EBFF33] py-10 lg:py-16 ">
         <div className="lg:px-12 px-4 container mx-auto">
@@ -1071,9 +1075,115 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </p>
             </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition"  onClick={() => setOpenPopup(true)}>
+            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition" onClick={() => setOpenPopup(true)}>
               Enquire Now ››
             </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#F5F8FA] py-10 lg:py-20">
+        <div className="px-4 lg:px-12 container mx-auto py-5 ">
+
+          {/* Heading */}
+          <div className="text-center mb-14">
+            <p className="text-yellow text-sm font-semibold mb-2">
+              Founder Note
+            </p>
+
+            <h2 className="text-2xl md:text-5xl font-semibold text-gray-800">
+              Meet Our Founder
+            </h2>
+
+            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
+              A message from our founder on simplifying compliance, empowering entrepreneurs,
+              and helping businesses grow with confidence.
+            </p>
+          </div>
+
+
+          {/* Content */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left */}
+            <div>
+
+              {/* Founder Info */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="relative">
+                  <img
+                    src="https://i.pravatar.cc/100"
+                    alt="founder"
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <BiBadgeCheck className="text-blue-500 absolute bottom-0 -right-2 bg-white w-6 h-6 rounded-full text-sm" />
+
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800">
+                    Pravin Kumar
+                  </h4>
+
+                  <p className="text-gray-500 text-sm">
+                    Founder, Insight Consulting
+                  </p>
+                </div>
+              </div>
+
+              {/* Tag */}
+              <p className="text-red text-xs font-semibold mb-4 tracking-wide">
+                ● OUR VISION & MISSION
+              </p>
+
+              {/* Title */}
+              <h3 className="text-xl md:text-3xl font-semibold text-gray-800 leading-snug mb-4">
+                Simplifying Compliance. Empowering Businesses.
+              </h3>
+
+              {/* Description */}
+              <p className="text-gray-500 mb-6 max-w-lg">
+                Insight Consulting was built with a simple goal — to remove the complexity
+                of registrations, filings, and regulatory requirements so entrepreneurs
+                can focus on growing their businesses with clarity and confidence.
+              </p>
+
+              {/* Button */}
+              <button onClick={() => navigate("/contact")} className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
+                Contact us
+              </button>
+            </div>
+
+            {/* Right Video Card */}
+            <div className="relative">
+
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border">
+
+                {/* Browser Bar */}
+                <div className="bg-gray-600 px-4 py-2 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
+                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
+                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
+                </div>
+
+                {/* Video */}
+                <div className="relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952"
+                    alt="video"
+                    className="w-full h-[280px] object-cover"
+                  />
+
+                  {/* Play Button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur rounded-full p-4 shadow-md">
+                      <IoPlay className="text-2xl text-gray-800" />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
@@ -1091,7 +1201,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </div>
 
             <div>
-              <button   onClick={() => navigate("/contact")} className="bg-red text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 transition">
+              <button onClick={() => navigate("/contact")} className="bg-red text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 transition">
                 Contact Us
               </button>
             </div>
@@ -1103,7 +1213,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-lg text-sm font-medium transition
+                className={`md:px-5 px-3 md:py-2 py-1 rounded-md text-xs md:text-sm font-medium transition
               ${activeTab === tab
                     ? "bg-red text-white"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300"
@@ -1154,111 +1264,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </div>
           ))}
 
-        </div>
-      </section>
-      <section className="bg-[#F5F8FA] py-10 lg:py-20">
-        <div className="px-4 lg:px-12 container mx-auto py-5 ">
-
-          {/* Heading */}
-          <div className="text-center mb-14">
-            <p className="text-yellow text-sm font-semibold mb-2">
-              Founder Note
-            </p>
-
-            <h2 className="text-2xl md:text-5xl font-semibold text-gray-800">
-              Meet Our Founder
-            </h2>
-
-            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
-              A message from our founder on simplifying compliance, empowering entrepreneurs,
-              and helping businesses grow with confidence.
-            </p>
-          </div>
-
-
-          {/* Content */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-
-            {/* Left */}
-            <div>
-
-              {/* Founder Info */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="relative">
-                  <img
-                    src="https://i.pravatar.cc/100"
-                    alt="founder"
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <BiBadgeCheck className="text-blue-500 absolute bottom-0 -right-2 bg-white w-6 h-6 rounded-full text-sm" />
-
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-800">
-                    Pravin Kumar
-                  </h4>
-
-                  <p className="text-gray-500 text-sm">
-                    Founder, Insight Consulting
-                  </p>
-                </div>
-              </div>
-
-              {/* Tag */}
-             <p className="text-red text-xs font-semibold mb-4 tracking-wide">
-          ● OUR VISION & MISSION
-        </p>
-
-        {/* Title */}
-        <h3 className="text-xl md:text-3xl font-semibold text-gray-800 leading-snug mb-4">
-          Simplifying Compliance. Empowering Businesses.
-        </h3>
-
-        {/* Description */}
-        <p className="text-gray-500 mb-6 max-w-lg">
-          Insight Consulting was built with a simple goal — to remove the complexity
-          of registrations, filings, and regulatory requirements so entrepreneurs
-          can focus on growing their businesses with clarity and confidence.
-        </p>
-
-              {/* Button */}
-              <button  onClick={() => navigate("/contact")} className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
-                Contact us
-              </button>
-            </div>
-
-            {/* Right Video Card */}
-            <div className="relative">
-
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border">
-
-                {/* Browser Bar */}
-                <div className="bg-gray-600 px-4 py-2 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
-                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
-                  <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
-                </div>
-
-                {/* Video */}
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952"
-                    alt="video"
-                    className="w-full h-[280px] object-cover"
-                  />
-
-                  {/* Play Button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur rounded-full p-4 shadow-md">
-                      <IoPlay className="text-2xl text-gray-800" />
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
         </div>
       </section>
 

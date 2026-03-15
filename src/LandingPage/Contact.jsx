@@ -21,7 +21,7 @@ const cards = [
     description:
       "Have questions about GST registration, filings, or compliance? Speak directly with our team and get clear, practical guidance tailored to your business.",
     buttonText: "Schedule a Call",
-    link: "/contact"
+    link: "/"
   },
   {
     title: "Learn More About Us",

@@ -1,14 +1,27 @@
 import React, { useEffect } from "react";
-import { FaTimes } from "react-icons/fa";
+import { RiCloseLargeFill } from "react-icons/ri";
 import Enquiryform from "./Enquiryform";
 
 const EnquiryPopup = ({ open, onClose }) => {
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "auto";
+    if (open) {
+      document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = "15px";
+    } else {
+      document.body.style.overflow = "auto";
+      document.body.style.paddingRight = "0px";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+      document.body.style.paddingRight = "0px";
+    };
   }, [open]);
 
   if (!open) return null;
+
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -18,9 +31,9 @@ const EnquiryPopup = ({ open, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-0 right-0 z-60  text-red-700 p-2 "
+          className="absolute top-0 right-0 md:right-8 z-60  text-red-700 p-2 "
         >
-          <FaTimes />
+          <RiCloseLargeFill />
         </button>
 
         <Enquiryform />

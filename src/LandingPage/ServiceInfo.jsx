@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaStar, FaGift, FaBoxes, FaArrowUp, FaCheckCircle } from "react-icons/fa";
 import { GiCheckMark } from "react-icons/gi";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { Star } from "lucide-react";
 
 import Enquiryform from "./reusable/Enquiryform";
 import ServiceContent from "./ServiceContent";
@@ -136,12 +137,12 @@ const ServiceInfoSection = () => {
 
         <div className="absolute inset-0 bg-white/90"></div>
 
-        <div className="relative container mx-auto px-4  lg:px-12 py-20  gap-16 ">
+        <div className="relative container mx-auto px-4  lg:px-12 lg:py-14 py-10  gap-16 ">
 
           {/* LEFT CONTENT */}
 
           <div className="w-full">
-            <p className=" text-gray-800 mb-4 lg:mb-20">
+            <p className=" text-gray-400 mb-10 lg:mb-20">
               Home › {categoryName} › {subCategoryName} › {selectedService?.name}
             </p>
             <div className=" max-w-6xl mx-auto grid lg:grid-cols-2 ">
@@ -153,7 +154,7 @@ const ServiceInfoSection = () => {
               {/* SERVICE NAME */}
 
               <div className="col-span-1">
-                <h1 className="text-4xl lg:text-5xl font-semibold text-gray-800 mb-4 lg:mb-8">
+                <h1 className=" text-2xl lg:text-4xl  font-semibold text-gray-800 mb-4 lg:mb-8">
 
                   {selectedService?.name || subCategoryName?.toUpperCase()}
 
@@ -206,8 +207,70 @@ const ServiceInfoSection = () => {
                   )}
 
                 </div>
+
+                <div className="flex items-center gap-8 flex-wrap">
+
+      {/* Rating Badge */}
+      <div className="flex items-center gap-3 border border-gray-300 rounded-full px-4 py-2 bg-white shadow-sm">
+
+        {/* Google Icon */}
+        <img
+          src="https://www.google.com/favicon.ico"
+          alt="google"
+          className="w-5 h-5"
+        />
+
+        <span className="text-sm font-medium text-gray-700">
+          4.8 Google Rating
+        </span>
+
+        {/* Stars */}
+        <div className="flex text-yellow-400">
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} size={14} fill="currentColor" />
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-gray-300"></div>
+
+        <span className="text-sm font-semibold text-gray-800">
+          Trustpilot
+        </span>
+      </div>
+
+      {/* Avatars */}
+      <div className="flex items-center gap-4">
+
+        <div className="flex -space-x-3">
+          <img
+            src="https://randomuser.me/api/portraits/men/32.jpg"
+            className="w-9 h-9 rounded-full border-2 border-white"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/women/44.jpg"
+            className="w-9 h-9 rounded-full border-2 border-white"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/men/45.jpg"
+            className="w-9 h-9 rounded-full border-2 border-white"
+          />
+
+          {/* Plus circle */}
+          <div className="w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center text-lg border-2 border-white">
+            +
+          </div>
+        </div>
+
+        {/* Happy Clients */}
+        <p className="text-lg font-medium text-gray-800">
+          1,64,739 Happy Clients
+        </p>
+      </div>
+
+    </div>
               </div>
-              <div className="relative xl:col-span-1">
+              <div className="relative xl:col-span-1  mt-10 lg:mt-0">
 
                 <Enquiryform />
 
