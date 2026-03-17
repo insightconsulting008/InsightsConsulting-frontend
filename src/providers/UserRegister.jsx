@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosInstance from "@src/providers/axiosInstance";
 
@@ -220,8 +219,8 @@ export default function UserRegister() {
     setApiError("");
     setGoogleLoading(true);
     try {
-      const res = await axios.post(
-        "https://insightsconsult-backend.onrender.com/user/google-auth",
+      const res = await axiosInstance.post(
+        "/user/google-auth",
         { token: credentialResponse.credential }
       );
 

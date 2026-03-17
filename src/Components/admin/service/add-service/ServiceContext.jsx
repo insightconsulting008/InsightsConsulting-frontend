@@ -65,6 +65,9 @@ if (!employeeId) {
   // Required documents (only for RECURRING services)
   const [requiredDocuments, setRequiredDocuments] = useState([]);
 
+  // Service highlight points
+  const [points, setPoints] = useState([]);
+
   // Track steps
   const [trackSteps, setTrackSteps] = useState([
     {
@@ -310,6 +313,7 @@ if (!employeeId) {
       photoUrl: '',
     });
     setRequiredDocuments([]);
+    setPoints([]);
     setPriceMode('fixed');
     setDiscountPercentage('');
     setSelectedMasterFields([]);
@@ -374,6 +378,8 @@ if (!employeeId) {
     setTrackSteps,
     requiredDocuments,
     setRequiredDocuments,
+    points,
+    setPoints,
     resetForm,
     fetchCategories,
     fetchSubcategories,

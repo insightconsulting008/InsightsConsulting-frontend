@@ -15,6 +15,140 @@ import {
 import Cropper from "react-easy-crop";
 import axiosInstance from "@src/providers/axiosInstance";
 
+/* ─── Points Section Component ─────────────────────────────── */
+function PointsSection() {
+  const { points, setPoints } = useService();
+  const [inputValue, setInputValue] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingValue, setEditingValue] = useState("");
+
+  const addPoint = () => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+    setPoints((prev) => [...prev, trimmed]);
+    setInputValue("");
+  };
+
+  const removePoint = (idx) => {
+    setPoints((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const startEdit = (idx) => {
+    setEditingIndex(idx);
+    setEditingValue(points[idx]);
+  };
+
+  const saveEdit = () => {
+    if (!editingValue.trim()) return;
+    setPoints((prev) =>
+      prev.map((p, i) => (i === editingIndex ? editingValue.trim() : p))
+    );
+    setEditingIndex(null);
+    setEditingValue("");
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditingValue("");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="block text-sm font-medium text-neutral-800 mb-1">
+          Service Highlights <span className="text-neutral-400 font-normal">(optional)</span>
+        </label>
+        <p className="text-xs text-neutral-500 mb-3">
+          Add key points that describe what's included or why this service stands out.
+        </p>
+      </div>
+
+      {/* Input row */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPoint())}
+          placeholder="e.g. Includes GST filing for 1 year"
+          className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-primary focus:ring-primary/20"
+        />
+        <button
+          type="button"
+          onClick={addPoint}
+          disabled={!inputValue.trim()}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+        >
+          <Plus className="w-4 h-4" />
+          Add
+        </button>
+      </div>
+
+      {/* Points list */}
+      {points.length > 0 && (
+        <ul className="space-y-2">
+          {points.map((point, idx) => (
+            <li
+              key={idx}
+              className="flex items-center gap-3 px-4 py-2.5 border border-neutral-200 rounded-lg bg-neutral-50 group"
+            >
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+                {idx + 1}
+              </span>
+
+              {editingIndex === idx ? (
+                <>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEdit();
+                      if (e.key === "Escape") cancelEdit();
+                    }}
+                    className="flex-1 px-2 py-1 border border-primary rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white"
+                  />
+                  <button
+                    onClick={saveEdit}
+                    className="text-xs font-semibold text-primary hover:underline"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="text-xs text-neutral-500 hover:underline"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="flex-1 text-sm text-neutral-800">{point}</span>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => startEdit(idx)}
+                      className="p-1.5 text-neutral-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => removePoint(idx)}
+                      className="p-1.5 text-neutral-400 hover:text-error-500 hover:bg-error-50 rounded-lg transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function ServiceInfo() {
   const {
     basicInfo,
@@ -32,6 +166,8 @@ export default function ServiceInfo() {
     uploadImage,
     requiredDocuments,
     setRequiredDocuments,
+    points,
+    setPoints,
   } = useService();
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -1191,6 +1327,9 @@ const handleDeleteSubcategory = async (subCategoryId) => {
           )}
         </div>
       </div>
+
+      {/* Service Points Section */}
+      <PointsSection />
 
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-6 border-t border-neutral-200">

@@ -30,13 +30,15 @@ import ViewService from "./service/get-service/ViewService";
 import EditService from "./service/get-service/EditService";
 import OrderManagement from "./order-management/OrderManagement";
 import ViewOrder from "./order-management/ViewOrder";
-import PaymentSettings from "./settings/PaymentSettings";
+import PaymentSettings from "./payments/PaymentSettings";
 import "@src/App.css";
 import CreateAmendmentLink from "../amendment-service/CreateAmendmentLink";
 import Report from "./report/Report";
 import DetailReport from "./report/DetailReport";
 import Profile from "./profile/Profile";
 import Users from "./users/Users";
+import PaymentHistory from "./payments/PaymentHistory";
+import EmailDashboard from "./sms/EmailDashboard";
 
 const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
   <>
@@ -62,6 +64,7 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
         <Route path="/services/:serviceId" element={<ViewService />} />
         <Route path="/amendment" element={<CreateAmendmentLink />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/payment-history" element={<PaymentHistory/>} />
 
         {/* Order Management */}
         <Route path="/orders" element={<OrderManagement />} />
@@ -71,6 +74,7 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
         <Route path="/reports" element={<Report />} />
         <Route path="/reports/:applicationId" element={<DetailReport />} />
         <Route path="/settings" element={<PaymentSettings />} />
+        <Route path="/email-config" element={<EmailDashboard />} />
         <Route path="/Profile" element={<Profile/>} />
       </Routes>
     </div>

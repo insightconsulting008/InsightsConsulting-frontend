@@ -46,7 +46,9 @@ const ADMIN_EXACT = [
   '/reports',
   '/amendment',
   '/profile',
-  '/users'
+  '/users',
+  '/payment-history',
+  '/email-config'
 ];
 const ADMIN_PREFIX = [
   '/services/',   // /services/add  /services/bundle/add

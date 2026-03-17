@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Home, Briefcase, Users,
   FileText, UserCircle, BarChart3, Settings,
-  Menu, X, ChevronLeft, ChevronRight
+  Menu, X, ChevronLeft, ChevronRight, CreditCard, MessageSquare
 } from "lucide-react";
-import { HiUserPlus } from "react-icons/hi2";
 import AddDepartmentModal from '../employee_repo/popup/AddDepartment';
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from '@src/providers/axiosInstance';
@@ -74,7 +73,9 @@ const navItems = [
   { path: '/amendment', icon: FileText, label: 'Amendment' },
   { path: '/users', icon: Users, label: 'Users Data' },   // ✅ better icon
   { path: '/reports', icon: BarChart3, label: 'Reports' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/email-config', icon: MessageSquare, label: 'Email Config' },
+  { path: '/payment-history', icon: CreditCard, label: 'Payment History' },
+  { path: '/settings', icon: Settings, label: 'Payment Settings' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
 

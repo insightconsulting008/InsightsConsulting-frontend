@@ -68,13 +68,13 @@ export default function Report() {
 
       {/* Nav */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
           <span className="font-bold text-primary text-sm">AdminPanel</span>
           <span className="text-sm text-gray-400">Application History</span>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

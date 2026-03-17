@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 /* ─── helpers ─────────────────────────────────────────────────────── */
-const staffId  = localStorage.getItem("userId");
+const staffId  = localStorage.getItem("employeeId");
 const fmt      = (n) => (n ?? 0).toLocaleString("en-IN");
 const pct      = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 const fmtDate  = (iso) =>

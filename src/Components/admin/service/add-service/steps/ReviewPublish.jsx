@@ -212,6 +212,7 @@ export default function ReviewPublish() {
     showSuccessPopup,
     setShowSuccessPopup,
     requiredDocuments,
+    points,
   } = useService();
 
   const navigate = useNavigate();
@@ -363,6 +364,35 @@ export default function ReviewPublish() {
       /* image — required */
       if (!basicInfo.photoFile) throw new Error("Service image is required");
       fd.append("photoUrl", basicInfo.photoFile, basicInfo.photoFile.name);
+
+      /* points — JSON array of highlight strings */
+      fd.append("points", JSON.stringify(points && points.length > 0 ? points : []));
+
+      /* ── LOG final payload ── */
+      const payloadPreview = {
+        name: basicInfo.name.trim(),
+        description: basicInfo.description.trim(),
+        serviceType: basicInfo.serviceType,
+        documentsRequired: basicInfo.serviceType === "RECURRING" ? (basicInfo.documentsRequired ?? false) : false,
+        individualPrice: parseFloat(basicInfo.individualPrice),
+        offerPrice: parseFloat(basicInfo.offerPrice),
+        isGstApplicable: basicInfo.isGstApplicable,
+        gstPercentage: basicInfo.isGstApplicable ? parseFloat(basicInfo.gstPercentage) : 0,
+        finalIndividualPrice: finalPrice,
+        employeeId: basicInfo.employeeId,
+        subCategoryId: basicInfo.subCategoryId,
+        ...(basicInfo.serviceType === "RECURRING" && {
+          frequency: basicInfo.frequency,
+          duration: parseInt(basicInfo.duration, 10),
+          durationUnit: basicInfo.durationUnit,
+          requiredDocuments: basicInfo.documentsRequired && validDocs.length > 0
+            ? validDocs.map(({ documentName, inputType }) => ({ documentName: documentName.trim(), inputType }))
+            : [],
+        }),
+        photoUrl: basicInfo.photoFile?.name,
+        points: points && points.length > 0 ? points : [],
+      };
+      console.log("📦 POST /service — Final Payload:", payloadPreview);
 
       /* ── POST /service ── */
       const res = await axiosInstance.post(`/service`, fd, {
@@ -557,6 +587,28 @@ export default function ReviewPublish() {
               </>
             )}
           </div>
+
+          {/* Service Highlight Points */}
+          {points && points.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-neutral-100">
+              <p className="text-xs font-semibold text-neutral-600 mb-2 flex items-center gap-1.5">
+                Service Highlights
+                <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  {points.length}
+                </span>
+              </p>
+              <ul className="space-y-1.5">
+                {points.map((point, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
+                      {i + 1}
+                    </span>
+                    <span className="text-xs text-neutral-700">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Required documents (RECURRING only) */}
           {basicInfo.serviceType === "RECURRING" &&
