@@ -9,6 +9,7 @@ import {
   CreditCard, BarChart, PieChart, TrendingUp
 } from 'lucide-react';
 import axiosInstance from '@src/providers/axiosInstance';
+import PageHeader from '../page-header/PageHeader';
 
 export default function ViewOrder() {
   const { applicationId } = useParams();
@@ -221,35 +222,19 @@ export default function ViewOrder() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <button onClick={() => navigate(-1)} className="p-2 hover:bg-primary-50 rounded-lg transition-colors">
-                <ArrowLeft size={24} className="text-primary" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
-                <p className="text-sm text-gray-600">ID: {order.applicationId}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={fetchOrderDetails}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-              >
-                <RefreshCw size={16} />
-                Refresh
-              </button>
-              <button className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors flex items-center gap-2">
-                <Download size={16} />
-                Export
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Order Details"
+        subtitle={order ? `ID: ${order.applicationId}` : ''}
+        onBack={() => navigate(-1)}
+        onRefresh={fetchOrderDetails}
+        refreshing={loading}
+        actions={
+          <button className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors flex items-center gap-2 text-sm">
+            <Download size={16} />
+            Export
+          </button>
+        }
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Tabs */}

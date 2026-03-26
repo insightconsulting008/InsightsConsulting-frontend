@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import axiosInstance from '@src/providers/axiosInstance';
 import { useNavigate } from 'react-router-dom';
+import PageHeader from '../page-header/PageHeader';
 
 export default function OrderManagement() {
   // State Management
@@ -371,7 +372,8 @@ export default function OrderManagement() {
 
   // Filtering Logic
   const filteredApplications = applications.filter(app => {
-    const matchesSearch = app.serviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = !searchTerm || // Show all if search term is empty
+                      app.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
       app.applicationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (app.userName && app.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (app.phoneNumber && app.phoneNumber.includes(searchTerm)) ||
@@ -649,20 +651,13 @@ export default function OrderManagement() {
         ></div>
       )}
 
+      <PageHeader
+        title="Order Assignment"
+        subtitle="Manage and assign client service requests"
+      />
+
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-primary-50 rounded-lg">
-              <Package className="text-primary" size={28} />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Assignment</h1>
-              <p className="text-gray-600 text-sm sm:text-base">Manage and assign client service requests</p>
-            </div>
-          </div>
-        </div>
 
         {/* Stats Panel */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">

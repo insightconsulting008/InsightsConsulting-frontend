@@ -1,5 +1,6 @@
 import React from 'react';
 import { ServiceProvider, useService } from './ServiceContext';
+import PageHeader from '../../page-header/PageHeader';
 import StepIndicator from './StepIndicator';
 import ServiceInfo from './steps/ServiceInfo';
 import PricingSetup from './steps/PricingSetup';
@@ -23,23 +24,16 @@ function AddServiceContent() {
 
   return (
     <div className="min-h-screen bg-neutral-50 font-sans">
+      <PageHeader
+        title="Service Onboarding"
+        subtitle="Create a new service, define inputs, and configure process steps"
+        actions={
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-lg">
+            {currentStep}/5 Steps
+          </span>
+        }
+      />
       <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-neutral-900">
-                Service Onboarding
-              </h1>
-              <p className="text-neutral-500 mt-2">
-                Create a new service, define inputs, and configure process steps.
-              </p>
-            </div>
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-lg">
-              {currentStep}/5 Steps
-            </span>
-          </div>
-        </div>
 
         {/* Main content layout */}
         <div className="flex flex-col lg:flex-row gap-8">

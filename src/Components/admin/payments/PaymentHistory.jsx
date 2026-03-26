@@ -24,6 +24,7 @@ import {
   UserCircle
 } from 'lucide-react';
 import axiosInstance from "@src/providers/axiosInstance";
+import PageHeader from '../page-header/PageHeader';
 
 const PaymentHistory = () => {
   const [viewType, setViewType] = useState('all');
@@ -210,62 +211,35 @@ const PaymentHistory = () => {
   return (
     <div className="min-h-screen" style={{ background: 'var(--neutral-50)', fontFamily: 'var(--font-sans)' }}>
 
-      {/* ── Sticky Header ───────────────────────────────────────────── */}
-      <div className="bg-white border-b sticky top-0 z-10"
-        style={{ borderColor: 'var(--neutral-200)', boxShadow: 'var(--shadow-sm)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-
-          {/* Title row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl p-2" style={{ background: 'var(--color-primary)' }}>
-                <Banknote className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold" style={{ color: 'var(--neutral-900)' }}>
-                  Payments Dashboard
-                </h1>
-                <p className="text-sm" style={{ color: 'var(--neutral-500)' }}>
-                  Monitor and manage all transactions
-                </p>
-              </div>
-            </div>
-
-           
-          </div>
-
-          {/* Stats strip — always visible; skeleton while loading */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-            {[
-              { label: 'Total Volume', value: formatAmount(summaryStats.total), bg: 'var(--primary-50)', color: 'var(--color-primary)', valColor: 'var(--primary-800)', skeletonBg: 'var(--primary-100)' },
-              { label: 'Successful',   value: summaryStats.paid,                bg: 'var(--success-50)', color: 'var(--success-600)', valColor: 'var(--success-700)', skeletonBg: 'var(--success-100)' },
-              { label: 'Pending',      value: summaryStats.pending,             bg: 'var(--warning-50)', color: 'var(--warning-700)', valColor: 'var(--warning-700)', skeletonBg: 'var(--warning-100)' },
-              { label: 'Failed',       value: summaryStats.failed,              bg: 'var(--error-50)',   color: 'var(--error-600)',   valColor: 'var(--error-700)',   skeletonBg: 'var(--error-100)' },
-            ].map(({ label, value, bg, color, valColor, skeletonBg }) => (
-              <div key={label} className="rounded-xl p-4" style={{ background: bg }}>
-                <p className="text-xs font-medium mb-2" style={{ color }}>{label}</p>
-                {loading ? (
-                  <>
-                    <div
-                      className="animate-pulse h-7 rounded-lg mb-1"
-                      style={{ background: skeletonBg, width: '60%' }}
-                    />
-                    <div
-                      className="animate-pulse h-3 rounded"
-                      style={{ background: skeletonBg, width: '40%', opacity: 0.6 }}
-                    />
-                  </>
-                ) : (
-                  <p className="text-xl font-bold" style={{ color: valColor }}>{value}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Payments Dashboard"
+        subtitle="Monitor and manage all transactions"
+      />
 
       {/* ── Main Content ────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        {/* Stats strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {[
+            { label: 'Total Volume', value: formatAmount(summaryStats.total), bg: 'var(--primary-50)', color: 'var(--color-primary)', valColor: 'var(--primary-800)', skeletonBg: 'var(--primary-100)' },
+            { label: 'Successful',   value: summaryStats.paid,                bg: 'var(--success-50)', color: 'var(--success-600)', valColor: 'var(--success-700)', skeletonBg: 'var(--success-100)' },
+            { label: 'Pending',      value: summaryStats.pending,             bg: 'var(--warning-50)', color: 'var(--warning-700)', valColor: 'var(--warning-700)', skeletonBg: 'var(--warning-100)' },
+            { label: 'Failed',       value: summaryStats.failed,              bg: 'var(--error-50)',   color: 'var(--error-600)',   valColor: 'var(--error-700)',   skeletonBg: 'var(--error-100)' },
+          ].map(({ label, value, bg, color, valColor, skeletonBg }) => (
+            <div key={label} className="rounded-xl p-4" style={{ background: bg }}>
+              <p className="text-xs font-medium mb-2" style={{ color }}>{label}</p>
+              {loading ? (
+                <>
+                  <div className="animate-pulse h-7 rounded-lg mb-1" style={{ background: skeletonBg, width: '60%' }} />
+                  <div className="animate-pulse h-3 rounded" style={{ background: skeletonBg, width: '40%', opacity: 0.6 }} />
+                </>
+              ) : (
+                <p className="text-xl font-bold" style={{ color: valColor }}>{value}</p>
+              )}
+            </div>
+          ))}
+        </div>
 
         {/* Tab bar + limit */}
         <div className="flex items-center justify-between mb-6">

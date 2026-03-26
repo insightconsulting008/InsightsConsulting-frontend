@@ -1,6 +1,6 @@
 // AdminLogin.jsx
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "./axiosInstance";
 import { useAuth } from "./AuthContext";
 
@@ -35,6 +35,17 @@ const SpinnerIcon = () => (
   <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25"/>
     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+  </svg>
+)
+const CloseIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+)
+const InboxIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+    <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
   </svg>
 )
 
@@ -103,6 +114,172 @@ function Alert({ type, message }) {
   )
 }
 
+/* ─── Forgot Password Modal ─────────────────────────────────────────── */
+function ForgotPasswordModal({ onClose }) {
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value)
+    if (emailError) setEmailError('')
+    if (error) setError('')
+  }
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault()
+
+    // Validate
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email) {
+      setEmailError('Email is required')
+      return
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      await axiosInstance.post('/staff/forgot-password', { email })
+      setSuccess(true)
+    } catch (err) {
+      if (err.response) {
+        switch (err.response.status) {
+          case 404:
+            setError('No account found with this email address.')
+            break
+          case 429:
+            setError('Too many requests. Please try again later.')
+            break
+          case 500:
+            setError('Server error. Please try again later.')
+            break
+          default:
+            setError(err?.response?.data?.message || 'Something went wrong. Please try again.')
+        }
+      } else if (err.request) {
+        setError('Network error. Please check your internet connection.')
+      } else {
+        setError('An unexpected error occurred.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    /* Backdrop */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <style>{`
+        @keyframes modalIn {
+          from { opacity: 0; transform: scale(0.95) translateY(8px); }
+          to   { opacity: 1; transform: scale(1)    translateY(0);   }
+        }
+        .modal-card { animation: modalIn 0.25s ease-out; }
+      `}</style>
+
+      <div className="modal-card w-full max-w-sm bg-white rounded-2xl border border-neutral-200 shadow-2xl overflow-hidden">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100">
+          <div>
+            <h2 className="text-lg font-bold text-neutral-800">Reset Password</h2>
+            <p className="text-xs text-neutral-500 mt-0.5">We'll send a reset link to your email</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg p-1.5 transition-all"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="px-6 py-5">
+          {/* Success State */}
+          {success ? (
+            <div className="text-center py-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success-50 text-success-600 mb-4">
+                <InboxIcon />
+              </div>
+              <h3 className="text-base font-semibold text-neutral-800 mb-2">Check your Mail!</h3>
+              <p className="text-sm text-neutral-500 mb-1">
+                We've sent a password reset link to
+              </p>
+              <p className="text-sm font-semibold text-primary mb-4 break-all">{email}</p>
+              <p className="text-xs text-neutral-400 mb-6">
+                Didn't receive it? Check your spam folder or{' '}
+                <button
+                  onClick={() => { setSuccess(false); setEmail('') }}
+                  className="text-primary hover:text-primary-hover font-medium underline underline-offset-2 transition-colors"
+                >
+                  try again
+                </button>
+                .
+              </p>
+              <button
+                onClick={onClose}
+                className="w-full py-3 px-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-hover transition-all active:scale-[0.98] shadow-lg hover:shadow-xl"
+              >
+                Back to Sign In
+              </button>
+            </div>
+          ) : (
+            /* Form State */
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Alert type="error" message={error} />
+
+              <InputField
+                icon={MailIcon}
+                label="Email Address"
+                type="email"
+                name="forgot-email"
+                value={email}
+                onChange={handleEmailChange}
+                error={emailError}
+              />
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={loading}
+                  className="flex-1 py-3 px-4 border border-neutral-200 text-neutral-600 rounded-xl font-semibold text-sm hover:bg-neutral-50 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 px-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-hover transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                >
+                  {loading ? (
+                    <>
+                      <SpinnerIcon />
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Reset Link'
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════════════════════════════════════ */
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -114,6 +291,9 @@ export default function AdminLogin() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  // Forgot password modal
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   // Handle input changes
   const handleChange = (e) => {
@@ -220,6 +400,11 @@ export default function AdminLogin() {
         }
       `}</style>
 
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <ForgotPasswordModal onClose={() => setShowForgotPassword(false)} />
+      )}
+
       <div className="login-card w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
@@ -275,12 +460,13 @@ export default function AdminLogin() {
 
             {/* Forgot Password Link */}
             <div className="flex justify-end">
-              <Link 
-                to="/admin-forgot-password" 
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
                 className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
               >
                 Forgot Password?
-              </Link>
+              </button>
             </div>
 
             {/* Submit Button */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axiosInstance from '@src/providers/axiosInstance'
+import PageHeader from '../page-header/PageHeader'
 
 const PROVIDER_CONFIG = {
   GOOGLE: {
@@ -119,19 +120,11 @@ export default function Users() {
 
   return (
     <div className="min-h-screen bg-neutral-50" style={{ fontFamily: 'var(--font-sans, DM Sans, sans-serif)' }}>
+      <PageHeader
+        title="Users"
+        subtitle={!loading && meta.total > 0 ? `${meta.total} registered user${meta.total !== 1 ? 's' : ''}` : 'User management'}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-
-        {/* ── Header ── */}
-        <div className="mb-7">
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-1 h-5 rounded-full bg-primary" />
-            <span className="text-xs font-bold tracking-widest text-primary uppercase">Management</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Users</h1>
-          <p className="mt-1 text-sm text-neutral-500 h-5">
-            {!loading && (meta.total > 0 ? `${meta.total} registered user${meta.total !== 1 ? 's' : ''}` : '')}
-          </p>
-        </div>
 
         {/* ── Filter Bar ── */}
         <div className="mb-5 flex flex-col sm:flex-row gap-3">

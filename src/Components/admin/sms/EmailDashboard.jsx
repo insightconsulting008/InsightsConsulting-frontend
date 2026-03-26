@@ -1,5 +1,6 @@
 import axiosInstance from "@src/providers/axiosInstance";
 import { useState, useEffect, useCallback } from "react";
+import PageHeader from '../page-header/PageHeader';
 import {
   Lock, Eye, EyeOff, X, Check, ShieldCheck, AlertCircle,
   Mail, RefreshCw, Send, Settings, Zap, FlaskConical,
@@ -338,27 +339,43 @@ export default function EmailDashboard() {
     setShowPasswordModal(true);
   };
 
-  const handleConfirmSave = async (profilePassword) => {
-    setModalLoading(true);
-    setModalError("");
-    try {
-      const response = await axiosInstance.post(`/email/config`, {
-        ...cfg, provider, employeeId, profilePassword,
-      });
-      if (response.data.success) {
-        setShowPasswordModal(false);
-        setShowSuccessModal(true);
+ const handleConfirmSave = async (profilePassword) => {
+  setModalLoading(true);
+  setModalError("");
+  try {
+    const response = await axiosInstance.post(`/email/config`, {
+      ...cfg, provider, employeeId, profilePassword,
+    });
+    if (response.data.success) {
+      setShowPasswordModal(false);
+      setShowSuccessModal(true);
+      
+      // Clear only specific fields after successful save
+      if (provider === "resend") {
+        setCfg(prev => ({
+          ...prev,
+          apiKey: "", // Clear only API key, keep fromEmail
+        }));
       } else {
-        setModalError(response.data.message || "Failed to save");
+        setCfg(prev => ({
+          ...prev,
+          accessKey: "",
+          secretKey: "",
+          region: "",
+          // Keep fromEmail
+        }));
       }
-    } catch (err) {
-      if (err.response) setModalError(err.response.data.message || "Failed to save");
-      else if (err.request) setModalError("Network error: No response received");
-      else setModalError("Network error");
-    } finally {
-      setModalLoading(false);
+    } else {
+      setModalError(response.data.message || "Failed to save");
     }
-  };
+  } catch (err) {
+    if (err.response) setModalError(err.response.data.message || "Failed to save");
+    else if (err.request) setModalError("Network error: No response received");
+    else setModalError("Network error");
+  } finally {
+    setModalLoading(false);
+  }
+};
 
   const handleTestEmail = async () => {
     setTestLoading(true);
@@ -400,25 +417,11 @@ export default function EmailDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white text-gray-800 font-sans">
+      <PageHeader
+        title="Email Configuration"
+        subtitle="Manage your email provider, events, and sending settings"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6 sm:mb-9">
-          <div
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white shadow-md flex-shrink-0"
-            style={{ background: `linear-gradient(135deg, ${primary}, ${primaryHover})` }}
-          >
-            <Mail className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-base sm:text-xl font-semibold text-gray-800 tracking-tight truncate">
-              Email Configuration
-            </h1>
-            <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">
-              Manage your email provider, events, and sending settings
-            </p>
-          </div>
-        </div>
 
         {/* Tabs */}
         <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 mb-5 sm:mb-7 shadow-sm w-full sm:w-fit">

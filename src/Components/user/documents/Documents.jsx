@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axiosInstance from '@src/providers/axiosInstance'
+import PageHeader from '../page-header/PageHeader'
 
 const USER_ID = localStorage.getItem("userId");
 const LIMIT   = 8
@@ -374,6 +375,11 @@ export default function Documents() {
   }, [])
 
   return (
+    <>
+    <PageHeader
+      title="Documents"
+      subtitle="Choose a folder to browse your files"
+    />
     <div className="docs-root">
       <style>{`
         .docs-root {
@@ -1149,20 +1155,15 @@ export default function Documents() {
       `}</style>
 
       {!active ? (
-        <>
-          <div className="page-header">
-            <h1>Documents</h1>
-            <p>Choose a folder to browse your files</p>
-          </div>
-          <div className="home-grid">
-            {FOLDERS.map(f => (
-              <FolderCard key={f.key} folder={f} count={counts[f.key]} onClick={() => setActive(f)}/>
-            ))}
-          </div>
-        </>
+        <div className="home-grid">
+          {FOLDERS.map(f => (
+            <FolderCard key={f.key} folder={f} count={counts[f.key]} onClick={() => setActive(f)}/>
+          ))}
+        </div>
       ) : (
         <DetailView folder={active} onBack={() => setActive(null)}/>
       )}
     </div>
+    </>
   )
 }

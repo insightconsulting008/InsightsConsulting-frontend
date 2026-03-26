@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, RefreshCw, AlertTriangle, Package, Layers, Folder } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '@src/providers/axiosInstance';
+import PageHeader from '../page-header/PageHeader';
 
 // Import components
 import CategoryList from './get-service/CategoryList';
@@ -211,7 +212,6 @@ export default function Service() {
   }, []);
 
   const handleRefresh = () => {
-    showToast('Refreshing data...', 'info');
     fetchAllData();
   };
 
@@ -255,33 +255,28 @@ export default function Service() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Service Hub</h1>
-              <p className="text-gray-600 mt-1">Manage all your services, categories, and bundles</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => navigate('/services/add')}
-                className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Add Service
-              </button>
-              <button
-                onClick={() => navigate('/services/bundle/add')}
-                className="flex items-center gap-2 px-4 py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Create Bundle
-              </button>
-            </div>
+      <PageHeader
+        title="Service Hub"
+        subtitle="Manage all your services, categories, and bundles"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/services/add')}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Service
+            </button>
+            <button
+              onClick={() => navigate('/services/bundle/add')}
+              className="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Create Bundle
+            </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Error Summary */}
@@ -385,7 +380,7 @@ export default function Service() {
                   <button
                     onClick={handleRefresh}
                     disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 md:px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors disabled:opacity-50"
                   >
                     <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     {loading ? 'Refreshing...' : 'Refresh Data'}

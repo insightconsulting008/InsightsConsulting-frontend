@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '@src/providers/axiosInstance';
+import PageHeader from '../page-header/PageHeader';
 import {
   ChevronLeft, RefreshCw, X, Check, Upload, Phone,
   FileText, Clock, Calendar, Activity, CheckCircle2, AlertTriangle,
@@ -722,41 +723,18 @@ export default function ServiceDetailPage() {
 
       <div className="min-h-screen" style={{ background: 'var(--neutral-50)' }}>
 
-        {/* ══ STICKY NAV ══ */}
-        <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
-          <div className="max-w-7xl mx-auto px-3 sm:px-5 flex items-center justify-between py-3 gap-2">
-            {/* Back */}
-            <button onClick={() => navigate('/my-services')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900
-                font-bold transition-colors flex-shrink-0 min-w-0">
-              <ChevronLeft size={17} />
-              <span className="hidden xs:inline truncate">My Services</span>
+        <PageHeader
+          title="Service Details"
+          subtitle="Track your service progress and updates"
+          onBack={() => navigate('/my-services')}
+          onRefresh={fetchDetail}
+          actions={
+            <button className="flex items-center gap-1.5 bg-primary text-white px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold hover:bg-primary-hover transition-colors">
+              <Phone size={13} />
+              <span className="hidden sm:inline">Call Us</span>
             </button>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {totalAlerts > 0 && (
-                <span className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-100 text-amber-800
-                  text-xs font-extrabold rounded-full border border-amber-300 whitespace-nowrap">
-                  <BellRing size={11} />
-                  <span className="hidden sm:inline">{totalAlerts} action{totalAlerts > 1 ? 's' : ''} needed</span>
-                  <span className="sm:hidden">{totalAlerts}</span>
-                </span>
-              )}
-              <button onClick={fetchDetail}
-                className="w-9 h-9 border border-gray-200 rounded-xl text-gray-400
-                  hover:text-primary hover:border-primary transition-all flex items-center justify-center">
-                <RefreshCw size={14} />
-              </button>
-              <button className="flex items-center gap-1.5 bg-primary text-white
-                px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold
-                hover:bg-primary-hover transition-colors">
-                <Phone size={13} />
-                <span className="hidden sm:inline">Call Us</span>
-              </button>
-            </div>
-          </div>
-        </div>
+          }
+        />
 
         {/* ══ PAGE BODY ══ */}
         <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-6">

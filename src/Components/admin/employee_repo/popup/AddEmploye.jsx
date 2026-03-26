@@ -1,6 +1,5 @@
 // EmployeeModal.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
 import { Plus, Users, X, Upload, ChevronDown, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { FaUsers } from 'react-icons/fa';
 import axiosInstance from '@src/providers/axiosInstance';
@@ -74,7 +73,7 @@ const SuccessPopup = ({ isOpen, onClose, employeeData, departmentData, mode = 'a
           </div>
           {mode === 'add' ? (
             <>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">'{employeeData?.name} | {employeeData?.employeeId}'</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">'{employeeData?.name} | {employeeData?.designation}'</h2>
               <p className="text-gray-700 mb-1">has been added to the '{departmentData?.label}' team.</p>
               <p className="text-sm text-gray-500">You can now view this employee under the assigned department.</p>
             </>
@@ -102,7 +101,7 @@ const EmployeeModal = ({
   const emptyForm = {
     department: '', status: 'Active', role: 'Staff',
     name: '', employeeId: '', email: '', mobile: '',
-    designation: '', photoUrl: '', password: '', photoFile: null
+    designation: '', photoUrl: '', photoFile: null
   };
 
   const [formData,       setFormData]       = useState(emptyForm);
@@ -124,7 +123,6 @@ const EmployeeModal = ({
   const [zoom,                setZoom]                = useState(1);
   const [croppedAreaPixels,   setCroppedAreaPixels]   = useState(null);
   const [cropLoading,         setCropLoading]         = useState(false);
-  const [showPassword,        setShowPassword]        = useState(false);
 
   const IMAGE_SIZE  = { width: 200, height: 200 };
   const aspectRatio = IMAGE_SIZE.width / IMAGE_SIZE.height;
@@ -132,8 +130,8 @@ const EmployeeModal = ({
   async function fetchDepartments(page = departmentPage, limit = departmentLimit) {
     setLoading(true);
     try {
-      const url = `https://insightsconsult-backend.onrender.com/department?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
-      const res = await axios.get(url);
+      const url = `/department?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+      const res = await axiosInstance.get(url);
       const json = res.data;
       let raw = [];
       if (Array.isArray(json)) raw = json;
@@ -178,7 +176,6 @@ const EmployeeModal = ({
         mobile:      initialData.mobileNumber ?? initialData.mobile ?? initialData.phone ?? '',
         designation: initialData.designation ?? '',
         photoUrl:    initialData.photoUrl ?? '',
-        password:    '',
         photoFile:   null
       });
       setShowError(false); setErrorMessage('');
@@ -304,15 +301,16 @@ const EmployeeModal = ({
       formDataPayload.append('role', (formData.role ?? 'Staff').toUpperCase());
       formDataPayload.append('status', (formData.status ?? 'Active').toUpperCase());
       if (formData.employeeId) formDataPayload.append('employeeId', formData.employeeId);
-      if (formData.password) {
-        formDataPayload.append('password', formData.password);
-      } else if (!initialData) {
-        setErrorMessage('Password is required for new employees'); setShowError(true); setSubmitting(false); return;
-      }
+
+      // Handle photo upload - send null if no photo
       if (formData.photoFile) {
         formDataPayload.append('photoUrl', formData.photoFile);
       } else if (formData.photoUrl && !formData.photoUrl.startsWith('blob:')) {
         formDataPayload.append('photoUrl', formData.photoUrl);
+      } else if (initialData && !formData.photoFile && (!formData.photoUrl || formData.photoUrl === '')) {
+        formDataPayload.append('photoUrl', 'null');
+      } else if (!initialData && !formData.photoFile && (!formData.photoUrl || formData.photoUrl === '')) {
+        formDataPayload.append('photoUrl', 'null');
       }
 
       if (initialData && (initialData._id || initialData.employeeId)) {
@@ -386,12 +384,7 @@ const EmployeeModal = ({
             <div className="flex flex-col items-center">
               <div className="relative w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mb-3 border-2 border-primary-200">
                 {formData.photoUrl ? (
-                  <>
-                    <img src={formData.photoUrl} alt={formData.name} className="w-full h-full object-cover rounded-full" />
-                    <button type="button" onClick={removePhoto} className="absolute top-0 right-0 bg-rose-500 text-white rounded-full p-1 hover:bg-rose-600 transition-colors" disabled={cropLoading || submitting}>
-                      <X className="w-3 h-3" />
-                    </button>
-                  </>
+                  <img src={formData.photoUrl} alt={formData.name} className="w-full h-full object-cover rounded-full" />
                 ) : (
                   <Users className="w-10 h-10 text-primary" />
                 )}
@@ -482,11 +475,6 @@ const EmployeeModal = ({
               <input type="text" placeholder="Rahul A" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClass} required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID</label>
-              <input type="text" placeholder="EMP012 (optional)" value={formData.employeeId} onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })} className={inputClass} />
-              <p className="text-xs text-gray-500 mt-1">If left blank, the server may generate one.</p>
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address <span className="text-rose-500">*</span></label>
               <input type="email" placeholder="rahul@companyname.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputClass} required />
             </div>
@@ -497,23 +485,6 @@ const EmployeeModal = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Designation <span className="text-rose-500">*</span></label>
               <input type="text" placeholder="Associate Manager" value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className={inputClass} required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password {initialData ? <span className="text-xs text-gray-500">(leave blank to keep current)</span> : <span className="text-rose-500">*</span>}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={initialData ? "Enter new password to change" : "Enter password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={`${inputClass} pr-12`}
-                />
-                <button type="button" onClick={() => setShowPassword(s => !s)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md hover:bg-primary-50 transition-colors">
-                  {showPassword ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
-                </button>
-              </div>
             </div>
 
             {showError && <div className="text-sm text-rose-600">{errorMessage}</div>}

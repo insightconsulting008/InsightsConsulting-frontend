@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axiosInstance from '@src/providers/axiosInstance'
+import PageHeader from '../page-header/PageHeader'
 
 /* ─── Icons ───────────────────────────────────────────────────────────── */
 const MailIcon = () => (
@@ -373,7 +374,7 @@ export default function Profile() {
 
   return (
     <div
-      className="min-h-screen bg-neutral-50 py-10 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-neutral-50"
       style={{ fontFamily: 'var(--font-sans)' }}
     >
       <style>{`
@@ -388,22 +389,21 @@ export default function Profile() {
         .profile-card { animation: fadeUp 0.3s ease both; }
       `}</style>
 
-      <div className="max-w-4xl mx-auto">
-
-        {/* ── Page heading ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-800 tracking-tight">My Profile</h1>
-            <p className="text-sm text-neutral-500 mt-1">View and manage your account information</p>
-          </div>
+      <PageHeader
+        title="My Profile"
+        subtitle="View and manage your account information"
+        actions={
           <button
             onClick={() => setShowPasswordModal(true)}
-            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-all active:scale-95 shadow-md hover:shadow-lg flex-shrink-0"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-all active:scale-95"
           >
             <LockIcon />
             Change Password
           </button>
-        </div>
+        }
+      />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* ── Profile card ── */}
         <div className="profile-card bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-xl">

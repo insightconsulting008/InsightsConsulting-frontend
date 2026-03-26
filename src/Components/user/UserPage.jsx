@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import axiosInstance from "@src/providers/axiosInstance";
 import PhonePopup from "./PhonePopup";
 import UserNav from "./UserNav";
-import UserDashboard from "./UserDashboard";
+import UserDashboard from "./user-dashboard/UserDashboard";
 import GetService from "./service/GetService";
 import MyService from "./my-service/MyService";
 import "@src/App.css"

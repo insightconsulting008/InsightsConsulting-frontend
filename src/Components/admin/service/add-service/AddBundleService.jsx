@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight as ChevronRightIcon, Tag, Layers,
   Sparkles, ShieldCheck
 } from 'lucide-react';
+import PageHeader from '../../page-header/PageHeader';
 import Cropper from "react-easy-crop";
 import axiosInstance from '@src/providers/axiosInstance';
 
@@ -316,6 +317,17 @@ export default function AddBundleService() {
     }
   };
 
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.activeElement.type === "number") {
+        document.activeElement.blur();
+      }
+    };
+  
+    window.addEventListener("wheel", handleWheel);
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
+
   /* ══════════════════════════════════════════════════════
      SUB-COMPONENTS (unchanged)
   ══════════════════════════════════════════════════════ */
@@ -620,25 +632,13 @@ export default function AddBundleService() {
 
       {/* ── Main Page ── */}
       <div className="min-h-screen font-sans" style={{ background: 'var(--neutral-50)' }}>
+        <PageHeader
+          title="Create Service Bundle"
+          subtitle="Package multiple services into a single compelling offer"
+          onBack={() => window.history.back()}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
 
-          {/* ── Page Header (unchanged) ── */}
-          <div className="mb-8 flex items-center gap-4">
-            <button
-              onClick={() => window.history.back()}
-              className="p-2 rounded-xl border transition-all hover:shadow-sm"
-              style={{ borderColor: 'var(--neutral-200)', background: '#fff', color: 'var(--neutral-600)' }}>
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--neutral-900)' }}>
-                Create Service Bundle
-              </h1>
-              <p className="text-sm mt-0.5" style={{ color: 'var(--neutral-500)' }}>
-                Package multiple services into a single compelling offer
-              </p>
-            </div>
-          </div>
 
           {/* ── Alerts (unchanged) ── */}
           {error && (

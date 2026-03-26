@@ -1,169 +1,129 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from "@src/providers/axiosInstance";
+import PageHeader from '../page-header/PageHeader';
 import {
   Package,
   Clock,
-  Calendar,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Search,
   Eye,
-  Layers,
-  Hash,
-  ChevronRight,
   UserCheck,
+  ChevronLeft,
+  ChevronRight,
+  Mail,
+  Phone,
+  User,
   X,
-  Filter,
-  MessageSquare,
-  HelpCircle,
-  ExternalLink
 } from 'lucide-react';
+
+const LIMIT = 8;
 
 export default function MyService() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1 });
+  const debounceRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
+  const employeeId = localStorage.getItem('employeeId');
 
-   // Hardcoded user ID as requested
-  const employeeId = localStorage.getItem("employeeId");
-
-if (!employeeId) {
-  console.error("Employee ID not found");
-}
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async (pg, q) => {
+    if (!employeeId) return;
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get(`staff/${employeeId}/applications/`);
-      if (response.data.success) {
-        setApplications(response.data.applications);
+      const params = new URLSearchParams({ page: pg, limit: LIMIT });
+      if (q) params.set('search', q);
+      const res = await axiosInstance.get(`staff/${employeeId}/applications?${params}`);
+      if (res.data.success) {
+        setApplications(res.data.applications ?? []);
+        setPagination({
+          total: res.data.pagination?.total ?? 0,
+          totalPages: res.data.pagination?.totalPages ?? 1,
+        });
       } else {
         setApplications([]);
       }
     } catch (err) {
       console.error('Error fetching applications:', err);
-      setError('Failed to load applications. Please try again later.');
+      setError('Failed to load applications. Please try again.');
     } finally {
       setLoading(false);
     }
+  }, [employeeId]);
+
+  useEffect(() => {
+    fetchApplications(page, search);
+  }, [page, search, fetchApplications]);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchInput(val);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearch(val);
+      setPage(1);
+    }, 400);
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearch('');
+    setPage(1);
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric',
     });
   };
 
   const getStatusConfig = (status) => {
     switch (status) {
       case 'ASSIGNED':
-        return { 
-          bg: 'bg-primary-50',
-          text: 'text-primary-800',
-          border: 'border-primary-200',
-          icon: UserCheck,
-          iconColor: 'text-primary',
-          label: 'Assigned'
-        };
+        return { bg: 'bg-primary-50', text: 'text-primary-800', border: 'border-primary-200', icon: UserCheck, iconColor: 'text-primary', label: 'Assigned' };
       case 'IN_PROGRESS':
-        return { 
-          bg: 'bg-warning-50',
-          text: 'text-warning-800',
-          border: 'border-warning-200',
-          icon: RefreshCw,
-          iconColor: 'text-warning-600',
-          label: 'In Progress'
-        };
+        return { bg: 'bg-warning-50', text: 'text-warning-800', border: 'border-warning-200', icon: RefreshCw, iconColor: 'text-warning-600', label: 'In Progress' };
       case 'COMPLETED':
-        return { 
-          bg: 'bg-success-50',
-          text: 'text-success-800',
-          border: 'border-success-200',
-          icon: CheckCircle,
-          iconColor: 'text-success-600',
-          label: 'Completed'
-        };
+        return { bg: 'bg-success-50', text: 'text-success-800', border: 'border-success-200', icon: CheckCircle, iconColor: 'text-success-600', label: 'Completed' };
       case 'PENDING':
-        return { 
-          bg: 'bg-neutral-100',
-          text: 'text-neutral-800',
-          border: 'border-neutral-200',
-          icon: Clock,
-          iconColor: 'text-neutral-600',
-          label: 'Pending'
-        };
+        return { bg: 'bg-neutral-100', text: 'text-neutral-800', border: 'border-neutral-200', icon: Clock, iconColor: 'text-neutral-600', label: 'Pending' };
       default:
-        return { 
-          bg: 'bg-neutral-100',
-          text: 'text-neutral-800',
-          border: 'border-neutral-200',
-          icon: AlertCircle,
-          iconColor: 'text-neutral-600',
-          label: status
-        };
+        return { bg: 'bg-neutral-100', text: 'text-neutral-800', border: 'border-neutral-200', icon: AlertCircle, iconColor: 'text-neutral-600', label: status };
     }
   };
 
   const getServiceTypeConfig = (type) => {
-    switch (type) {
-      case 'RECURRING':
-        return {
-          bg: 'bg-primary-50',
-          text: 'text-primary-800',
-          border: 'border-primary-200',
-          label: 'Recurring'
-        };
-      case 'ONE_TIME':
-        return {
-          bg: 'bg-info-50',
-          text: 'text-info-800',
-          border: 'border-info-200',
-          label: 'One Time'
-        };
-      default:
-        return {
-          bg: 'bg-neutral-100',
-          text: 'text-neutral-800',
-          border: 'border-neutral-200',
-          label: type
-        };
-    }
+    if (type === 'RECURRING') return { bg: 'bg-primary-50', text: 'text-primary-800', border: 'border-primary-200', label: 'Recurring' };
+    if (type === 'ONE_TIME') return { bg: 'bg-info-50', text: 'text-info-800', border: 'border-info-200', label: 'One Time' };
+    return { bg: 'bg-neutral-100', text: 'text-neutral-800', border: 'border-neutral-200', label: type };
   };
 
-  const handleViewDetails = (applicationId) => {
-    navigate(`/tasks/${applicationId}`);
-  };
-
-  const filteredApplications = applications.filter(app => {
-    const matchesSearch = 
-      app.applicationId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.serviceName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
-
-  if (loading) {
+  /* ── Skeleton ── */
+  if (loading && applications.length === 0) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary-200 border-t-primary mb-4"></div>
-          <p className="text-neutral-600 text-lg font-medium">Loading your services...</p>
-          <p className="text-neutral-500 text-sm mt-2">Please wait while we fetch your data</p>
+      <div className="min-h-screen bg-neutral-50 font-sans">
+        <PageHeader title="My Services" subtitle="Manage and track all your assigned service applications" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-white rounded-xl border border-neutral-200 p-5 animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-neutral-200 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-neutral-200 rounded w-1/3" />
+                  <div className="h-3 bg-neutral-100 rounded w-1/4" />
+                </div>
+                <div className="h-8 w-24 bg-neutral-200 rounded-lg" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -172,16 +132,12 @@ if (!employeeId) {
   if (error) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-error-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Error Loading Data</h2>
-          <p className="text-neutral-600 mb-6">{error}</p>
-          <button
-            onClick={fetchApplications}
-            className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto shadow-sm"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Try Again
+        <div className="text-center max-w-md px-4">
+          <AlertCircle className="w-14 h-14 text-error-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-neutral-900 mb-2">Something went wrong</h2>
+          <p className="text-neutral-500 mb-6 text-sm">{error}</p>
+          <button onClick={() => fetchApplications(page, search)} className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:opacity-90 transition flex items-center gap-2 mx-auto text-sm">
+            <RefreshCw size={16} /> Try Again
           </button>
         </div>
       </div>
@@ -190,271 +146,245 @@ if (!employeeId) {
 
   return (
     <div className="min-h-screen bg-neutral-50 font-sans">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-primary-50 rounded-lg">
-                <Package className="text-primary" size={28} />
-              </div>
+      <PageHeader
+        title="My Services"
+        subtitle="Manage and track all your assigned service applications"
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+        {/* ── Stats Cards ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5 shadow-sm">
+            <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">My Services</h1>
-                <p className="text-neutral-500 text-sm sm:text-base">Manage and track all your assigned service applications</p>
+                <p className="text-xs text-neutral-500 mb-1">Total Services</p>
+                <h3 className="text-2xl font-bold text-neutral-900">{pagination.total}</h3>
+                <p className="text-xs text-neutral-400 mt-1">All assigned services</p>
+              </div>
+              <div className="p-2.5 bg-primary-50 rounded-lg">
+                <Package className="text-primary" size={22} />
               </div>
             </div>
           </div>
-
-          {/* Stats Panel */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            {/* Total Services */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">Total Services</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-neutral-900">{applications.length}</h3>
-                  <p className="text-xs text-neutral-400 mt-2">All assigned services</p>
-                </div>
-                <div className="p-3 bg-primary-50 rounded-lg">
-                  <Package className="text-primary" size={28} />
-                </div>
+          <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-neutral-500 mb-1">Assigned</p>
+                <h3 className="text-2xl font-bold text-neutral-900">
+                  {applications.filter(a => a.status === 'ASSIGNED').length}
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">Currently assigned</p>
               </div>
-            </div>
-
-            {/* Assigned Services */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">Assigned</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-                    {applications.filter(app => app.status === 'ASSIGNED').length}
-                  </h3>
-                  <p className="text-xs text-neutral-400 mt-2">Currently assigned</p>
-                </div>
-                <div className="p-3 bg-primary-50 rounded-lg">
-                  <UserCheck className="text-primary" size={28} />
-                </div>
-              </div>
-            </div>
-
-            {/* In Progress */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">In Progress</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-                    {applications.filter(app => app.status === 'IN_PROGRESS').length}
-                  </h3>
-                  <p className="text-xs text-neutral-400 mt-2">Currently in progress</p>
-                </div>
-                <div className="p-3 bg-warning-50 rounded-lg">
-                  <RefreshCw className="text-warning-600" size={28} />
-                </div>
-              </div>
-            </div>
-
-            {/* Recurring Services */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-neutral-500 mb-1">Recurring</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-                    {applications.filter(app => app.serviceType === 'RECURRING').length}
-                  </h3>
-                  <p className="text-xs text-neutral-400 mt-2">Monthly/Yearly services</p>
-                </div>
-                <div className="p-3 bg-primary-50 rounded-lg">
-                  <Layers className="text-primary" size={28} />
-                </div>
+              <div className="p-2.5 bg-primary-50 rounded-lg">
+                <UserCheck className="text-primary" size={22} />
               </div>
             </div>
           </div>
-
-          {/* Main Content */}
-          <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-md">
-            {/* Search and Filters */}
-            <div className="px-4 sm:px-6 pt-6">
-              <div className="flex flex-wrap gap-2 mb-6">
-                <button
-                  onClick={() => setStatusFilter('All')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    statusFilter === 'All' 
-                      ? 'bg-primary text-white border-primary shadow-sm' 
-                      : "bg-white text-neutral-700 border-neutral-300 hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  All Services ({applications.length})
-                </button>
-                <button
-                  onClick={() => setStatusFilter('ASSIGNED')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    statusFilter === 'ASSIGNED' 
-                      ? 'bg-primary-50 text-primary-800 border-primary-300' 
-                      : "bg-white text-neutral-700 border-neutral-300 hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  Assigned ({applications.filter(app => app.status === 'ASSIGNED').length})
-                </button>
-                <button
-                  onClick={() => setStatusFilter('IN_PROGRESS')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    statusFilter === 'IN_PROGRESS' 
-                      ? 'bg-warning-50 text-warning-800 border-warning-300' 
-                      : "bg-white text-neutral-700 border-neutral-300 hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  In Progress ({applications.filter(app => app.status === 'IN_PROGRESS').length})
-                </button>
-                <button
-                  onClick={() => setStatusFilter('COMPLETED')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                    statusFilter === 'COMPLETED' 
-                      ? 'bg-success-50 text-success-800 border-success-300' 
-                      : "bg-white text-neutral-700 border-neutral-300 hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  Completed ({applications.filter(app => app.status === 'COMPLETED').length})
-                </button>
+          <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-neutral-500 mb-1">In Progress</p>
+                <h3 className="text-2xl font-bold text-neutral-900">
+                  {applications.filter(a => a.status === 'IN_PROGRESS').length}
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">Currently in progress</p>
               </div>
-
-              {/* Search Bar */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                <div className="relative w-full sm:w-auto">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 z-10" size={20} />
-                    <input
-                      type="text"
-                      placeholder="Search services by name or ID..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2.5 border border-neutral-300 bg-white text-sm rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary w-full sm:w-80 transition-all"
-                    />
-                  </div>
-                </div>
+              <div className="p-2.5 bg-warning-50 rounded-lg">
+                <RefreshCw className="text-warning-600" size={22} />
               </div>
             </div>
-
-            {/* Services List */}
-            <div className="px-4 sm:px-6 pb-6">
-              {filteredApplications.length === 0 ? (
-                <div className="text-center py-12 sm:py-24 bg-neutral-50 rounded-lg border border-neutral-100">
-                  <div className="inline-flex items-center justify-center w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-neutral-100 mb-6">
-                    <Search className="text-neutral-400" size={32} />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-3">No services found</h3>
-                  <p className="text-neutral-500 max-w-md mx-auto mb-6 sm:mb-8 text-sm sm:text-base">
-                    {searchTerm || statusFilter !== 'All' 
-                      ? "No services match your current search criteria." 
-                      : "No services available at the moment."}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    {searchTerm || statusFilter !== 'All' ? (
-                      <button
-                        onClick={() => {
-                          setSearchTerm("");
-                          setStatusFilter("All");
-                        }}
-                        className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm"
-                      >
-                        <Filter size={18} />
-                        Clear All Filters
-                      </button>
-                    ) : null}
-                    
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredApplications.map((app) => {
-                    const statusConfig = getStatusConfig(app.status);
-                    const StatusIcon = statusConfig.icon;
-                    const serviceTypeConfig = getServiceTypeConfig(app.serviceType);
-                    
-                    return (
-                      <div key={app.applicationId} className="bg-white border border-neutral-200 rounded-xl px-4 py-4 sm:px-6 hover:border-primary-200 hover:shadow-sm transition-all">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 items-start sm:items-center gap-4 md:gap-6">
-                          
-                          {/* ICON + SERVICE NAME */}
-                          <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex items-center gap-3">
-                            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-primary-50 rounded-full flex items-center justify-center shrink-0">
-                              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-neutral-900 text-sm sm:text-base truncate">
-                                {app.serviceName}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${serviceTypeConfig.bg} ${serviceTypeConfig.text} border ${serviceTypeConfig.border}`}>
-                                  {serviceTypeConfig.label}
-                                </div>
-                                {app.totalPeriods > 0 && (
-                                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-primary-50 text-primary-800 border border-primary-200">
-                                    <Layers size={10} />
-                                    {app.totalPeriods} periods
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* APPLICATION ID */}
-                          <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-                            <p className="text-xs text-neutral-400 mb-1">Application ID</p>
-                            <p className="font-medium text-neutral-900 text-sm truncate" title={app.applicationId}>
-                              <span className="hidden sm:inline">{app.applicationId}</span>
-                              <span className="sm:hidden">{app.applicationId.slice(0, 8)}...</span>
-                            </p>
-                          </div>
-
-                          {/* STATUS */}
-                          <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-                            <p className="text-xs text-neutral-400 mb-1">Status</p>
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border ${statusConfig.border} ${statusConfig.bg}`}>
-                              <StatusIcon size={14} className={statusConfig.iconColor} />
-                              <span className={`text-xs font-semibold ${statusConfig.text}`}>
-                                {statusConfig.label}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* DATE */}
-                          <div className="col-span-1 sm:col-span-2 lg:col-span-3">
-                            <p className="text-xs text-neutral-400 mb-1">Created Date</p>
-                            <p className="font-medium text-neutral-900 text-sm">
-                              {formatDate(app.createdAt)}
-                            </p>
-                          </div>
-
-                          {/* ACTIONS */}
-                          <div className="col-span-1 sm:col-span-2 lg:col-span-2 lg:justify-self-end">
-                            <div className="flex flex-col sm:flex-row gap-2">
-                              <button
-                                onClick={() => handleViewDetails(app.applicationId)}
-                                className="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition whitespace-nowrap flex items-center justify-center gap-2 shadow-sm"
-                              >
-                                <Eye size={16} />
-                                View Details
-                              </button>
-                              <button
-                                onClick={() => window.open(`/tasks/${app.applicationId}`, '_blank')}
-                                className="w-full sm:w-auto px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50 transition whitespace-nowrap flex items-center justify-center gap-2"
-                              >
-                                <ExternalLink size={16} />
-                                New Tab
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          </div>
+          <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-neutral-500 mb-1">Recurring</p>
+                <h3 className="text-2xl font-bold text-neutral-900">
+                  {applications.filter(a => a.serviceType === 'RECURRING').length}
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">Monthly/Yearly services</p>
+              </div>
+              <div className="p-2.5 bg-primary-50 rounded-lg">
+                <Package className="text-primary" size={22} />
+              </div>
             </div>
-
           </div>
         </div>
+
+        {/* ── Toolbar ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          {/* Search */}
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by service name or client…"
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="w-full pl-9 pr-9 py-2.5 text-sm border border-neutral-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
+            {searchInput && (
+              <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600">
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Total count */}
+          <p className="text-sm text-neutral-500 shrink-0">
+            {pagination.total} application{pagination.total !== 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {/* ── List ── */}
+        {applications.length === 0 ? (
+          <div className="bg-white rounded-xl border border-neutral-200 py-20 text-center">
+            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="text-neutral-400" size={28} />
+            </div>
+            <h3 className="text-lg font-semibold text-neutral-800 mb-1">No applications found</h3>
+            <p className="text-sm text-neutral-500">
+              {search ? 'Try a different search term.' : 'No applications assigned yet.'}
+            </p>
+            {search && (
+              <button onClick={clearSearch} className="mt-4 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition">
+                Clear Search
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {applications.map((app) => {
+              const statusCfg = getStatusConfig(app.status);
+              const StatusIcon = statusCfg.icon;
+              const typeCfg = getServiceTypeConfig(app.serviceType);
+
+              return (
+                <div key={app.applicationId} className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-sm transition-all">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+
+                    {/* Service photo + name */}
+                    <div className="flex items-center gap-3 sm:w-56 lg:w-64 shrink-0">
+                      {app.servicePhotoUrl ? (
+                        <img
+                          src={app.servicePhotoUrl}
+                          alt={app.serviceName}
+                          className="w-24 h-full rounded-xl object-cover border border-neutral-100 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center shrink-0">
+                          <Package className="text-primary" size={20} />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-neutral-900 text-sm truncate">{app.serviceName}</p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium border ${typeCfg.bg} ${typeCfg.text} ${typeCfg.border}`}>
+                          {typeCfg.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Customer info */}
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 min-w-0">
+                      <div className="min-w-0">
+                        <p className="text-xs text-neutral-400 mb-1">User Name</p>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <User size={14} className="text-neutral-400 shrink-0" />
+                          <span className="font-medium text-neutral-900 text-sm truncate">{app.name || 'N/A'}</span>
+                        </div>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-neutral-400 mb-1">Email</p>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Mail size={14} className="text-neutral-400 shrink-0" />
+                          <span className="font-medium text-neutral-900 text-sm truncate">{app.email || 'N/A'}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-neutral-400 mb-1">Phone Number</p>
+                        <div className="flex items-center gap-1">
+                          <Phone size={14} className="text-neutral-400 shrink-0" />
+                          <span className="font-medium text-neutral-900 text-sm">{app.phoneNumber || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status + date + action */}
+                    <div className="flex flex-row sm:flex-col lg:flex-row items-center gap-3 sm:gap-2 lg:gap-3 shrink-0">
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}>
+                        <StatusIcon size={13} className={statusCfg.iconColor} />
+                        {statusCfg.label}
+                      </div>
+                      <span className="text-xs text-neutral-400 whitespace-nowrap">{formatDate(app.createdAt)}</span>
+                      <button
+                        onClick={() => navigate(`/tasks/${app.applicationId}`)}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 transition whitespace-nowrap"
+                      >
+                        <Eye size={14} /> View
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Pagination ── */}
+        {pagination.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
+            <p className="text-sm text-neutral-500">
+              Page {page} of {pagination.totalPages} · {pagination.total} total
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-300 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+
+              {/* Page numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 1)
+                  .reduce((acc, p, idx, arr) => {
+                    if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((item, idx) =>
+                    item === '...' ? (
+                      <span key={`ellipsis-${idx}`} className="px-2 text-neutral-400 text-sm">…</span>
+                    ) : (
+                      <button
+                        key={item}
+                        onClick={() => setPage(item)}
+                        className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
+                          item === page
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'border border-neutral-300 text-neutral-700 hover:bg-neutral-50'
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    )
+                  )}
+              </div>
+
+              <button
+                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={page === pagination.totalPages}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-300 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "@src/providers/axiosInstance";
+import PageHeader from '../page-header/PageHeader';
 import {
   FiCreditCard, FiEye, FiEyeOff, FiSave, FiEdit2, FiTrash2,
   FiX, FiCheck, FiRefreshCw, FiAlertCircle, FiClock,
@@ -293,49 +294,10 @@ const PaymentSettings = () => {
         loading={modal.loading} error={modal.error}
       />
 
-      {/* ── Page Header ── */}
-      <div style={{
-        background: "linear-gradient(to right, #ffffff, var(--primary-50))",
-        borderBottom: "1px solid var(--primary-200)",
-        boxShadow: "0 1px 0 var(--primary-100), 0 4px 16px rgb(239 68 68 / 0.06)",
-        position: "sticky", top: 0, zIndex: 30,
-      }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3.5">
-              <div style={{
-                width: 44, height: 44, borderRadius: 14,
-                background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))",
-                boxShadow: "0 4px 14px rgb(239 68 68 / 0.35)",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <FiCreditCard className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-neutral-900 leading-tight" style={{ fontSize: "1.35rem", letterSpacing: "-0.025em" }}>
-                  Payment Settings
-                </h1>
-                <p className="text-neutral-500 mt-0.5" style={{ fontSize: "0.8rem" }}>
-                  Configure your Razorpay payment gateway
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em",
-                textTransform: "uppercase", color: "var(--primary-700)",
-                background: "linear-gradient(to right, var(--primary-100), var(--primary-50))",
-                border: "1px solid var(--primary-300)", borderRadius: 9999,
-                padding: "0.3rem 0.85rem",
-              }}>
-                <FiZap style={{ width: 11, height: 11 }} />
-                Razorpay Gateway
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Payment Settings"
+        subtitle="Configure your Razorpay payment gateway"
+      />
 
       {/* ── Main content ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">

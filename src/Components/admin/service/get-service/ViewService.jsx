@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import axiosInstance from '@src/providers/axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
+import PageHeader from '../../page-header/PageHeader';
 
 export default function ViewService() {
   const { serviceId } = useParams();
@@ -82,47 +83,20 @@ export default function ViewService() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/service-hub')}
-                className="p-2 rounded-lg text-gray-400 transition-colors"
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.backgroundColor = 'var(--primary-50)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">{service.name}</h1>
-                <p className="text-xs text-gray-400">Service Details</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate(`/services/edit/${serviceId}`)}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium border transition-all"
-                style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--primary-50)'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                <Edit2 className="w-4 h-4" /> Edit Service
-              </button>
-              <button
-                onClick={() => navigate('/service-hub')}
-                className="px-3.5 py-2 text-white rounded-lg text-sm font-medium transition-all"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-              >
-                Back to List
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={service.name || 'Service Details'}
+        subtitle="Service Details"
+        onBack={() => navigate('/services-hub')}
+        actions={
+          <button
+            onClick={() => navigate(`/services/edit/${serviceId}`)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-all"
+            style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+          >
+            <Edit2 className="w-4 h-4" /> Edit Service
+          </button>
+        }
+      />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

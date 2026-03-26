@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Home, Briefcase, Users,
   FileText, UserCircle, BarChart3, Settings,
-  Menu, X, ChevronLeft, ChevronRight, CreditCard, MessageSquare
+  Menu, X, ChevronLeft, ChevronRight, CreditCard, MessageSquare,
+  BookOpen
 } from "lucide-react";
 import AddDepartmentModal from '../employee_repo/popup/AddDepartment';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -65,29 +66,85 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-const navItems = [
-  { path: '/admin-dashboard', icon: Home, label: 'Dashboard' },
-  { path: '/services-hub', icon: Briefcase, label: 'Services' },
-  { path: '/orders', icon: FileText, label: 'Orders' },
-  { path: '/employees', icon: UserCircle, label: 'Employees' },
-  { path: '/amendment', icon: FileText, label: 'Amendment' },
-  { path: '/users', icon: Users, label: 'Users Data' },   // ✅ better icon
-  { path: '/reports', icon: BarChart3, label: 'Reports' },
-  { path: '/email-config', icon: MessageSquare, label: 'Email Config' },
-  { path: '/payment-history', icon: CreditCard, label: 'Payment History' },
-  { path: '/settings', icon: Settings, label: 'Payment Settings' },
-  { path: '/profile', icon: UserCircle, label: 'Profile' },
-];
+  // Function to check if a route is active (supports nested routes)
+  const isRouteActive = (routePath) => {
+    const currentPath = location.pathname;
+    
+    // Exact match for simple routes
+    if (routePath === '/services-hub') {
+      // Services hub active only on exact /services-hub path
+      return currentPath === routePath;
+    }
+    
+    if (routePath === '/orders') {
+      // Orders active for /orders and any /orders/* paths
+      return currentPath === routePath || currentPath.startsWith('/orders/');
+    }
+    
+    if (routePath === '/reports') {
+      // Reports active for /reports and any /reports/* paths
+      return currentPath === routePath || currentPath.startsWith('/reports/');
+    }
+
+    if (routePath === '/manage-blog') {
+      // Blog active for /manage-blog, /manage-blog/:slug and /add-blog
+      return currentPath === '/manage-blog' ||
+             currentPath === '/add-blog' ||
+             currentPath.startsWith('/manage-blog/');
+    }
+
+    if (routePath === '/services') {
+      // Services active for /services-hub and all service-related paths
+      return currentPath === '/services-hub' || 
+             currentPath === '/services/add' ||
+             currentPath === '/services/bundle/add' ||
+             currentPath.startsWith('/services/edit/') ||
+             currentPath.startsWith('/bundle/edit/');
+    }
+    
+    // For all other routes, check exact match
+    return currentPath === routePath;
+  };
+
+  const navItems = [
+    { path: '/admin-dashboard', icon: Home, label: 'Dashboard', matchExact: true },
+    { path: '/services', icon: Briefcase, label: 'Services', matchNested: true },
+    { path: '/orders', icon: FileText, label: 'Orders', matchNested: true },
+    { path: '/employees', icon: UserCircle, label: 'Employees', matchExact: true },
+    { path: '/amendment', icon: FileText, label: 'Amendment', matchExact: true },
+    { path: '/users', icon: Users, label: 'Users Data', matchExact: true },
+    { path: '/reports', icon: BarChart3, label: 'Reports', matchNested: true },
+    { path: '/manage-blog', icon: BookOpen, label: 'Blog', matchNested: true },
+    { path: '/email-config', icon: MessageSquare, label: 'Email Config', matchExact: true },
+    { path: '/payment-history', icon: CreditCard, label: 'Payment History', matchExact: true },
+    { path: '/settings', icon: Settings, label: 'Payment Settings', matchExact: true },
+    { path: '/profile', icon: UserCircle, label: 'Profile', matchExact: true },
+  ];
 
   const handleNavClick = (path) => {
-    setActiveRoute(path);
-    navigate(path);
+    // For services, navigate to services-hub
+    if (path === '/services') {
+      setActiveRoute('/services-hub');
+      navigate('/services-hub');
+    } else {
+      setActiveRoute(path);
+      navigate(path);
+    }
+    
     if (isMobile) {
       setIsMobileMenuOpen(false);
     }
   };
 
-  useEffect(() => { setActiveRoute(location.pathname); }, [location.pathname]);
+  useEffect(() => { 
+    // Update active route based on current path
+    const activeNavItem = navItems.find(item => isRouteActive(item.path));
+    if (activeNavItem) {
+      setActiveRoute(activeNavItem.path);
+    } else {
+      setActiveRoute(location.pathname);
+    }
+  }, [location.pathname]);
 
   const fetchDepartments = async (page = 1, limit = deptPageSize) => {
     setLoadingDepts(true);
@@ -172,7 +229,7 @@ const navItems = [
       {/* Navigation Items */}
       <nav className="py-6 overflow-y-auto flex-1 px-3">
         {navItems.map(({ path, icon: Icon, label }) => {
-          const isActive = activeRoute === path;
+          const isActive = isRouteActive(path);
           return (
             <button
               key={path}
@@ -263,7 +320,7 @@ const navItems = [
 
   // Mobile Top Navigation
   const MobileTopNav = () => (
-    <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-neutral-200 z-30 px-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-3">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -274,13 +331,13 @@ const navItems = [
         <span className="font-bold text-lg text-primary">Gridlines</span>
       </div>
       <div className="flex items-center gap-2">
-        <div 
+        <div
           className="w-8 h-8 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center cursor-pointer hover:bg-primary-200 transition-colors"
           onClick={() => handleNavClick('/profile')}
         >
           {profile?.photoUrl ? (
-            <img 
-              src={profile.photoUrl} 
+            <img
+              src={profile.photoUrl}
               alt={profile.name}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -294,25 +351,26 @@ const navItems = [
             </span>
           )}
         </div>
+        <LogoutButton variant="icon" />
       </div>
     </div>
   );
 
   // Mobile Bottom Navigation
   const MobileBottomNav = () => (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-30 px-2 py-2 flex justify-around shadow-lg">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-neutral-200 z-30 px-2 flex items-center justify-around shadow-lg">
       {navItems.slice(0, 5).map(({ path, icon: Icon, label }) => {
-        const isActive = activeRoute === path;
+        const isActive = isRouteActive(path);
         return (
           <button
             key={path}
             onClick={() => handleNavClick(path)}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors cursor-pointer ${
               isActive ? 'text-primary' : 'text-neutral-500 hover:text-primary hover:bg-primary-50'
             }`}
           >
             <Icon size={20} />
-            <span className="text-[10px] mt-1 font-medium">{label}</span>
+            <span className="text-[10px] font-medium leading-tight">{label}</span>
           </button>
         );
       })}
@@ -351,7 +409,7 @@ const navItems = [
           {/* Menu Items */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
             {navItems.map(({ path, icon: Icon, label }) => {
-              const isActive = activeRoute === path;
+              const isActive = isRouteActive(path);
               return (
                 <button
                   key={path}
@@ -424,8 +482,8 @@ const navItems = [
       {/* Main Content Spacer for Desktop */}
       <div className={`hidden md:block transition-all duration-300 ${isOpen || isHovered ? 'ml-64' : 'ml-20'}`} />
 
-      {/* Main Content Spacer for Mobile */}
-      <div className="md:hidden pb-20" />
+      {/* Main Content Spacer for Mobile — matches MobileTopNav height (h-16 = 64px) */}
+      <div className="md:hidden h-16" />
 
       {/* Department Modal */}
       {isDeptOpen && (

@@ -101,11 +101,51 @@ const UserNav = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => { setActive(location.pathname); }, [location.pathname]);
+  // Function to check if a route is active (supports nested routes)
+  const isRouteActive = (routePath) => {
+    const currentPath = location.pathname;
+    
+    if (routePath === '/my-services') {
+      // My Services active for /my-services and any /my-service/view/{id} paths
+      // Note: The path in the requirement is /my-service/view/{id} (singular)
+      return currentPath === routePath || 
+             currentPath.startsWith('/my-service/view/');
+    }
+    
+    if (routePath === '/services') {
+      // Browse Services active for /services and any /services/* paths
+      return currentPath === routePath || currentPath.startsWith('/services/');
+    }
+    
+    if (routePath === '/documents') {
+      // Documents active for /documents and any /documents/* paths
+      return currentPath === routePath || currentPath.startsWith('/documents/');
+    }
+    
+    // For all other routes, check exact match
+    return currentPath === routePath;
+  };
+
+  useEffect(() => { 
+    // Update active route based on current path
+    const activeNavItem = NAV_ITEMS.find(item => isRouteActive(item.path));
+    if (activeNavItem) {
+      setActive(activeNavItem.path);
+    } else {
+      setActive(location.pathname);
+    }
+  }, [location.pathname]);
 
   const go = (path) => { 
-    setActive(path); 
-    navigate(path);
+    // For my-services, navigate to /my-services
+    if (path === '/my-services') {
+      setActive(path);
+      navigate('/my-services');
+    } else {
+      setActive(path);
+      navigate(path);
+    }
+    
     if (isMobile) {
       setIsMobileMenuOpen(false);
     }
@@ -203,7 +243,7 @@ const UserNav = () => {
       {/* Navigation Items */}
       <nav className="py-6 overflow-y-auto flex-1 px-3">
         {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
-          const isActive = active === path;
+          const isActive = isRouteActive(path);
           return (
             <button
               key={path}
@@ -256,7 +296,7 @@ const UserNav = () => {
 
   // Mobile Top Navigation
   const MobileTopNav = () => (
-    <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-neutral-200 z-30 px-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-3">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -268,25 +308,26 @@ const UserNav = () => {
       </div>
       <div className="flex items-center gap-2">
         <UserAvatar size="sm" onClick={goToProfile} />
+        <LogoutButton variant="icon" />
       </div>
     </div>
   );
 
   // Mobile Bottom Navigation
   const MobileBottomNav = () => (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-30 px-2 py-2 flex justify-around shadow-lg">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-neutral-200 z-30 px-2 flex items-center justify-around shadow-lg">
       {NAV_ITEMS.slice(0, 5).map(({ path, icon: Icon, label }) => {
-        const isActive = active === path;
+        const isActive = isRouteActive(path);
         return (
           <button
             key={path}
             onClick={() => go(path)}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors cursor-pointer ${
               isActive ? 'text-primary' : 'text-neutral-500 hover:text-primary hover:bg-primary-50'
             }`}
           >
             <Icon size={20} />
-            <span className="text-[10px] mt-1 font-medium">{label}</span>
+            <span className="text-[10px] font-medium leading-tight">{label}</span>
           </button>
         );
       })}
@@ -325,7 +366,7 @@ const UserNav = () => {
           {/* Menu Items */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
             {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
-              const isActive = active === path;
+              const isActive = isRouteActive(path);
               return (
                 <button
                   key={path}
@@ -390,8 +431,8 @@ const UserNav = () => {
       {/* Main Content Spacer for Desktop */}
       <div className={`hidden md:block transition-all duration-300 ${isOpen || isHovered ? 'ml-64' : 'ml-20'}`} />
 
-      {/* Main Content Spacer for Mobile */}
-      <div className="md:hidden pb-16" />
+      {/* Main Content Spacer for Mobile — matches MobileTopNav height (h-16 = 64px) */}
+      <div className="md:hidden h-16" />
     </>
   );
 };

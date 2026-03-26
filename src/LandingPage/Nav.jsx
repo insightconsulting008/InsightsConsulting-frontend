@@ -1,689 +1,470 @@
-import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Phone, FileText, ChevronRight, Menu, X, ChevronUp, AlertCircle } from "lucide-react";
-import { GrSelect } from "react-icons/gr";
+import { Menu, X, Phone, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { servicesData } from "./data/servicesData";
+
+const NAV_ITEMS = [
+  { label: "Home", to: "/" },
+  { label: "Blogs", to: "/resource" },
+  { label: "About Us", to: "/about" },
+  { label: "Contact Us", to: "/contact" },
+];
 
 export default function Nav() {
-  const [isPinned, setIsPinned] = useState(false);
-  const hoverTimeout = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const menuRef = useRef(null);
-  const mobileMenuRef = useRef(null);
-
-  const [openServices, setOpenServices] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState(null);
-
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [services, setServices] = useState([]);
+  const closeTimer = useRef(null);
 
   const [activeCat, setActiveCat] = useState(null);
-  const [activeSub, setActiveSub] = useState(null);
-  const [activeService, setActiveService] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeCatIndex, setActiveCatIndex] = useState(null);
 
-  // Error states
-  const [categoryError, setCategoryError] = useState(null);
-  const [subcategoryError, setSubcategoryError] = useState(null);
-  const [serviceError, setServiceError] = useState(null);
+  const [mobileOpenCat, setMobileOpenCat] = useState(null);
+  const [mobileOpenSub, setMobileOpenSub] = useState(null);
 
-  // Loading states
-  const [loadingCat, setLoadingCat] = useState(true);
-  const [loadingSub, setLoadingSub] = useState(false);
-  const [loadingServices, setLoadingServices] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [selectedSubId, setSelectedSubId] = useState(null);
 
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [mobileActiveCategory, setMobileActiveCategory] = useState(null);
-  const [mobileActiveSub, setMobileActiveSub] = useState(null);
+  const subcatWithServices = activeCat
+    ? (servicesData.find((c) => c.categoryId === activeCat)?.subcategories || [])
+    : [];
 
-  const isServicesActive = location.pathname.startsWith("/our-services");
-
-  // Clear ALL active highlights on route change
   useEffect(() => {
-    if (!isServicesActive) {
-      // Desktop
-      setActiveCat(null);
-      setActiveSub(null);
-      setActiveService(null);
-      setSubcategories([]);
-      setServices([]);
-      setExpandedCategory(null);
-      // Mobile
-      setMobileActiveCategory(null);
-      setMobileActiveSub(null);
-      setMobileServicesOpen(false);
-      
-      // Clear errors
-      setSubcategoryError(null);
-      setServiceError(null);
+    const parts = location.pathname.split("/");
+    if (parts[1] === "our-services") {
+      setSelectedSubId(parts[3] || null);
+      setSelectedServiceId(parts[4] || null);
     }
-  }, [location.pathname]);
+  }, [location]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setCategoryError(null);
-        const res = await axios.get("https://insightsconsult-backend.onrender.com/api/categories");
-        setCategories(res.data?.data || []);
-        if (!res.data?.data || res.data.data.length === 0) {
-          setCategoryError("No categories found");
-        }
-      } catch (err) {
-        console.log(err);
-        setCategoryError(err.response?.data?.message || "Failed to load categories");
-        setCategories([]);
-      } finally {
-        setLoadingCat(false);
-      }
-    };
-    fetchCategories();
+  const scheduleClose = useCallback(() => {
+    closeTimer.current = setTimeout(() => setOpenDropdown(false), 150);
   }, []);
 
-  const fetchSubcategories = async (catId) => {
-    if (activeCat === catId) {
-      setExpandedCategory(expandedCategory === catId ? null : catId);
-      return;
-    }
-    setActiveCat(catId);
-    setActiveSub(null);
-    setServices([]);
-    setLoadingSub(true);
-    setSubcategoryError(null);
-    setExpandedCategory(catId);
-    try {
-      const res = await axios.get(`https://insightsconsult-backend.onrender.com/api/categories/${catId}/subcategories`);
-      const data = res.data?.data || [];
-      setSubcategories(data);
-      if (data.length === 0) {
-        setSubcategoryError("No subcategories available");
-      }
-    } catch (err) {
-      console.log(err);
-      setSubcategoryError(err.response?.data?.message || "Failed to load subcategories");
-      setSubcategories([]);
-    } finally {
-      setLoadingSub(false);
-    }
-  };
-
-  const handleMouseEnter = () => {
-    if (!isPinned) {
-      if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-      setOpenServices(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (!isPinned) {
-      hoverTimeout.current = setTimeout(() => { setOpenServices(false); }, 180);
-    }
-  };
-
-  const fetchServices = async (subId) => {
-    if (activeSub === subId) return;
-    setActiveSub(subId);
-    setLoadingServices(true);
-    setServiceError(null);
-    try {
-      const res = await axios.get(`https://insightsconsult-backend.onrender.com/api/subcategories/${subId}/services`);
-      const data = res.data?.data || [];
-      setServices(data);
-      if (data.length === 0) {
-        setServiceError("No services available");
-      }
-    } catch (err) {
-      console.log(err);
-      setServiceError(err.response?.data?.message || "Failed to load services");
-      setServices([]);
-    } finally {
-      setLoadingServices(false);
-    }
-  };
-
-  const handleSelectSub = (sub) => {
-    navigate(`/our-services/${activeCat}/${sub.subCategoryId}`, {
-      state: {
-        categoryName: categories.find((c) => c.categoryId === activeCat)?.categoryName,
-        subCategoryName: sub.subCategoryName,
-      },
-    });
-    setOpenServices(false);
-    setMobileMenuOpen(false);
-    setExpandedCategory(null);
-  };
-
-  const handleSelectService = (service) => {
-    setActiveService(service.serviceId);
-    navigate(`/our-services/${activeCat}/${activeSub}/${service.serviceId}`, {
-      state: {
-        categoryName: categories.find((c) => c.categoryId === activeCat)?.categoryName,
-        subCategoryName: subcategories.find((s) => s.subCategoryId === activeSub)?.subCategoryName,
-        serviceName: service.name,
-      },
-    });
-    setOpenServices(false);
-    setMobileMenuOpen(false);
-    setExpandedCategory(null);
-  };
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (!menuRef.current?.contains(e.target) && !isPinned) {
-        setOpenServices(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
-  useEffect(() => {
-    if (mobileMenuOpen || openServices) {
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = `${scrollBarWidth}px`;
+  const navigateToService = (catId, sub, service) => {
+    setSelectedServiceId(service.serviceId);
+    setSelectedSubId(sub.subCategoryId);
+    setOpenDropdown(false);
+    setMobileMenuOpen(false);
+
+    const category = servicesData.find((c) => c.categoryId === catId);
+
+    navigate(
+      `/our-services/${catId}/${sub.subCategoryId}/${service.serviceId}`,
+      {
+        state: {
+          categoryName: category?.categoryName,
+          subCategoryName: sub.subCategoryName,
+        },
+      }
+    );
+  };
+
+  const navigateToSubcategory = (catId, sub) => {
+    setSelectedSubId(sub.subCategoryId);
+    setSelectedServiceId(null);
+    setOpenDropdown(false);
+
+    navigate(`/our-services/${catId}/${sub.subCategoryId}`);
+  };
+
+  const handleMobileCatToggle = (catId) => {
+    if (mobileOpenCat === catId) {
+      setMobileOpenCat(null);
+      setMobileOpenSub(null);
     } else {
-      document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
-    };
-  }, [mobileMenuOpen, openServices]);
-
-  const fetchMobileSubcategories = async (catId) => {
-    try {
-      setLoadingSub(true);
-      setSubcategoryError(null);
-      const res = await axios.get(`https://insightsconsult-backend.onrender.com/api/categories/${catId}/subcategories`);
-      const data = res.data?.data || [];
-      setSubcategories(data);
-      if (data.length === 0) {
-        setSubcategoryError("No subcategories available");
-      }
-    } catch (err) {
-      console.log(err);
-      setSubcategoryError(err.response?.data?.message || "Failed to load subcategories");
-      setSubcategories([]);
-    } finally {
-      setLoadingSub(false);
+      setMobileOpenCat(catId);
+      setMobileOpenSub(null);
     }
   };
 
-  // Error/Empty State Component
- const ErrorState = ({ message, type = "error" }) => (
-  <div className="flex flex-col items-center justify-center p-4 text-center">
+  const handleMobileSubToggle = (subId) => {
+    setMobileOpenSub(mobileOpenSub === subId ? null : subId);
+  };
 
-    {type === "error" ? (
-      <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
-    ) : (
-      <GrSelect className="w-8 h-8 mb-2 text-gray-400" />
-    )}
+  // Check if a route is active
+  const isActiveRoute = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
-    <p
-      className={`text-sm ${
-        type === "error" ? "text-red-600" : "text-gray-500"
-      }`}
-    >
-      {message}
-    </p>
-
-  </div>
-);
+  const ErrorState = ({ message }) => (
+    <div className="flex flex-col items-center justify-center p-6 text-center">
+      <AlertCircle className="w-5 h-5 text-red-400 mb-2" />
+      <p className="text-xs text-gray-400">{message}</p>
+    </div>
+  );
 
   return (
-    <header className="w-full shadow-sm sticky top-0 bg-white z-40">
+    <>
+      <style>{`
+        @keyframes fadeDown {
+          from {opacity:0; transform:translateY(-5px);}
+          to {opacity:1; transform:translateY(0);}
+        }
 
-      {/* TOP BAR */}
-      <div className="bg-neutral-900 text-white text-sm py-2 px-4 flex items-center justify-center gap-3 text-center flex-wrap">
-        <span className="hidden md:block tracking-wide">
-          Looking For The Right{" "}
-          <span className="text-yellow-400 font-semibold">Compliance & Registration Services</span>
-          {" "}| Get A Quick Guidance From Our Team
-        </span>
-        <span className="md:hidden block">
-          Get expert <span className="text-yellow-400 font-semibold">guidance</span> today
-        </span>
-        <button
-          onClick={() => navigate("/contact")}
-          className="ml-2 bg-red-600 hover:bg-red-700 transition-colors text-white px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide"
-        >
-          Enquire Now
-        </button>
-      </div>
+        @keyframes mIn {
+          from {opacity:0; transform:translateY(5px);}
+          to {opacity:1; transform:translateY(0);}
+        }
+      `}</style>
 
-      {/* MAIN NAV */}
-      <div className="bg-white border-b border-gray-100 px-4 lg:px-12 container mx-auto py-3 flex items-center justify-between">
+      <header className="w-full sticky top-0  bg-white shadow-sm z-40">
+        {/* Top Bar */}
+        <div className="bg-neutral-900  text-white text-sm py-2 px-4 flex items-center justify-center lg:justify-between flex-wrap">
+          <span className="hidden lg:block">
+            Reliable solutions for{" "}
+            <span className="text-yellow-400 font-semibold">
+              compliance, filings, and regulatory requirements
+            </span>{" "}
+            supporting businesses at every stage.
+          </span>
 
-        {/* LOGO */}
-        <Link to="/home" className="flex items-center gap-2">
-          <img
-            src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/image%2033%201%20(1)%201.png"
-            className="h-10 md:h-14"
-            alt="Insights Consultancy"
-          />
-        </Link>
 
-        {/* DESKTOP NAV LINKS */}
-        <nav className="hidden lg:flex items-center gap-1 text-gray-700 font-medium">
-
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-              ${isActive
-                ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                : "border-transparent hover:text-red-500 "
-              }`
-            }
-          >
-            Home
-          </NavLink>
-
-          {/* SERVICES */}
-          <div
-            className="relative"
-            ref={menuRef}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              onClick={() => {
-                setIsPinned((prev) => !prev);
-                setOpenServices((prev) => !prev);
-              }}
-              className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-                ${isServicesActive
-                  ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                  : "border-transparent hover:text-red-500 "
-                }`}
-            >
-              Services <ChevronDown size={15} />
-            </button>
-
-            {openServices && (
-              <div
-                className="absolute -left-70 top-full mt-3 w-[880px] bg-white shadow-2xl border border-gray-100 rounded-2xl grid grid-cols-3 overflow-hidden"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                {/* CATEGORIES */}
-                <div className="p-5 border-r h-96 overflow-y-scroll border-gray-100">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 pb-2 border-b border-gray-100">
-                    Categories
-                  </h4>
-                  {loadingCat ? (
-                    <p className="text-gray-400 text-sm text-center py-4">Loading...</p>
-                  ) : categoryError ? (
-                    <ErrorState message={categoryError} type="error" />
-                  ) : categories.length === 0 ? (
-                    <ErrorState message="No categories found" type="empty" />
-                  ) : (
-                    <div className="space-y-1">
-                      {categories.map((cat) => (
-                        <div
-                          key={cat.categoryId}
-                          onMouseEnter={() => fetchSubcategories(cat.categoryId)}
-                          className={`flex justify-between items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all duration-150
-                            ${activeCat === cat.categoryId
-                              ? "bg-red-50 border-red-500 text-red-600"
-                              : "border-transparent hover:bg-gray-50 hover:border-gray-200"
-                            }`}
-                        >
-                          <div className="flex gap-2.5 items-center">
-                            <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0
-                              ${activeCat === cat.categoryId ? "bg-red-100" : "bg-gray-100"}`}>
-                              <FileText size={14} className={activeCat === cat.categoryId ? "text-red-500" : "text-gray-500"} />
-                            </div>
-                            <p className={`text-sm line-clamp-1 font-medium ${activeCat === cat.categoryId ? "text-red-600" : "text-gray-800"}`}>
-                              {cat.categoryName}
-                            </p>
-                          </div>
-                          <ChevronRight size={14} className={activeCat === cat.categoryId ? "text-red-400" : "text-gray-300"} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* SUBCATEGORIES */}
-                <div className="p-5 border-r h-96 overflow-y-scroll border-gray-100">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 pb-2 border-b border-gray-100">
-                    Subcategories
-                  </h4>
-                  {loadingSub ? (
-                    <p className="text-gray-400 text-sm text-center py-4">Loading...</p>
-                  ) : subcategoryError ? (
-                    <ErrorState message={subcategoryError} type="error" />
-                  ) : !activeCat ? (
-                    <ErrorState message="Select a category" type="empty" />
-                  ) : subcategories.length === 0 ? (
-                    <ErrorState message="No subcategories available" type="empty" />
-                  ) : (
-                    <div className="space-y-1 ">
-                      {subcategories.map((sub) => (
-                        <div
-                          key={sub.subCategoryId}
-                          onMouseEnter={() => fetchServices(sub.subCategoryId)}
-                          onClick={() => handleSelectSub(sub)}
-                          className={`flex justify-between items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all duration-150
-                            ${activeSub === sub.subCategoryId
-                              ? "bg-red-50 border-red-500 text-red-600"
-                              : "border-transparent hover:bg-gray-50 hover:border-gray-200"
-                            }`}
-                        >
-                          <div className="flex gap-2.5 items-center">
-                            <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0
-                              ${activeSub === sub.subCategoryId ? "bg-red-100" : "bg-gray-100"}`}>
-                              <FileText size={14} className={activeSub === sub.subCategoryId ? "text-red-500" : "text-gray-500"} />
-                            </div>
-                            <p className={`text-sm line-clamp-1 font-medium ${activeSub === sub.subCategoryId ? "text-red-600" : "text-gray-700"}`}>
-                              {sub.subCategoryName}
-                            </p>
-                          </div>
-                          <ChevronRight size={14} className={activeSub === sub.subCategoryId ? "text-red-400" : "text-gray-300"} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* SERVICES */}
-                <div className="p-5 h-96 overflow-y-scroll">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 pb-2 border-b border-gray-100">
-                    Services
-                  </h4>
-                  {loadingServices ? (
-                    <p className="text-gray-400 text-sm text-center py-4">Loading...</p>
-                  ) : serviceError ? (
-                    <ErrorState message={serviceError} type="error" />
-                  ) : !activeSub ? (
-                    <ErrorState message="Select a subcategory" type="empty" />
-                  ) : services.length === 0 ? (
-                    <ErrorState message="No services available" type="empty" />
-                  ) : (
-                    <div className="space-y-1">
-                      {services.map((service) => (
-                        <div
-                          key={service.serviceId}
-                          onClick={() => handleSelectService(service)}
-                          className={`flex gap-3 px-2 py-2.5 rounded-lg border cursor-pointer transition-all duration-150
-                            ${activeService === service.serviceId
-                              ? "bg-red-50 border-red-500"
-                              : "border-transparent hover:bg-red-50 hover:border-red-200"
-                            }`}
-                        >
-                          <img
-                            src={service.photoUrl}
-                            alt={service.name}
-                            className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
-                          />
-                          <div>
-                            <p className={`text-sm font-semibold line-clamp-1 ${activeService === service.serviceId ? "text-red-600" : "text-gray-800"}`}>
-                              {service.name}
-                            </p>
-                            <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{service.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <NavLink
-            to="/servicehub"
-            className={({ isActive }) =>
-              `px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-              ${isActive
-                ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                : "border-transparent hover:text-red-500 "
-              }`
-            }
-          >
-            Service Hub
-          </NavLink>
-
-          <NavLink
-            to="/resource"
-            className={({ isActive }) =>
-              `flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-              ${isActive
-                ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                : "border-transparent hover:text-red-500 "
-              }`
-            }
-          >
-            Blog 
-          </NavLink>
-
-          <NavLink
-            to="/company"
-            className={({ isActive }) =>
-              `flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-              ${isActive
-                ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                : "border-transparent hover:text-red-500 "
-              }`
-            }
-          >
-            Company 
-          </NavLink>
-
-          <NavLink
-            to="/contact"
-            className={({ isActive }) =>
-              `px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150
-              ${isActive
-                ? "text-red-600 bg-red-50 border-red-500 font-semibold"
-                : "border-transparent hover:text-red-500 "
-              }`
-            }
-          >
-            Contact
-          </NavLink>
-        </nav>
-
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-3">
-          <Link to="/login">
-            <button className="hidden lg:flex items-center gap-1.5 bg-red-600 hover:bg-red-700 transition-colors text-white px-5 py-2.5 rounded-lg text-sm font-semibold tracking-wide">
-              Login &rarr;
-            </button>
-          </Link>
+          <span className="lg:hidden">
+            Get the right  <span className="text-yellow-400 font-semibold"> compliance guidance</span>
+          </span>
           <button
-            className="lg:hidden p-2 border border-gray-200 hover:border-red-400 hover:bg-red-50 hover:text-red-500 rounded-lg transition-all"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={() => navigate("/contact")}
+            className="ml-2 block bg-red-600  lg:hidden  hover:bg-red-700 px-4 py-1 rounded t font-semibold"
           >
-            <Menu size={22} />
+            Enquire Now
           </button>
-        </div>
-      </div>
 
-      {/* MOBILE SIDE NAV */}
-      {mobileMenuOpen && (
-        <>
-          {/* Overlay */}
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          {/* Drawer */}
-          <div
-            ref={mobileMenuRef}
-            className="fixed top-0 right-0 h-full w-full bg-white shadow-2xl z-50 lg:hidden flex flex-col"
-          >
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-              <img
-                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/image%2033%201%20(1)%201.png"
-                className="h-9"
-                alt="Insights Consultancy"
-              />
-              <button
-                className="p-2 bg-gray-100 hover:bg-red-50 hover:text-red-500 rounded-lg transition-all"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Drawer Body */}
-            <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-
-              {/* Home */}
+          <div className="hidden lg:flex items-center cursor-pointer gap-2">
+            {NAV_ITEMS.map(({ label, to }) => (
               <NavLink
-                to="/"
+                key={label}
+                to={to}
                 className={({ isActive }) =>
-                  `flex items-center px-3 py-2.5 rounded-xl text-sm font-medium border transition-all
-                  ${isActive
-                    ? "bg-red-50 text-red-600 border-red-400 font-semibold"
-                    : "border-transparent hover:bg-gray-50 hover:border-gray-200 text-gray-700"
+                  `px-3 py-1 text-sm transition-colors ${isActive || isActiveRoute(to)
+                    ? "text-yellow-400"
+                    : "text-gray-300 hover:text-white"
                   }`
                 }
-                onClick={() => setMobileMenuOpen(false)}
               >
-                Home
+                {label}
               </NavLink>
+            ))}
 
-              {/* Services Accordion */}
-              <div className="rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setMobileServicesOpen((prev) => !prev)}
-                  className={`flex items-center justify-between w-full px-3 py-3 text-sm font-semibold transition-colors
-                    ${mobileServicesOpen ? "bg-red-50 text-red-600" : "text-gray-800 hover:bg-gray-100"}`}
-                >
-                  <span>Services We Provide</span>
-                  {mobileServicesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
 
-                {mobileServicesOpen && (
-                  <div className="divide-y divide-gray-100">
-                    {categoryError ? (
-                      <ErrorState message={categoryError} type="error" />
-                    ) : categories.length === 0 ? (
-                      <ErrorState message="No categories found" type="empty" />
-                    ) : (
-                      <div className="h-40 overflow-y-scroll">
-                        {categories.map((cat) => (
-                          <div key={cat.categoryId}>
+          </div>
 
-                            {/* Category Button */}
-                            <button
-                              onClick={async () => {
-                                if (mobileActiveCategory === cat.categoryId) {
-                                  setMobileActiveCategory(null);
-                                  setMobileActiveSub(null);
-                                  setSubcategoryError(null);
-                                } else {
-                                  setMobileActiveCategory(cat.categoryId);
-                                  setMobileActiveSub(null);
-                                  await fetchMobileSubcategories(cat.categoryId);
-                                }
-                              }}
-                              className={`flex items-center justify-between w-full px-4 py-2.5 text-sm transition-all
-                                ${mobileActiveCategory === cat.categoryId
-                                  ? "bg-red-50 text-red-600 font-semibold border-l-2 border-red-500"
-                                  : "hover:bg-gray-50 text-gray-700"
-                                }`}
-                            >
-                              <span>{cat.categoryName}</span>
-                              {mobileActiveCategory === cat.categoryId
-                                ? <ChevronUp size={15} />
-                                : <ChevronDown size={15} />
-                              }
-                            </button>
+        </div>
 
-                            {/* Subcategories */}
-                            {mobileActiveCategory === cat.categoryId && (
-                              <div className="bg-gray-50 pl-6 pr-3 py-2 space-y-1">
-                                {loadingSub ? (
-                                  <p className="text-xs text-gray-400 py-1 px-2">Loading...</p>
-                                ) : subcategoryError ? (
-                                  <ErrorState message={subcategoryError} type="error" />
-                                ) : subcategories.length === 0 ? (
-                                  <ErrorState message="No subcategories available" type="empty" />
-                                ) : (
-                                  subcategories.map((sub) => (
+        {/* Main Nav */}
+        <div className="lg:px-12 px-4 py-3 flex justify-between items-center">
+          <Link to="/">
+            <img
+              src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/image%2033%201%20(1)%201.png"
+              className="h-10"
+              alt="logo"
+            />
+          </Link>
+
+          {/* Desktop */}
+          <nav className="hidden lg:flex items-center  gap-5">
+            {servicesData.map((cat, index) => {
+                const isCategoryActive =
+                  location.pathname.startsWith(`/our-services/${cat.categoryId}`) ||
+                  (openDropdown && activeCat === cat.categoryId);
+
+                return (
+                  <div
+                    key={cat.categoryId}
+                    className="relative"
+                    onMouseEnter={() => {
+                      cancelClose();
+                      setOpenDropdown(true);
+                      setActiveCatIndex(index);
+                      setActiveCat(cat.categoryId);
+                    }}
+                    onMouseLeave={scheduleClose}
+                  >
+                    <button
+                      className={`flex items-center gap-1  cursor-pointer font-medium transition-colors ${isCategoryActive
+                        ? "text-red-600"
+                        : "text-gray-700 hover:text-red-500"
+                        }`}
+                    >
+                      {cat.categoryName}
+                      <ChevronDown
+                        size={13}
+                        className={`transition-transform duration-200 ${openDropdown && activeCat === cat.categoryId ? "rotate-180" : ""
+                          }`}
+                      />
+                    </button>
+
+                    {openDropdown && activeCat === cat.categoryId && (
+                      <>
+                        {/* Hover bridge */}
+                        <div
+                          className="absolute top-full w-full h-2.5"
+                          style={{ right: 0 }}
+                          onMouseEnter={cancelClose}
+                          onMouseLeave={scheduleClose}
+                        />
+
+                        {/* Dropdown - Always positioned to the right */}
+                        <div
+                          className="absolute top-full mt-2.5 bg-white rounded-xl border border-gray-100 overflow-hidden"
+                          style={{
+                            width: "520px",
+                            animation: "fadeDown .15s ease both",
+                            right: 0,
+                            boxShadow: "0 4px 24px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)",
+                          }}
+                          onMouseEnter={cancelClose}
+                          onMouseLeave={scheduleClose}
+                        >
+                          {/* Red accent line */}
+                          <div className="h-0.5 bg-red-600 w-full" />
+
+                          {subcatWithServices.length === 0 ? (
+                            <ErrorState message="No services available" />
+                          ) : (
+                            <div className="overflow-y-auto" style={{ maxHeight: "550px" }}>
+                            <div className={`grid  ${subcatWithServices.length === 1
+                              ? "grid-cols-1"
+                              : "grid-cols-2"
+                              } gap-0 divide-x divide-gray-100`}>
+                              {subcatWithServices.map((sub, index) => {
+                                const isSubActive = selectedSubId === sub.subCategoryId;
+
+                                return (
+                                  <div
+                                    key={sub.subCategoryId}
+                                    className={`p-5 ${index < subcatWithServices.length - (subcatWithServices.length === 1 ? 0 : 2)
+                                      ? "border-b border-gray-100"
+                                      : ""
+                                      }`}
+                                  >
+                                    <div className="flex items-center gap-2 mb-3">
+                                      <span className="w-1 h-4 bg-red-500 rounded-full flex-shrink-0" />
+                                      <button
+                                        className={` font-bold transition-colors ${isSubActive
+                                          ? "text-red-600"
+                                          : "text-gray-900 hover:text-red-600"
+                                          }`}
+                                        onClick={() => navigateToSubcategory(cat.categoryId, sub)}
+                                      >
+                                        {sub.subCategoryName}
+                                      </button>
+                                    </div>
+
+                                    {sub.services.length === 0 ? (
+                                      <p className="text-xs text-gray-400 pl-3">No services</p>
+                                    ) : (
+                                      <ul className="space-y-0.5 pl-3">
+                                        {sub.services.map((service) => {
+                                          const isServiceActive = selectedServiceId === service.serviceId;
+
+                                          return (
+                                            <li key={service.serviceId}>
+                                              <button
+                                                onClick={() =>
+                                                  navigateToService(cat.categoryId, sub, service)
+                                                }
+                                                className={`block w-full text-left  px-2 py-1 rounded transition-colors ${isServiceActive
+                                                  ? "text-red-600 bg-red-50 font-medium"
+                                                  : "text-gray-600 cursor-pointer hover:text-red-600 hover:bg-red-50"
+                                                  }`}
+                                              >
+                                                {service.name}
+                                              </button>
+                                            </li>
+                                          );
+                                        })}
+                                      </ul>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+
+            <button
+              onClick={() => navigate("/login")}
+              className="ml-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold"
+            >
+              Login
+            </button>
+          </nav>
+
+          <button className="lg:hidden" onClick={() => setMobileMenuOpen(true)}>
+            <Menu size={24} />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+          <div className="flex justify-between items-center px-5 py-4 ">
+            <span className="font-semibold text-sm">Menu</span>
+            <button onClick={() => setMobileMenuOpen(false)}>
+              <X size={20} />
+            </button>
+          </div>
+
+          <div
+            className="flex-1 overflow-y-auto px-5 py-2"
+            style={{ animation: "mIn .18s ease both" }}
+          >
+            {/* Home Link */}
+            <NavLink
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                `block py-3 text-sm font-medium  ${isActive || isActiveRoute("/")
+                  ? "text-red-600"
+                  : "text-gray-700"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+
+            {servicesData.map((cat) => {
+                const isCatOpen = mobileOpenCat === cat.categoryId;
+                const isCategoryActive = location.pathname.startsWith(`/our-services/${cat.categoryId}`);
+
+                return (
+                  <div key={cat.categoryId} className="">
+                    <button
+                      className={`w-full flex justify-between py-3 text-sm font-semibold ${isCategoryActive ? "text-red-600" : "text-gray-800"
+                        }`}
+                      onClick={() => handleMobileCatToggle(cat.categoryId)}
+                    >
+                      {cat.categoryName}
+                      <ChevronDown
+                        size={15}
+                        className={`text-gray-400 transition-transform ${isCatOpen ? "rotate-180" : ""
+                          }`}
+                      />
+                    </button>
+
+                    {isCatOpen && (
+                      <div className="pb-3">
+                        {cat.subcategories.map((sub) => {
+                            const isSubOpen = mobileOpenSub === sub.subCategoryId;
+                            const isSubActive = selectedSubId === sub.subCategoryId && !selectedServiceId;
+
+                            return (
+                              <div key={sub.subCategoryId}>
+                                <div className="flex justify-between items-center py-2 pl-3 pr-1">
+                                  <button
+                                    onClick={() => handleMobileSubToggle(sub.subCategoryId)}
+                                    className={`text-sm font-medium text-left flex-1 ${isSubActive ? "text-red-600" : "text-gray-700"
+                                      }`}
+                                  >
+                                    {sub.subCategoryName}
+                                  </button>
+                                  {sub.services.length > 0 && (
                                     <button
-                                      key={sub.subCategoryId}
-                                      onClick={() => {
-                                        setMobileActiveSub(sub.subCategoryId);
-                                        navigate(`/our-services/${mobileActiveCategory}/${sub.subCategoryId}`, {
-                                          state: {
-                                            categoryName: cat.categoryName,
-                                            subCategoryName: sub.subCategoryName,
-                                          },
-                                        });
-                                        setMobileMenuOpen(false);
-                                      }}
-                                      className={`w-full text-left px-3 py-2 rounded-lg text-sm border transition-all
-                                        ${mobileActiveSub === sub.subCategoryId
-                                          ? "bg-red-50 text-red-600 font-semibold border-red-400"
-                                          : "border-transparent hover:bg-white hover:border-gray-200 text-gray-600"
-                                        }`}
+                                      onClick={() => handleMobileSubToggle(sub.subCategoryId)}
+                                      className="p-1"
                                     >
-                                      {sub.subCategoryName}
+                                      <ChevronRight
+                                        size={14}
+                                        className={`text-gray-400 transition-transform ${isSubOpen ? "rotate-90" : ""
+                                          }`}
+                                      />
                                     </button>
-                                  ))
+                                  )}
+                                </div>
+
+                                {isSubOpen && (
+                                  <ul className="pl-6 pr-2 space-y-1 pb-2">
+                                    {sub.services.map((service) => {
+                                      const isServiceActive = selectedServiceId === service.serviceId;
+
+                                      return (
+                                        <li key={service.serviceId}>
+                                          <button
+                                            onClick={() =>
+                                              navigateToService(
+                                                cat.categoryId,
+                                                sub,
+                                                service
+                                              )
+                                            }
+                                            className={`text-sm py-1.5 px-2 rounded w-full text-left transition-colors ${isServiceActive
+                                              ? "text-red-600 bg-red-50 font-medium"
+                                              : "text-gray-500 hover:text-red-600 hover:bg-gray-50"
+                                              }`}
+                                          >
+                                            {service.name}
+                                          </button>
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
                                 )}
                               </div>
-                            )}
-
-                          </div>
-                        ))}
+                            );
+                          })}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
+                );
+              })}
 
-              {[
-                { to: "/servicehub", label: "Service Hub" },
-                { to: "/resource",   label: "Resources"    },
-                { to: "/company",    label: "Company"      },
-                { to: "/contact",    label: "Contact"      },
-              ].map(({ to, label }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  className={({ isActive }) =>
-                    `flex items-center px-3 py-2.5 rounded-xl text-sm font-medium border transition-all
-                    ${isActive
-                      ? "bg-red-50 text-red-600 border-red-400 font-semibold"
-                      : "border-transparent hover:bg-gray-50 hover:border-gray-200 text-gray-700"
-                    }`
-                  }
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {label}
-                </NavLink>
-              ))}
+            {/* Other Navigation Items */}
+            {NAV_ITEMS.slice(1).map(({ label, to }) => (
+              <NavLink
+                key={label}
+                to={to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block py-3 text-sm font-medium  ${isActive || isActiveRoute(to)
+                    ? "text-red-600"
+                    : "text-gray-700"
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
 
-              {/* Phone */}
-              <div className="flex items-center gap-2 px-3 py-3 mt-1 border-t border-gray-100 text-gray-500">
-                <Phone size={15} className="text-red-500" />
-                <span className="text-sm font-medium">+91 98578474975</span>
-              </div>
+          {/* Mobile Footer */}
+          <div className="px-5 py-4 border-t bg-gray-50">
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+              <Phone size={14} />
+              <span>+91 98578474975</span>
             </div>
-
-            {/* Drawer Footer */}
-            <div className="px-4 py-4 border-t border-gray-100 bg-white">
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full bg-red-600 hover:bg-red-700 transition-colors text-white py-3 rounded-xl text-sm font-bold tracking-wide">
-                  Login &rarr;
-                </button>
-              </Link>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}
+                className="flex-1 border border-red-600 text-red-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate("/contact"); }}
+                className="flex-1 bg-red-600 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Enquire Now
+              </button>
             </div>
           </div>
-        </>
+        </div>
       )}
-    </header>
+    </>
   );
 }

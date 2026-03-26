@@ -26,6 +26,8 @@ import UserLogin   from './providers/Userlogin';
 import NotFound    from './Components/NotFound';
 import UserRegister from './providers/UserRegister';
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import EmployeeResetPassword from './providers/EmployeeResetPassword';
+import UserResetPassword from './providers/UserResetPassword';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KNOWN ROUTE REGISTRY — audit every Route in every shell page here
@@ -48,7 +50,9 @@ const ADMIN_EXACT = [
   '/profile',
   '/users',
   '/payment-history',
-  '/email-config'
+  '/email-config',
+  '/add-blog',           // create blog
+  '/manage-blog',        // blog list
 ];
 const ADMIN_PREFIX = [
   '/services/',   // /services/add  /services/bundle/add
@@ -56,7 +60,9 @@ const ADMIN_PREFIX = [
   '/orders/',     // /orders/:applicationId
   '/settings/',   // /settings/general
   '/services/edit/',
-  '/reports/'
+  '/reports/',
+  '/bundle/',     // /bundle/edit/:bundleId
+  '/manage-blog/', // /manage-blog/:slug
 ];
 
 /* ─── STAFF (StaffPage.jsx) ─────────────────────────────────────────────── */
@@ -96,7 +102,7 @@ const LANDING_EXACT = [
   '/resource',
   '/add-blog',
   '/contact',
-  '/company',
+  '/about',
   '/servicehub',
 ];
 const LANDING_PREFIX = [
@@ -172,6 +178,8 @@ const App = () => (
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/login"       element={<UserLogin />} />
       <Route path="/register"       element={<UserRegister/>} />
+      <Route path="/staff/reset-password"       element={<EmployeeResetPassword/>} />
+      <Route path="/user/reset-password"       element={<UserResetPassword/>} />
 
       {/* Everything else → RoleRouter decides */}
       <Route path="/*" element={<RoleRouter />} />

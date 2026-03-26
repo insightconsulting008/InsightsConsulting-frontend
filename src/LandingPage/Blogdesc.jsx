@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 import { FaClock, FaTag, FaUser } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import axiosInstance from "@src/providers/axiosInstance";
 
 export default function Blogdesc() {
   const { slug } = useParams();
@@ -18,8 +18,8 @@ export default function Blogdesc() {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(
-          `https://insightsconsult-backend.onrender.com/blogs/${slug}`
+        const res = await axiosInstance.get(
+          `/blogs/${slug}`
         );
         setBlog(res.data);
       } catch (err) {

@@ -1,174 +1,183 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
+import axiosInstance from "@src/providers/axiosInstance";
 
+// ─── Constants ───────────────────────────────────────────────────────────────
 const EMPLOYEE_ID = localStorage.getItem("employeeId");
 
-const T = {
-  primary50:  "var(--primary-50)",
-  primary100: "var(--primary-100)",
-  primary200: "var(--primary-200)",
-  primary500: "var(--color-primary)",
-  primary600: "var(--color-primary-hover)",
-  primary700: "var(--color-primary-text)",
-  primary800: "var(--primary-800)",
-  neutral0:   "#ffffff",
-  neutral50:  "#f8f8fa",
-  neutral100: "#f1f1f5",
-  neutral200: "#e4e4ec",
-  neutral300: "#d1d1de",
-  neutral400: "#a8a8c0",
-  neutral500: "#7878a0",
-  neutral600: "#5a5a7a",
-  neutral700: "#424260",
-  neutral800: "#2c2c45",
-  neutral900: "#1a1a2e",
-  success50:  "#ecfdf5", success100: "#d1fae5", success500: "#10b981", success600: "#059669", success700: "#047857",
-  warning50:  "#fffbeb", warning100: "#fef3c7", warning500: "#f59e0b", warning700: "#b45309",
-  error50:    "#fff1f2", error100:   "#ffe4e6", error500:   "#f43f5e", error700:   "#be123c",
-  shadowSm: "var(--shadow-sm)", shadowMd: "var(--shadow-md)", shadowLg: "var(--shadow-lg)", shadowXl: "var(--shadow-xl)",
-  rsm: "6px", rmd: "10px", rlg: "14px", rxl: "18px", rfull: "9999px",
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+const fmtDate = (d) =>
+  !d ? null : new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+const fmtTime = (d) =>
+  !d ? "" : new Date(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+const timeAgo = (d) => {
+  if (!d) return "";
+  const m = Math.floor((Date.now() - new Date(d)) / 60000);
+  if (m < 1) return "Just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 };
-const primaryRgb = "239 68 68";
+const initials = (n) =>
+  !n ? "?" : n.split(" ").map((x) => x[0]).slice(0, 2).join("").toUpperCase();
 
-const fmtDate = (d) => !d ? null : new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
-const fmtTime = (d) => !d ? "" : new Date(d).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
-const avatarColors = [["#dc2626","#fef2f2"],["#7c3aed","#f5f3ff"],["#059669","#ecfdf5"],["#2563eb","#eff6ff"],["#d97706","#fffbeb"],["#db2777","#fdf4ff"]];
-const avatarStyle = (name) => avatarColors[(name?.charCodeAt(0) ?? 0) % avatarColors.length];
-const initials = (n) => !n ? "?" : n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase();
+const AVATAR_COLORS = [
+  ["#dc2626", "#fef2f2"], ["#7c3aed", "#f5f3ff"], ["#059669", "#ecfdf5"],
+  ["#2563eb", "#eff6ff"], ["#d97706", "#fffbeb"], ["#db2777", "#fdf4ff"],
+];
+const avatarStyle = (name) => AVATAR_COLORS[(name?.charCodeAt(0) ?? 0) % AVATAR_COLORS.length];
 
-const Svg = ({ d, size=16, sw=2 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-    {(Array.isArray(d)?d:[d]).map((p,i)=><path key={i} d={p}/>)}
+// ─── STATUS CONFIG ────────────────────────────────────────────────────────────
+const STATUS = {
+  PAID:    { bg: "bg-green-50",  text: "text-green-700",  border: "border-green-100", dot: "bg-green-500",  label: "Paid",    pulse: false },
+  CREATED: { bg: "bg-amber-50",  text: "text-amber-700",  border: "border-amber-100", dot: "bg-amber-500",  label: "Pending", pulse: true  },
+  FAILED:  { bg: "bg-rose-50",   text: "text-rose-700",   border: "border-rose-100",  dot: "bg-rose-500",   label: "Failed",  pulse: false },
+  EXPIRED: { bg: "bg-slate-50",  text: "text-slate-500",  border: "border-slate-200", dot: "bg-slate-400",  label: "Expired", pulse: false },
+};
+
+// ─── SVG Icons ────────────────────────────────────────────────────────────────
+const Icon = ({ d, size = 16, sw = 2, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+    className={className}>
+    {(Array.isArray(d) ? d : [d]).map((p, i) => <path key={i} d={p} />)}
   </svg>
 );
-const IC = {
-  link:     ["M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71","M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"],
-  search:   ["M11 3a8 8 0 100 16A8 8 0 0011 3z","M21 21l-4.35-4.35"],
-  user:     ["M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2","M12 3a4 4 0 100 8 4 4 0 000-8z"],
+
+const ICONS = {
+  link:     ["M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71", "M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"],
+  search:   ["M11 3a8 8 0 100 16A8 8 0 0011 3z", "M21 21l-4.35-4.35"],
+  user:     ["M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2", "M12 3a4 4 0 100 8 4 4 0 000-8z"],
   chevron:  "M6 9l6 6 6-6",
   check:    "M20 6L9 17l-5-5",
-  copy:     ["M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866","M10 21h8c1.105 0 2-.911 2-2.036V9.107c0-1.124-.895-2.036-2-2.036H10c-1.105 0-2 .912-2 2.036v9.857C8 20.09 8.895 21 10 21z"],
-  refresh:  ["M23 4v6h-6","M1 20v-6h6","M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"],
-  alert:    ["M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z","M12 9v4M12 17h.01"],
+  copy:     ["M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866", "M10 21h8c1.105 0 2-.911 2-2.036V9.107c0-1.124-.895-2.036-2-2.036H10c-1.105 0-2 .912-2 2.036v9.857C8 20.09 8.895 21 10 21z"],
+  refresh:  ["M23 4v6h-6", "M1 20v-6h6", "M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"],
+  alert:    ["M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z", "M12 9v4M12 17h.01"],
   x:        "M18 6L6 18M6 6l12 12",
   phone:    "M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z",
-  mail:     ["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z","M22 6l-10 7L2 6"],
-  clock:    ["M12 2a10 10 0 100 20A10 10 0 0012 2z","M12 6v6l4 2"],
-  external: ["M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6","M15 3h6v6","M10 14L21 3"],
+  mail:     ["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", "M22 6l-10 7L2 6"],
+  clock:    ["M12 2a10 10 0 100 20A10 10 0 0012 2z", "M12 6v6l4 2"],
+  external: ["M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6", "M15 3h6v6", "M10 14L21 3"],
   prev:     "M15 18l-6-6 6-6",
   next:     "M9 18l6-6-6-6",
-  users:    ["M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2","M9 3a4 4 0 100 8 4 4 0 000-8z","M23 21v-2a4 4 0 00-3-3.87","M16 3.13a4 4 0 010 7.75"],
+  users:    ["M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2", "M9 3a4 4 0 100 8 4 4 0 000-8z", "M23 21v-2a4 4 0 00-3-3.87", "M16 3.13a4 4 0 010 7.75"],
+  bell:     "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+  plus:     "M12 5v14M5 12h14",
+  globe:    ["M12 2a10 10 0 100 20A10 10 0 0012 2z", "M2 12h20", "M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"],
 };
 
-const Avatar = ({ name, photo, size="md" }) => {
-  const [bg, fg] = avatarStyle(name);
-  const dim = size==="sm" ? 32 : size==="xs" ? 24 : 40;
-  const fs  = size==="sm" ? 11 : size==="xs" ? 9 : 13;
-  if (photo) return (
-    <img src={photo} alt={name} onError={e=>e.target.style.display="none"}
-      style={{ width:dim, height:dim, borderRadius:T.rfull, objectFit:"cover", flexShrink:0, border:`2px solid ${fg}20` }}/>
-  );
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+const Avatar = ({ name, photo, size = "md" }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const [bg, fg] = avatarStyle(name ?? "E");
+  const dim = size === "sm" ? "w-8 h-8 text-[11px]" : size === "xs" ? "w-6 h-6 text-[9px]" : "w-10 h-10 text-[13px]";
+  if (photo && !imgFailed)
+    return (
+      <img src={photo} alt={name}
+        onError={() => setImgFailed(true)}
+        className={`${dim} rounded-full object-cover flex-shrink-0 border-2`}
+        style={{ borderColor: `${fg}30` }} />
+    );
   return (
-    <div style={{ width:dim, height:dim, borderRadius:T.rfull, background:bg, color:fg,
-      display:"flex", alignItems:"center", justifyContent:"center",
-      fontSize:fs, fontWeight:800, flexShrink:0, letterSpacing:"0.03em" }}>
-      {initials(name)}
+    <div className={`${dim} rounded-full flex items-center justify-center flex-shrink-0 font-extrabold tracking-wide`}
+      style={{ background: bg, color: fg }}>
+      {initials(name ?? "EX")}
     </div>
   );
 };
 
-const STATUS = {
-  PAID:    { bg:T.success50,  color:T.success700, border:T.success100, dot:T.success500, label:"Paid"    },
-  CREATED: { bg:T.warning50,  color:T.warning700, border:T.warning100, dot:T.warning500, label:"Pending", pulse:true },
-  FAILED:  { bg:T.error50,    color:T.error700,   border:T.error100,   dot:T.error500,   label:"Failed"  },
-  EXPIRED: { bg:T.neutral50,  color:T.neutral600, border:T.neutral200, dot:T.neutral400, label:"Expired" },
-};
+// ─── Status Badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ s }) => {
   const c = STATUS[s] || STATUS.EXPIRED;
   return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"3px 10px", borderRadius:T.rfull,
-      background:c.bg, color:c.color, border:`1px solid ${c.border}`,
-      fontSize:11, fontWeight:700, letterSpacing:"0.04em", whiteSpace:"nowrap", fontFamily:"inherit" }}>
-      <span style={{ width:6, height:6, borderRadius:T.rfull, background:c.dot, flexShrink:0,
-        ...(c.pulse?{animation:"pulse 1.6s infinite"}:{})}}/>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-widest border whitespace-nowrap ${c.bg} ${c.text} ${c.border}`}>
+      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${c.dot} ${c.pulse ? "animate-pulse" : ""}`} />
       {c.label}
     </span>
   );
 };
 
+// ─── Copy Button ──────────────────────────────────────────────────────────────
 const CopyBtn = ({ text, id, copied, onCopy }) => {
-  const done = copied===id;
+  const done = copied === id;
   return (
-    <button onClick={()=>onCopy(text,id)} style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 9px",
-      borderRadius:T.rsm, cursor:"pointer", fontFamily:"inherit",
-      border:done?`1px solid ${T.success100}`:`1px solid ${T.neutral200}`,
-      background:done?T.success50:T.neutral0, color:done?T.success700:T.neutral500,
-      fontSize:11, fontWeight:600, transition:"all 150ms", flexShrink:0 }}>
-      {done?<><Svg d={IC.check} size={10}/><span>Copied!</span></>:<><Svg d={IC.copy} size={10}/><span>Copy</span></>}
+    <button onClick={() => onCopy(text, id)}
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-semibold border transition-all duration-150 flex-shrink-0 cursor-pointer
+        ${done ? "bg-green-50 border-green-100 text-green-700" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"}`}>
+      {done ? <><Icon d={ICONS.check} size={10} /><span>Copied!</span></> : <><Icon d={ICONS.copy} size={10} /><span>Copy</span></>}
     </button>
   );
 };
 
-const Spinner = ({ size=16, color="#fff" }) => (
-  <div className="spin" style={{ width:size, height:size, borderRadius:T.rfull, border:`2px solid ${color}30`, borderTopColor:color }}/>
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+const Spinner = ({ size = 16 }) => (
+  <div className="rounded-full border-2 border-white/30 border-t-white animate-spin flex-shrink-0"
+    style={{ width: size, height: size }} />
 );
 
+// ─── Pagination Bar ───────────────────────────────────────────────────────────
 const PaginBar = ({ page, totalPages, onPage, loading }) => {
-  if (totalPages<=1) return null;
-  const pages=[];
-  for(let i=1;i<=totalPages;i++){
-    if(i===1||i===totalPages||(i>=page-1&&i<=page+1)) pages.push(i);
-    else if(i===page-2||i===page+2) pages.push("...");
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) pages.push(i);
+    else if (i === page - 2 || i === page + 2) pages.push("...");
   }
-  const deduped=pages.filter((p,i)=>p!==pages[i-1]);
+  const deduped = pages.filter((p, i) => p !== pages[i - 1]);
   return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"12px 0" }}>
-      <button onClick={()=>onPage(page-1)} disabled={page===1||loading}
-        style={{ width:32, height:32, borderRadius:T.rmd, border:`1px solid ${T.neutral200}`, background:T.neutral0,
-          cursor:page===1?"not-allowed":"pointer", color:T.neutral500,
-          display:"flex", alignItems:"center", justifyContent:"center", opacity:page===1?0.4:1 }}>
-        <Svg d={IC.prev} size={13}/>
+    <div className="flex items-center justify-center gap-1 py-3">
+      <button onClick={() => onPage(page - 1)} disabled={page === 1 || loading}
+        className="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:border-slate-300 transition-colors cursor-pointer">
+        <Icon d={ICONS.prev} size={13} />
       </button>
-      {deduped.map((p,i)=>p==="..."
-        ?<span key={`e${i}`} style={{padding:"0 4px",color:T.neutral400,fontSize:12}}>…</span>
-        :<button key={p} onClick={()=>onPage(p)} disabled={loading}
-          style={{ width:32, height:32, borderRadius:T.rmd,
-            border:`1px solid ${p===page?T.primary500:T.neutral200}`,
-            background:p===page?T.primary500:T.neutral0,
-            color:p===page?"#fff":T.neutral700, cursor:"pointer", fontSize:13,
-            fontWeight:p===page?700:400,
-            boxShadow:p===page?`0 2px 8px rgb(${primaryRgb}/.3)`:"none" }}>
-          {p}
-        </button>
+      {deduped.map((p, i) =>
+        p === "..." ? (
+          <span key={`e${i}`} className="px-1 text-slate-400 text-xs">…</span>
+        ) : (
+          <button key={p} onClick={() => onPage(p)} disabled={loading}
+            className="w-8 h-8 rounded-lg border text-sm font-semibold transition-all cursor-pointer"
+            style={p === page
+              ? { borderColor: "var(--color-primary)", background: "var(--color-primary)", color: "#fff" }
+              : { borderColor: "#e4e4ec", background: "#fff", color: "#424260" }}>
+            {p}
+          </button>
+        )
       )}
-      <button onClick={()=>onPage(page+1)} disabled={page===totalPages||loading}
-        style={{ width:32, height:32, borderRadius:T.rmd, border:`1px solid ${T.neutral200}`, background:T.neutral0,
-          cursor:page===totalPages?"not-allowed":"pointer", color:T.neutral500,
-          display:"flex", alignItems:"center", justifyContent:"center", opacity:page===totalPages?0.4:1 }}>
-        <Svg d={IC.next} size={13}/>
+      <button onClick={() => onPage(page + 1)} disabled={page === totalPages || loading}
+        className="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:border-slate-300 transition-colors cursor-pointer">
+        <Icon d={ICONS.next} size={13} />
       </button>
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════
-   USER PICKER — redesigned as a clean modal-style
-   dropdown with integrated search
-═══════════════════════════════════════════════ */
+// ─── Skeleton Row ─────────────────────────────────────────────────────────────
+const SkeletonRow = () => (
+  <tr>
+    {[160, 110, 200, 70, 80, 150, 80, 90].map((w, i) => (
+      <td key={i} className="px-3.5 py-3 border-b border-slate-100">
+        <div className="h-4 bg-slate-100 rounded animate-pulse" style={{ width: w }} />
+      </td>
+    ))}
+  </tr>
+);
+
+// ─── User Picker ──────────────────────────────────────────────────────────────
 const UserPicker = ({ selectedUser, onSelect }) => {
-  const [open, setOpen]           = useState(false);
-  const [query, setQuery]         = useState("");
-  const [debQ, setDebQ]           = useState("");
-  const [users, setUsers]         = useState([]);
+  const [open, setOpen]             = useState(false);
+  const [query, setQuery]           = useState("");
+  const [debQ, setDebQ]             = useState("");
+  const [users, setUsers]           = useState([]);
   const [pagination, setPagination] = useState(null);
-  const [page, setPage]           = useState(1);
-  const [loading, setLoading]     = useState(false);
-  const ref    = useRef(null);
+  const [page, setPage]             = useState(1);
+  const [loading, setLoading]       = useState(false);
+  const ref      = useRef(null);
   const inputRef = useRef(null);
-  const debRef = useRef(null);
+  const debRef   = useRef(null);
 
   useEffect(() => {
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
@@ -181,10 +190,10 @@ const UserPicker = ({ selectedUser, onSelect }) => {
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    const p = new URLSearchParams({ page, limit:8 });
+    const p = new URLSearchParams({ page, limit: 50 });
     if (debQ) p.set("search", debQ);
     axios.get(`https://insightsconsult-backend.onrender.com/users?${p}`)
-      .then(r => { setUsers(r.data.users||[]); setPagination(r.data.pagination||null); })
+      .then((r) => { setUsers(r.data.users || []); setPagination(r.data.pagination || null); })
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   }, [open, debQ, page]);
@@ -193,157 +202,111 @@ const UserPicker = ({ selectedUser, onSelect }) => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
 
-  const handleOpen = () => setOpen(v => !v);
   const handleSelect = (u) => { onSelect(u); setOpen(false); setQuery(""); };
-
   const isSelected = (u) => selectedUser?.userId === u.userId;
 
   return (
-    <div ref={ref} style={{ position:"relative" }}>
-      {/* Trigger button */}
-      <button type="button" onClick={handleOpen} style={{
-        width:"100%", height:48, padding:"0 14px", borderRadius:T.rlg, cursor:"pointer",
-        display:"flex", alignItems:"center", justifyContent:"space-between", gap:10,
-        border:`2px solid ${open?"var(--color-primary)":T.neutral200}`,
-        background:open?T.neutral0:T.neutral50,
-        boxShadow:open?`0 0 0 3px rgb(${primaryRgb}/.1)`:"none",
-        transition:"all 150ms", fontFamily:"inherit" }}>
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        className="w-full h-12 px-3.5 rounded-xl flex items-center justify-between gap-2.5 border-2 transition-all duration-150 cursor-pointer font-[inherit]"
+        style={open
+          ? { borderColor: "var(--color-primary)", background: "#fff", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" }
+          : { borderColor: "#e4e4ec", background: "#f8f8fa" }}>
         {!selectedUser ? (
-          <span style={{ display:"flex", alignItems:"center", gap:10, color:T.neutral400 }}>
-            <div style={{ width:32, height:32, borderRadius:T.rfull, background:T.neutral100,
-              display:"flex", alignItems:"center", justifyContent:"center", color:T.neutral300 }}>
-              <Svg d={IC.user} size={14}/>
+          <span className="flex items-center gap-2.5 text-slate-400">
+            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+              <Icon d={ICONS.user} size={14} />
             </div>
-            <span style={{ fontSize:14, color:T.neutral400 }}>Choose a user…</span>
+            <span className="text-sm">Choose a user…</span>
           </span>
-        ) : selectedUser==="other" ? (
-          <span style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:32, height:32, borderRadius:T.rfull, background:T.neutral100,
-              border:`2px dashed ${T.neutral300}`, display:"flex", alignItems:"center", justifyContent:"center", color:T.neutral400 }}>
-              <Svg d={IC.user} size={14}/>
+        ) : selectedUser === "other" ? (
+          <span className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400">
+              <Icon d={ICONS.user} size={14} />
             </div>
-            <div style={{ textAlign:"left" }}>
-              <p style={{ margin:0, fontSize:14, fontWeight:700, color:T.neutral900 }}>Other / External</p>
-              <p style={{ margin:0, fontSize:11, color:T.neutral400 }}>Unlisted user</p>
+            <div className="text-left">
+              <p className="m-0 text-sm font-bold text-slate-900">Other / External</p>
+              <p className="m-0 text-[11px] text-slate-400">Unlisted user</p>
             </div>
           </span>
         ) : (
-          <span style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <Avatar name={selectedUser.name} photo={selectedUser.photoUrl}/>
-            <div style={{ textAlign:"left", minWidth:0 }}>
-              <p style={{ margin:0, fontSize:14, fontWeight:700, color:T.neutral900,
-                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:180 }}>
-                {selectedUser.name}
-              </p>
-              <p style={{ margin:0, fontSize:11, color:T.neutral500,
-                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:180 }}>
+          <span className="flex items-center gap-2.5">
+            <Avatar name={selectedUser.name} photo={selectedUser.photoUrl} />
+            <div className="text-left min-w-0">
+              <p className="m-0 text-sm font-bold text-slate-900 truncate max-w-[200px]">{selectedUser.name}</p>
+              <p className="m-0 text-[11px] text-slate-500 truncate max-w-[200px]">
                 {selectedUser.email || selectedUser.phoneNumber || ""}
               </p>
             </div>
           </span>
         )}
-        <div style={{ transform:open?"rotate(180deg)":"none", transition:"transform 200ms",
-          color:open?"var(--color-primary)":T.neutral400, display:"flex", flexShrink:0 }}>
-          <Svg d={IC.chevron} size={16}/>
+        <div className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`}
+          style={{ color: open ? "var(--color-primary)" : "#a8a8c0" }}>
+          <Icon d={ICONS.chevron} size={16} />
         </div>
       </button>
 
-      {/* Dropdown panel */}
       {open && (
-        <div className="fadein" style={{
-          position:"absolute", zIndex:1000, width:"100%", top:"calc(100% + 6px)",
-          background:T.neutral0, borderRadius:T.rxl,
-          border:`1.5px solid ${T.neutral200}`,
-          boxShadow:`0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08)`,
-          overflow:"hidden" }}>
-
-          {/* Search input — clean, prominent */}
-          <div style={{ padding:"12px 12px 0" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:9, height:42,
-              padding:"0 12px", borderRadius:T.rlg,
-              border:`1.5px solid ${T.neutral200}`, background:T.neutral50,
-              transition:"all 150ms" }}
-              onFocus={e=>{ e.currentTarget.style.borderColor="var(--color-primary)"; e.currentTarget.style.background=T.neutral0; e.currentTarget.style.boxShadow=`0 0 0 3px rgb(${primaryRgb}/.1)`; }}
-              onBlur={e=>{ e.currentTarget.style.borderColor=T.neutral200; e.currentTarget.style.background=T.neutral50; e.currentTarget.style.boxShadow="none"; }}>
-              <span style={{ color:T.neutral400, display:"flex", flexShrink:0 }}>
-                {loading ? <Spinner size={14} color={T.primary500}/> : <Svg d={IC.search} size={14}/>}
+        <div className="absolute z-[60] w-full mt-1.5 bg-white rounded-2xl border border-slate-200 overflow-hidden animate-[fadein_0.18s_ease]"
+          style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08)" }}>
+          <div className="p-3 pb-0">
+            <div className="flex items-center gap-2 h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 transition-all">
+              <span className="text-slate-400 flex-shrink-0">
+                {loading
+                  ? <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200 animate-spin" style={{ borderTopColor: "var(--color-primary)" }} />
+                  : <Icon d={ICONS.search} size={14} />}
               </span>
-              <input ref={inputRef} value={query} onChange={e=>setQuery(e.target.value)}
+              <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by name, email or phone…"
-                style={{ flex:1, border:"none", outline:"none", background:"transparent",
-                  fontSize:13, color:T.neutral900, fontFamily:"inherit" }}/>
+                className="flex-1 border-none outline-none bg-transparent text-[13px] text-slate-900 font-[inherit]" />
               {query && (
-                <button type="button" onClick={()=>{ setQuery(""); inputRef.current?.focus(); }}
-                  style={{ border:"none", background:"none", cursor:"pointer", padding:0,
-                    color:T.neutral400, display:"flex", borderRadius:T.rsm }}>
-                  <Svg d={IC.x} size={13}/>
+                <button type="button" onClick={() => { setQuery(""); inputRef.current?.focus(); }}
+                  className="border-none bg-transparent cursor-pointer p-0 text-slate-400 flex hover:text-slate-600">
+                  <Icon d={ICONS.x} size={13} />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Result count hint */}
           {pagination && (
-            <p style={{ margin:"8px 14px 0", fontSize:11, color:T.neutral400, fontWeight:500 }}>
-              {loading ? "Searching…" : `${pagination.total} user${pagination.total!==1?"s":""} found`}
-              {pagination.totalPages>1 && ` · page ${pagination.page}/${pagination.totalPages}`}
+            <p className="mx-3.5 mt-2 mb-0 text-[11px] text-slate-400 font-medium">
+              {loading ? "Searching…" : `${pagination.total} user${pagination.total !== 1 ? "s" : ""} found`}
             </p>
           )}
 
-          {/* User list */}
-          <div style={{ overflowY:"auto", maxHeight:320, padding:"8px 0 4px" }}>
-            {loading && users.length===0 ? (
-              <div style={{ display:"flex", justifyContent:"center", padding:"24px 0" }}>
-                <Spinner size={22} color={T.primary500}/>
+          <div className="overflow-y-auto max-h-72 py-2">
+            {loading && users.length === 0 ? (
+              <div className="flex justify-center py-6">
+                <div className="w-6 h-6 rounded-full border-2 border-slate-200 animate-spin" style={{ borderTopColor: "var(--color-primary)" }} />
               </div>
-            ) : users.length===0 ? (
-              <div style={{ textAlign:"center", padding:"28px 20px" }}>
-                <div style={{ width:40, height:40, borderRadius:T.rfull, background:T.neutral100,
-                  display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 8px", color:T.neutral300 }}>
-                  <Svg d={IC.users} size={18}/>
-                </div>
-                <p style={{ margin:0, fontSize:13, color:T.neutral500, fontWeight:500 }}>No users found</p>
-                {query && <p style={{ margin:"4px 0 0", fontSize:11, color:T.neutral400 }}>Try a different search term</p>}
+            ) : users.length === 0 ? (
+              <div className="text-center py-7 px-5">
+                <p className="m-0 text-[13px] text-slate-500 font-medium">No users found</p>
               </div>
-            ) : users.map(u => {
+            ) : users.map((u) => {
               const active = isSelected(u);
               return (
-                <button key={u.userId} type="button" onClick={()=>handleSelect(u)}
-                  style={{ width:"100%", display:"flex", alignItems:"center", gap:12,
-                    padding:"10px 14px", border:"none",
-                    background:active?`rgb(${primaryRgb}/.06)`:"transparent",
-                    cursor:"pointer", textAlign:"left", transition:"background 100ms",
-                    borderLeft:active?`3px solid var(--color-primary)`:`3px solid transparent` }}>
-                  <Avatar name={u.name} photo={u.photoUrl}/>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                      <p style={{ margin:0, fontSize:14, fontWeight:600, color:T.neutral900,
-                        overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                        {u.name}
-                      </p>
-                      <span style={{ fontSize:9, color:T.neutral300, fontFamily:"monospace",
-                        background:T.neutral100, padding:"1px 5px", borderRadius:4, flexShrink:0 }}>
+                <button key={u.userId} type="button" onClick={() => handleSelect(u)}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 border-none cursor-pointer text-left transition-colors duration-100 hover:bg-slate-50"
+                  style={active
+                    ? { background: "rgba(239,68,68,0.06)", borderLeft: "3px solid var(--color-primary)", paddingLeft: 11 }
+                    : { borderLeft: "3px solid transparent" }}>
+                  <Avatar name={u.name} photo={u.photoUrl} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <p className="m-0 text-sm font-semibold text-slate-900 truncate">{u.name}</p>
+                      <span className="text-[9px] text-slate-300 font-mono bg-slate-100 px-1 py-px rounded flex-shrink-0">
                         #{u.userId?.slice(-5)}
                       </span>
                     </div>
-                    <div style={{ display:"flex", flexWrap:"wrap", gap:"3px 12px" }}>
-                      {u.email && (
-                        <span style={{ display:"flex", alignItems:"center", gap:4, fontSize:12, color:T.neutral500 }}>
-                          <Svg d={IC.mail} size={10}/>{u.email}
-                        </span>
-                      )}
-                      {u.phoneNumber && (
-                        <span style={{ display:"flex", alignItems:"center", gap:4, fontSize:12, color:T.neutral500 }}>
-                          <Svg d={IC.phone} size={10}/>{u.phoneNumber}
-                        </span>
-                      )}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                      {u.email && <span className="flex items-center gap-1 text-xs text-slate-500"><Icon d={ICONS.mail} size={10} />{u.email}</span>}
+                      {u.phoneNumber && <span className="flex items-center gap-1 text-xs text-slate-500"><Icon d={ICONS.phone} size={10} />{u.phoneNumber}</span>}
                     </div>
                   </div>
                   {active && (
-                    <div style={{ width:22, height:22, borderRadius:T.rfull,
-                      background:"var(--color-primary)", display:"flex", alignItems:"center",
-                      justifyContent:"center", flexShrink:0 }}>
-                      <Svg d={IC.check} size={11} sw={2.5}/>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-white" style={{ background: "var(--color-primary)" }}>
+                      <Icon d={ICONS.check} size={10} sw={2.5} />
                     </div>
                   )}
                 </button>
@@ -351,90 +314,468 @@ const UserPicker = ({ selectedUser, onSelect }) => {
             })}
           </div>
 
-          {/* Other/External option */}
-          <div style={{ borderTop:`1px solid ${T.neutral100}`, margin:"0 0 0" }}>
-            <button type="button" onClick={()=>{ onSelect("other"); setOpen(false); setQuery(""); }}
-              style={{ width:"100%", display:"flex", alignItems:"center", gap:12,
-                padding:"10px 14px", border:"none",
-                background:selectedUser==="other"?T.neutral50:"transparent",
-                borderLeft:selectedUser==="other"?`3px solid ${T.neutral400}`:`3px solid transparent`,
-                cursor:"pointer", textAlign:"left" }}>
-              <div style={{ width:40, height:40, borderRadius:T.rfull, background:T.neutral100,
-                border:`2px dashed ${T.neutral300}`, display:"flex", alignItems:"center",
-                justifyContent:"center", flexShrink:0, color:T.neutral400 }}>
-                <Svg d={IC.user} size={16}/>
+          {pagination && pagination.totalPages > 1 && (
+            <div className="border-t border-slate-100 px-3 py-2 bg-slate-50 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">Showing {users.length} of {pagination.total}</span>
+              <div className="flex gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} type="button" onClick={() => setPage(p)} disabled={loading}
+                    className="w-6 h-6 rounded text-[11px] border-none cursor-pointer font-semibold transition-all"
+                    style={p === page ? { background: "var(--color-primary)", color: "#fff" } : { background: "#e4e4ec", color: "#5a5a7a" }}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="border-t border-slate-100">
+            <button type="button" onClick={() => { onSelect("other"); setOpen(false); setQuery(""); }}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 border-none cursor-pointer text-left transition-colors hover:bg-slate-50"
+              style={selectedUser === "other"
+                ? { background: "#f8f8fa", borderLeft: "3px solid #7878a0", paddingLeft: 11 }
+                : { borderLeft: "3px solid transparent" }}>
+              <div className="w-10 h-10 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center flex-shrink-0 text-slate-400">
+                <Icon d={ICONS.user} size={16} />
               </div>
               <div>
-                <p style={{ margin:0, fontSize:14, fontWeight:600, color:T.neutral700 }}>Other / External</p>
-                <p style={{ margin:"2px 0 0", fontSize:12, color:T.neutral400 }}>User not in the system</p>
+                <p className="m-0 text-sm font-semibold text-slate-700">Other / External</p>
+                <p className="m-0 text-xs text-slate-400 mt-0.5">User not in the system</p>
               </div>
-              {selectedUser==="other" && (
-                <div style={{ marginLeft:"auto", width:22, height:22, borderRadius:T.rfull,
-                  background:T.neutral600, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <Svg d={IC.check} size={11} sw={2.5}/>
+              {selectedUser === "other" && (
+                <div className="ml-auto w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0 text-white">
+                  <Icon d={ICONS.check} size={10} sw={2.5} />
                 </div>
               )}
             </button>
           </div>
-
-          {/* Pagination footer */}
-          {pagination && pagination.totalPages>1 && (
-            <div style={{ borderTop:`1px solid ${T.neutral100}`, padding:"8px 12px",
-              background:T.neutral50, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <span style={{ fontSize:11, color:T.neutral400 }}>
-                Showing {users.length} of {pagination.total}
-              </span>
-              <div style={{ display:"flex", gap:4 }}>
-                {[...Array(pagination.totalPages)].map((_,i)=>{
-                  const p = i+1;
-                  return (
-                    <button key={p} type="button" onClick={()=>setPage(p)} disabled={loading}
-                      style={{ width:26, height:26, borderRadius:T.rsm, border:"none",
-                        background:p===page?`var(--color-primary)`:T.neutral200,
-                        color:p===page?"#fff":T.neutral600,
-                        cursor:"pointer", fontSize:11, fontWeight:p===page?700:400 }}>
-                      {p}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════
-   MAIN COMPONENT
-═══════════════════════════════════════════════ */
-export default function CreateAmendmentLink() {
+// ─── Create Link Modal ────────────────────────────────────────────────────────
+const CreateLinkModal = ({ onClose, onSuccess }) => {
   const [selectedUser, setSelected] = useState(null);
-  const [form, setForm]             = useState({ note:"", amount:"" });
+  const [form, setForm]             = useState({ note: "", amount: "" });
   const [loading, setLoading]       = useState(false);
-  const [successLink, setSuccess]   = useState(null);
   const [error, setError]           = useState("");
-  const [copied, setCopied]         = useState(null);
-  const [mobile, setMobile]         = useState(window.innerWidth < 640);
-
-  const [payments, setPayments]         = useState([]);
-  const [payPagination, setPayPagination] = useState(null);
-  const [payPage, setPayPage]           = useState(1);
-  const [tableSearch, setTSearch]       = useState("");
-  const [tableDebouncedQ, setTableDebouncedQ] = useState("");
-  const [tLoading, setTLoading]         = useState(false);
-  const tableDebounceRef = useRef(null);
+  const overlayRef = useRef(null);
 
   useEffect(() => {
-    const onRS = () => setMobile(window.innerWidth < 640);
-    window.addEventListener("resize", onRS);
-    return () => window.removeEventListener("resize", onRS);
+    const h = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
+  }, [onClose]);
+
+  // lock body scroll while modal open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!selectedUser)                            { setError("Please select a user."); return; }
+    if (!form.amount || Number(form.amount) <= 0) { setError("Amount must be greater than 0."); return; }
+    setLoading(true); setError("");
+    // capture before async so we always have them
+    const submittedAmount = Number(form.amount);
+    const submittedNote   = form.note;
+    try {
+      const r = await axios.post("https://insightsconsult-backend.onrender.com/create/amendment-link", {
+        employeeId: EMPLOYEE_ID,
+        userId: selectedUser === "other" ? null : selectedUser?.userId,
+        note: submittedNote,
+        amount: submittedAmount,
+      });
+      // attach submitted values so success modal is never 0
+      onSuccess({ ...r.data, _amount: submittedAmount, _note: submittedNote });
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div ref={overlayRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(26,26,46,0.55)] backdrop-blur-sm"
+      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-[slideup_0.28s_cubic-bezier(0.34,1.56,0.64,1)]"
+        onClick={(e) => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b rounded-t-2xl"
+          style={{ background: "var(--primary-50)", borderColor: "var(--primary-100)" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
+              style={{ background: "var(--color-primary)", boxShadow: "0 4px 12px rgba(239,68,68,0.3)" }}>
+              <Icon d={ICONS.link} size={16} />
+            </div>
+            <div>
+              <p className="m-0 text-[15px] font-bold" style={{ color: "var(--primary-800)" }}>Create Payment Link</p>
+              <p className="m-0 text-[11px]" style={{ color: "var(--primary-600)" }}>Fill in details to generate</p>
+            </div>
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-600 hover:border-slate-300 cursor-pointer transition-all">
+            <Icon d={ICONS.x} size={14} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Select User</label>
+            <UserPicker selectedUser={selectedUser} onSelect={setSelected} />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+              Note <span className="opacity-50 font-normal normal-case tracking-normal">(optional)</span>
+            </label>
+            <input
+              className="w-full h-11 px-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-900 outline-none transition-all duration-150 font-[inherit]"
+              placeholder="Brief note for this amendment…"
+              value={form.note}
+              onChange={(e) => setForm({ ...form, note: e.target.value })} />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Amount</label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] font-extrabold pointer-events-none"
+                style={{ color: "var(--color-primary-hover)" }}>₹</span>
+              <input type="text" inputMode="numeric"
+                className="w-full h-11 pl-7 pr-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-900 outline-none transition-all duration-150 font-[inherit]"
+                placeholder="0"
+                value={form.amount}
+                onChange={(e) => { if (/^\d*$/.test(e.target.value)) setForm({ ...form, amount: e.target.value }); }} />
+            </div>
+            <p className="mt-1.5 m-0 text-[11px] text-slate-400">Whole numbers only — no decimals</p>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-sm">
+              <Icon d={ICONS.alert} size={14} className="flex-shrink-0" />{error}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-6 flex gap-3">
+          <button type="button" onClick={onClose}
+            className="flex-1 h-11 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold text-sm cursor-pointer font-[inherit] hover:border-slate-300 transition-all active:scale-[0.97]">
+            Cancel
+          </button>
+          <button type="button" onClick={handleSubmit} disabled={loading}
+            className={`flex-1 h-11 rounded-xl border-none text-white font-bold text-sm flex items-center justify-center gap-2 font-[inherit] transition-all duration-150 cursor-pointer ${loading ? "opacity-75 cursor-not-allowed" : "active:scale-[0.97]"}`}
+            style={{ background: "var(--color-primary)", boxShadow: "0 4px 16px rgba(239,68,68,0.3)" }}>
+            {loading ? <><Spinner size={16} />Generating…</> : <><Icon d={ICONS.link} size={15} />Generate</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Notification Panel ───────────────────────────────────────────────────────
+function NotifPanel({ open, onClose, onCountChange }) {
+  const [items, setItems]           = useState([]);
+  const [loading, setLoading]       = useState(false);
+  const [err, setErr]               = useState(null);
+  const [busy, setBusy]             = useState(new Set());
+  const [markingAll, setMarkingAll] = useState(false);
+  const ref   = useRef(null);
+  const empId = localStorage.getItem("employeeId");
+
+  const load = useCallback(async () => {
+    if (!empId) return;
+    setLoading(true); setErr(null);
+    try {
+      const r = await axiosInstance.get(`/notifications/employee/${empId}`);
+      if (r.data?.success) {
+        const list = r.data.data ?? [];
+        setItems(list);
+        onCountChange?.(list.filter((n) => !n.isRead).length);
+      }
+    } catch { setErr("Could not load notifications."); }
+    finally { setLoading(false); }
+  }, [empId, onCountChange]);
+
+  useEffect(() => { if (open) load(); }, [open, load]);
+
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    const t = setTimeout(() => document.addEventListener("mousedown", h), 15);
+    return () => { clearTimeout(t); document.removeEventListener("mousedown", h); };
+  }, [open, onClose]);
+
+  useEffect(() => {
+    const h = (e) => { if (e.key === "Escape" && open) onClose(); };
+    document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
+  }, [open, onClose]);
+
+  const markOne = async (id) => {
+    if (busy.has(id)) return;
+    setBusy((p) => new Set([...p, id]));
+    try {
+      await axiosInstance.put(`/notifications/read/${id}`);
+      setItems((p) => {
+        const next = p.map((n) => n.notificationId === id ? { ...n, isRead: true } : n);
+        onCountChange?.(next.filter((n) => !n.isRead).length);
+        return next;
+      });
+    } catch { /* silent */ }
+    finally { setBusy((p) => { const s = new Set(p); s.delete(id); return s; }); }
+  };
+
+  const markAll = async () => {
+    const unread = items.filter((n) => !n.isRead);
+    if (!unread.length || markingAll) return;
+    setMarkingAll(true);
+    try {
+      await Promise.all(unread.map((n) => axiosInstance.put(`/notifications/read/${n.notificationId}`)));
+      setItems((p) => { const next = p.map((n) => ({ ...n, isRead: true })); onCountChange?.(0); return next; });
+    } catch { /* silent */ }
+    finally { setMarkingAll(false); }
+  };
+
+  const unreadCount = items.filter((n) => !n.isRead).length;
+
+  return (
+    <>
+      <div onClick={onClose}
+        className={`fixed inset-0 z-40 bg-[rgba(10,10,30,0.28)] backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
+      <div ref={ref} role="dialog"
+        className={`fixed top-0 right-0 bottom-0 w-full max-w-sm z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] ${open ? "translate-x-0" : "translate-x-full"}`}>
+
+        <div className="h-16 flex-shrink-0 flex items-center justify-between px-5 border-b border-slate-100"
+          style={{ background: "linear-gradient(to right, var(--primary-50), #fff)" }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: "var(--primary-100)", color: "var(--color-primary)" }}>
+              <Icon d={ICONS.bell} size={16} />
+            </div>
+            <div>
+              <p className="m-0 text-sm font-bold text-slate-900 leading-tight">Notifications</p>
+              <p className="m-0 text-[11px] text-slate-400 mt-0.5">
+                {loading ? "Refreshing…" : unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button onClick={load} disabled={loading}
+              className="w-8 h-8 rounded-lg border border-slate-200 bg-transparent flex items-center justify-center text-slate-500 cursor-pointer hover:border-slate-300 transition-colors">
+              <Icon d={ICONS.refresh} size={13} className={loading ? "animate-spin" : ""} />
+            </button>
+            {unreadCount > 0 && (
+              <button onClick={markAll} disabled={markingAll}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer font-[inherit] border"
+                style={{ borderColor: "var(--primary-200)", background: "var(--primary-50)", color: "var(--color-primary)", opacity: markingAll ? 0.5 : 1 }}>
+                <Icon d={ICONS.check} size={10} /> Mark all read
+              </button>
+            )}
+            <button onClick={onClose}
+              className="w-8 h-8 rounded-lg border border-slate-200 bg-transparent flex items-center justify-center text-slate-500 cursor-pointer hover:border-slate-300 transition-colors">
+              <Icon d={ICONS.x} size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          {err && (
+            <div className="m-4 p-3 rounded-xl bg-rose-50 border border-rose-100 flex items-center gap-2">
+              <Icon d={ICONS.alert} size={14} className="text-rose-600" />
+              <p className="m-0 text-xs text-rose-700 flex-1">{err}</p>
+              <button onClick={load} className="bg-transparent border-none text-rose-700 text-[11px] font-bold cursor-pointer font-[inherit]">Retry</button>
+            </div>
+          )}
+          {loading && items.length === 0 && Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="flex gap-3 px-5 py-3.5 border-b border-slate-50">
+              <div className="w-9 h-9 rounded-xl bg-slate-100 animate-pulse flex-shrink-0" />
+              <div className="flex-1 flex flex-col gap-2">
+                <div className="h-2.5 w-1/2 rounded bg-slate-100 animate-pulse" />
+                <div className="h-2.5 w-3/4 rounded bg-slate-100 animate-pulse" />
+              </div>
+            </div>
+          ))}
+          {!loading && !err && items.length === 0 && (
+            <div className="min-h-[280px] flex flex-col items-center justify-center gap-3 p-10 text-center">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{ background: "var(--primary-50)", color: "var(--color-primary)" }}>
+                <Icon d={ICONS.bell} size={22} />
+              </div>
+              <p className="m-0 text-[15px] font-bold text-slate-700">All caught up!</p>
+              <p className="m-0 text-[13px] text-slate-400">No notifications right now.</p>
+            </div>
+          )}
+          {!loading && items.map((n, i) => {
+            const isBusy = busy.has(n.notificationId);
+            return (
+              <div key={n.notificationId}
+                className={`flex gap-3 px-5 py-3.5 relative ${i < items.length - 1 ? "border-b border-slate-50" : ""}`}
+                style={{ background: n.isRead ? "#fff" : "var(--primary-50)" }}>
+                {!n.isRead && <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-r" style={{ background: "var(--color-primary)" }} />}
+                <div className="w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center"
+                  style={{ background: n.isRead ? "#f1f1f5" : "var(--primary-100)", color: n.isRead ? "#a8a8c0" : "var(--color-primary)" }}>
+                  <Icon d={ICONS.bell} size={15} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex gap-2 justify-between mb-0.5">
+                    <p className={`m-0 text-[13px] leading-snug ${n.isRead ? "font-normal" : "font-bold"} text-slate-900`}>{n.title}</p>
+                    <span className="text-[10px] text-slate-400 flex-shrink-0 mt-0.5">{timeAgo(n.createdAt)}</span>
+                  </div>
+                  {n.description && <p className="m-0 text-xs text-slate-500 leading-relaxed">{n.description}</p>}
+                  <div className="flex items-center gap-3 mt-2">
+                    {n.redirectUrl && (
+                      <a href={n.redirectUrl} onClick={() => !n.isRead && markOne(n.notificationId)}
+                        className="text-[11px] font-bold no-underline" style={{ color: "var(--color-primary)" }}>
+                        View details →
+                      </a>
+                    )}
+                    {!n.isRead && (
+                      <button onClick={() => markOne(n.notificationId)} disabled={isBusy}
+                        className={`bg-transparent border-none p-0 text-[11px] text-slate-400 cursor-pointer font-[inherit] ${isBusy ? "opacity-50 cursor-not-allowed" : ""}`}>
+                        {isBusy ? "…" : "Mark as read"}
+                      </button>
+                    )}
+                    {n.isRead && <span className="text-[11px] text-green-500">✓ Read</span>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {items.length > 0 && (
+          <div className="border-t border-slate-100 px-5 py-2.5 bg-slate-50 text-center">
+            <p className="m-0 text-[11px] text-slate-400">
+              {items.length} notification{items.length !== 1 ? "s" : ""}
+              {unreadCount > 0 ? ` · ${unreadCount} unread` : " · all read"}
+            </p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─── Payment Card (Mobile) ────────────────────────────────────────────────────
+const PaymentCard = ({ p, copied, onCopy }) => {
+  const isExternal = !p.user;
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-3 shadow-sm animate-[fadein_0.18s_ease]">
+      {/* Top: user + status */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          {isExternal ? (
+            <div className="w-10 h-10 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center flex-shrink-0 text-slate-400">
+              <Icon d={ICONS.globe} size={16} />
+            </div>
+          ) : <Avatar name={p.user.name} photo={p.user.photoUrl} />}
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <p className="m-0 font-bold text-slate-900 text-sm truncate">{isExternal ? "External" : p.user?.name}</p>
+              {isExternal && <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap">External</span>}
+            </div>
+            {!isExternal && p.user?.email && <p className="m-0 text-[11px] text-slate-400 truncate">{p.user.email}</p>}
+            {!isExternal && p.user?.phoneNumber && (
+              <span className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
+                <Icon d={ICONS.phone} size={9} />{p.user.phoneNumber}
+              </span>
+            )}
+          </div>
+        </div>
+        <StatusBadge s={p.status} />
+      </div>
+
+      {/* Amount + Payment Link highlighted together */}
+      <div className="rounded-xl border p-3 mb-2.5"
+        style={{ background: "var(--primary-50)", borderColor: "var(--primary-200)" }}>
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-xl font-extrabold tracking-tight" style={{ color: "var(--primary-700)" }}>
+            ₹{(p.amount || 0).toLocaleString("en-IN")}
+          </span>
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold border"
+            style={{ background: "var(--primary-100)", color: "var(--primary-700)", borderColor: "var(--primary-200)" }}>
+            {p.type}
+          </span>
+          {p.createdBy?.name && (
+            <span className="flex items-center gap-1.5 ml-auto text-[11px] text-slate-500">
+              <Avatar name={p.createdBy.name} photo={p.createdBy.photoUrl} size="xs" />{p.createdBy.name}
+            </span>
+          )}
+        </div>
+        {p.razorpayPaymentLink ? (
+          <div className="flex items-center gap-1.5">
+            <a href={p.razorpayPaymentLink} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1 font-mono text-[11px] no-underline truncate flex-1"
+              style={{ color: "var(--primary-600)" }}>
+              <Icon d={ICONS.external} size={10} />{p.razorpayPaymentLink}
+            </a>
+            <CopyBtn text={p.razorpayPaymentLink} id={p.paymentId} copied={copied} onCopy={onCopy} />
+          </div>
+        ) : <span className="text-[11px] text-slate-300">No payment link</span>}
+      </div>
+
+      {/* Order ID */}
+      {p.razorpayOrderId && (
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 mb-2">
+          <div className="min-w-0">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Order ID</span>
+            <p className="m-0 mt-0.5 font-mono text-[11px] text-slate-600 truncate max-w-[200px]">{p.razorpayOrderId}</p>
+          </div>
+          <CopyBtn text={p.razorpayOrderId} id={`ord-${p.paymentId}`} copied={copied} onCopy={onCopy} />
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-2">
+        <span className="flex items-center gap-1 text-[11px] text-slate-400">
+          <Icon d={ICONS.clock} size={10} />{fmtDate(p.createdAt)} · {fmtTime(p.createdAt)}
+        </span>
+        {p.paidAt && <span className="text-[11px] font-bold text-green-600">✓ Paid {fmtDate(p.paidAt)}</span>}
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+export default function CreateAmendmentLink() {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [successLink, setSuccess]             = useState(null);
+  const [copied, setCopied]                   = useState(null);
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unread, setUnread]       = useState(0);
+  const [bellAnim, setBellAnim]   = useState(false);
+
+  const [payments, setPayments]           = useState([]);
+  const [payPagination, setPayPagination] = useState(null);
+  const [payPage, setPayPage]             = useState(1);
+  const [tableSearch, setTSearch]         = useState("");
+  const [tableDebouncedQ, setTableDQ]     = useState("");
+  const [tLoading, setTLoading]           = useState(false);
+  const tableDebRef = useRef(null);
+
+  useEffect(() => {
+    const id = localStorage.getItem("employeeId");
+    if (!id) return;
+    axiosInstance.get(`/notifications/employee/${id}`)
+      .then((r) => { if (r.data?.success) setUnread((r.data.data ?? []).filter((n) => !n.isRead).length); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
-    clearTimeout(tableDebounceRef.current);
-    tableDebounceRef.current = setTimeout(() => { setTableDebouncedQ(tableSearch); setPayPage(1); }, 350);
+    if (unread > 0) { setBellAnim(true); const t = setTimeout(() => setBellAnim(false), 850); return () => clearTimeout(t); }
+  }, [unread]);
+
+  useEffect(() => {
+    clearTimeout(tableDebRef.current);
+    tableDebRef.current = setTimeout(() => { setTableDQ(tableSearch); setPayPage(1); }, 350);
   }, [tableSearch]);
 
   const fetchPayments = useCallback(() => {
@@ -443,419 +784,386 @@ export default function CreateAmendmentLink() {
     const params = new URLSearchParams({ page: payPage, limit: 10 });
     if (tableDebouncedQ) params.set("search", tableDebouncedQ);
     axios.get(`https://insightsconsult-backend.onrender.com/payments/${EMPLOYEE_ID}?${params}`)
-      .then(r => { setPayments(r.data.data||[]); setPayPagination(r.data.pagination||null); })
+      .then((r) => { setPayments(r.data.data || []); setPayPagination(r.data.pagination || null); })
       .catch(() => setPayments([]))
       .finally(() => setTLoading(false));
   }, [payPage, tableDebouncedQ]);
 
   useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
-  const handleSubmit = async () => {
-    if (!selectedUser)                            { setError("Please select a user."); return; }
-    if (!form.amount || Number(form.amount) <= 0) { setError("Amount must be greater than 0."); return; }
-    setLoading(true); setError("");
-    try {
-      const r = await axios.post("https://insightsconsult-backend.onrender.com/create/amendment-link", {
-        employeeId: EMPLOYEE_ID,
-        userId: selectedUser==="other" ? null : selectedUser?.userId,
-        note: form.note, amount: Number(form.amount),
-      });
-      setSuccess(r.data);
-      setForm({ note:"", amount:"" });
-      setSelected(null);
-      setPayPage(1);
-      fetchPayments();
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong. Please try again.");
-    } finally { setLoading(false); }
+  const doCopy = (text, id) =>
+    navigator.clipboard.writeText(text).then(() => { setCopied(id); setTimeout(() => setCopied(null), 2000); });
+
+  const handleSuccess = (data) => {
+    setShowCreateModal(false);
+    setSuccess(data);
+    setPayPage(1);
+    fetchPayments();
   };
 
-  const doCopy = (text, id) =>
-    navigator.clipboard.writeText(text).then(() => { setCopied(id); setTimeout(()=>setCopied(null),2000); });
-
   const stats = [
-    { label:"Total Links", val:payPagination?.total??"—", color:T.primary700, bg:T.primary50,  border:T.primary200 },
-    { label:"Paid",        val:payments.filter(p=>p.status==="PAID").length,    color:T.success700, bg:T.success50,  border:T.success100 },
-    { label:"Pending",     val:payments.filter(p=>p.status==="CREATED").length, color:T.warning700, bg:T.warning50,  border:T.warning100 },
-    { label:"Failed",      val:payments.filter(p=>p.status==="FAILED").length,  color:T.error700,   bg:T.error50,    border:T.error100   },
+    { label: "Total Links", val: payPagination?.total ?? "—",                          color: "var(--primary-700)", bg: "var(--primary-50)",  border: "var(--primary-200)" },
+    { label: "Paid",        val: payments.filter((p) => p.status === "PAID").length,    color: "#047857",             bg: "#ecfdf5",            border: "#d1fae5"            },
+    { label: "Pending",     val: payments.filter((p) => p.status === "CREATED").length, color: "#b45309",             bg: "#fffbeb",            border: "#fef3c7"            },
+    { label: "Failed",      val: payments.filter((p) => p.status === "FAILED").length,  color: "#be123c",             bg: "#fff1f2",            border: "#ffe4e6"            },
   ];
 
-  const card = { background:T.neutral0, borderRadius:T.rlg, border:`1px solid ${T.neutral200}`, overflow:"hidden", boxShadow:T.shadowSm };
-  const inp  = { width:"100%", height:44, padding:"0 14px", borderRadius:T.rlg,
-    border:`2px solid ${T.neutral200}`, background:T.neutral50, fontSize:14,
-    color:T.neutral900, outline:"none", boxSizing:"border-box",
-    transition:"border-color 150ms, box-shadow 150ms, background 150ms", fontFamily:"inherit" };
-  const lbl  = { display:"block", fontSize:10, fontWeight:700, color:T.neutral500,
-    letterSpacing:"0.08em", marginBottom:6, textTransform:"uppercase" };
-  const th   = { padding:"10px 14px", textAlign:"left", fontSize:10, fontWeight:700,
-    color:T.primary700, textTransform:"uppercase", letterSpacing:"0.07em",
-    background:T.primary50, borderBottom:`1px solid ${T.primary100}`, whiteSpace:"nowrap" };
-  const td   = { padding:"12px 14px", borderBottom:`1px solid ${T.neutral100}`, verticalAlign:"middle" };
+  const TABLE_HEADERS = ["User", "Created By", "Amount & Link", "Type", "Status", "Order ID", "Paid At", "Created"];
 
   return (
-    <div style={{ minHeight:"100vh", background:T.neutral100, fontFamily:"'DM Sans',-apple-system,sans-serif" }}>
+    <div className="min-h-screen bg-slate-100 font-[DM_Sans,system-ui,sans-serif]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap');
-        *{box-sizing:border-box}
-        input:focus{border-color:var(--color-primary)!important;box-shadow:0 0 0 3px rgb(${primaryRgb}/.12)!important;background:#fff!important}
-        .tr:hover td{background:var(--primary-50)!important}
-        button:active{transform:scale(0.97)}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes slideup{from{opacity:0;transform:translateY(24px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-        .spin{animation:spin .7s linear infinite}
-        .fadein{animation:fadein .18s ease}
-        .slideup{animation:slideup .28s cubic-bezier(0.34,1.56,0.64,1)}
-        ::-webkit-scrollbar{width:4px;height:4px}
-        ::-webkit-scrollbar-thumb{background:${T.neutral200};border-radius:4px}
-        @media(min-width:900px){.main-grid{display:grid!important;grid-template-columns:340px 1fr;gap:20px;align-items:start}}
+        * { box-sizing: border-box; }
+        @keyframes fadein  { from{opacity:0;transform:translateY(6px)}  to{opacity:1;transform:translateY(0)} }
+        @keyframes slideup { from{opacity:0;transform:translateY(24px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes bell    { 0%,100%{transform:rotate(0)} 15%{transform:rotate(14deg)} 30%{transform:rotate(-10deg)} 45%{transform:rotate(8deg)} 60%{transform:rotate(-6deg)} 75%{transform:rotate(3deg)} }
+        .bell-anim { animation: bell 0.82s ease; }
+        .row-hover:hover td { background: var(--primary-50) !important; }
+        input:focus { border-color: var(--color-primary) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.12) !important; background: #fff !important; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #e4e4ec; border-radius: 4px; }
       `}</style>
 
-      {/* HEADER */}
-      <div style={{ background:T.neutral0, borderBottom:`1px solid ${T.neutral200}`, padding:"14px 20px", boxShadow:T.shadowSm }}>
-        <div style={{ maxWidth:1320, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:42, height:42, borderRadius:T.rlg, background:"var(--color-primary)",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              boxShadow:`0 4px 14px rgb(${primaryRgb}/.35)`, color:"#fff" }}>
-              <Svg d={IC.link} size={18}/>
+      {/* ── HEADER ──────────────────────────────────────────── */}
+      <div className="bg-white border-b border-slate-200 px-5 h-16 flex items-center sticky top-0 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+              style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(239,68,68,0.35)" }}>
+              <Icon d={ICONS.link} size={18} />
             </div>
             <div>
-              <h1 style={{ margin:0, fontSize:mobile?17:20, fontWeight:800, color:T.neutral900, letterSpacing:"-0.025em" }}>Amendment Links</h1>
-              <p style={{ margin:0, fontSize:12, color:T.neutral400 }}>Generate Razorpay payment links for amendments</p>
+              <h1 className="m-0 text-[17px] font-extrabold text-slate-900 tracking-tight leading-tight">Amendment Links</h1>
+              <p className="m-0 text-[11px] text-slate-400 hidden sm:block">Generate Razorpay payment links for amendments</p>
             </div>
           </div>
-          <span style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:T.rfull,
-            background:T.primary50, color:T.primary700, fontSize:10, fontWeight:700, letterSpacing:"0.08em", border:`1px solid ${T.primary200}` }}>
-            <span style={{ width:6, height:6, borderRadius:T.rfull, background:T.primary500, animation:"pulse 2s infinite" }}/>
-            INTERNAL TOOL
-          </span>
+
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowCreateModal(true)}
+              className="hidden sm:flex items-center gap-2 h-9 px-4 rounded-xl border-none text-white text-sm font-bold cursor-pointer font-[inherit] transition-all active:scale-[0.97]"
+              style={{ background: "var(--color-primary)", boxShadow: "0 3px 10px rgba(239,68,68,0.3)" }}>
+              <Icon d={ICONS.plus} size={14} />Create Link
+            </button>
+
+            <div className="relative">
+              <button onClick={() => setNotifOpen((v) => !v)}
+                className="w-9 h-9 rounded-xl border flex items-center justify-center cursor-pointer transition-all duration-150"
+                style={notifOpen
+                  ? { borderColor: "var(--color-primary)", background: "var(--primary-50)", color: "var(--color-primary)" }
+                  : { borderColor: "#e4e4ec", background: "transparent", color: "#7878a0" }}>
+                <Icon d={ICONS.bell} size={16} className={bellAnim ? "bell-anim" : ""} />
+              </button>
+              {unread > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 rounded-full text-white text-[9px] font-extrabold flex items-center justify-center border-2 border-white px-0.5"
+                  style={{ background: "var(--color-primary)" }}>
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style={{ maxWidth:1320, margin:"0 auto", padding:mobile?"14px":"20px" }}>
+      <NotifPanel open={notifOpen} onClose={() => setNotifOpen(false)} onCountChange={setUnread} />
+      {showCreateModal && <CreateLinkModal onClose={() => setShowCreateModal(false)} onSuccess={handleSuccess} />}
 
-        {/* STATS */}
-        <div style={{ display:"grid", gridTemplateColumns:`repeat(${mobile?2:4},1fr)`, gap:12, marginBottom:20 }}>
-          {stats.map(s=>(
-            <div key={s.label} className="fadein" style={{ background:s.bg, borderRadius:T.rlg,
-              padding:mobile?"12px 14px":"16px 20px", border:`1px solid ${s.border}`, boxShadow:T.shadowSm }}>
-              <p style={{ margin:0, fontSize:10, fontWeight:700, color:s.color, textTransform:"uppercase", letterSpacing:"0.08em" }}>{s.label}</p>
-              <p style={{ margin:"6px 0 0", fontSize:mobile?26:32, fontWeight:800, color:s.color, letterSpacing:"-0.03em", lineHeight:1 }}>{s.val}</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-5 py-5">
+
+        {/* ── STATS ───────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+          {stats.map((s) => (
+            <div key={s.label} className="rounded-xl p-4 border shadow-sm"
+              style={{ background: s.bg, borderColor: s.border }}>
+              <p className="m-0 text-[10px] font-bold uppercase tracking-widest" style={{ color: s.color }}>{s.label}</p>
+              <p className="m-0 mt-1.5 text-[32px] font-extrabold tracking-tighter leading-none" style={{ color: s.color }}>{s.val}</p>
             </div>
           ))}
         </div>
 
-        <div className="main-grid" style={{ display:"flex", flexDirection:"column", gap:20 }}>
+        {/* ── FULL-WIDTH TABLE CARD ───────────────────────────── */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
 
-          {/* FORM CARD */}
-          <div style={card}>
-            <div style={{ padding:"14px 18px", borderBottom:`1px solid ${T.primary100}`,
-              background:T.primary50, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <div>
-                <p style={{ margin:0, fontSize:15, fontWeight:700, color:T.primary800 }}>Create Payment Link</p>
-                <p style={{ margin:"2px 0 0", fontSize:11, color:T.primary600 }}>Fill in details to generate</p>
-              </div>
-              <div style={{ width:34, height:34, borderRadius:T.rmd, background:T.primary100,
-                display:"flex", alignItems:"center", justifyContent:"center", color:T.primary700 }}>
-                <Svg d={IC.link} size={16}/>
-              </div>
+          {/* Toolbar */}
+          <div className="px-5 py-3.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="m-0 text-sm font-bold text-slate-900">Recent Payments</p>
+              <p className="m-0 text-xs text-slate-400 mt-0.5">
+                {payPagination
+                  ? `${payPagination.total} total · page ${payPagination.page} of ${payPagination.totalPages}`
+                  : "Loading…"}
+              </p>
             </div>
+            <div className="flex items-center gap-2">
+              {/* Mobile create */}
+              <button onClick={() => setShowCreateModal(true)}
+                className="sm:hidden flex items-center gap-1.5 h-9 px-3 rounded-xl border-none text-white text-xs font-bold cursor-pointer font-[inherit]"
+                style={{ background: "var(--color-primary)" }}>
+                <Icon d={ICONS.plus} size={13} />Create
+              </button>
 
-            <div style={{ padding:20 }}>
-              <div style={{ marginBottom:16 }}>
-                <label style={lbl}>Select User</label>
-                <UserPicker selectedUser={selectedUser} onSelect={setSelected}/>
+              {/* Search */}
+              <div className="flex items-center gap-1.5 h-9 px-3 rounded-xl border-[1.5px] transition-all duration-150"
+                style={tableSearch
+                  ? { borderColor: "var(--color-primary)", background: "var(--primary-50)" }
+                  : { borderColor: "#e4e4ec", background: "#f8f8fa" }}>
+                <span style={{ color: tableSearch ? "var(--color-primary)" : "#a8a8c0" }}>
+                  {tLoading
+                    ? <div className="w-3 h-3 rounded-full border-2 border-slate-200 animate-spin" style={{ borderTopColor: "var(--color-primary)" }} />
+                    : <Icon d={ICONS.search} size={13} />}
+                </span>
+                <input type="text" value={tableSearch} onChange={(e) => setTSearch(e.target.value)}
+                  placeholder="Search payments…"
+                  className="border-none outline-none bg-transparent text-xs text-slate-900 font-[inherit] w-28 sm:w-48" />
+                {tableSearch && (
+                  <button type="button" onClick={() => setTSearch("")}
+                    className="border-none bg-transparent cursor-pointer text-slate-400 flex p-0 hover:text-slate-600">
+                    <Icon d={ICONS.x} size={12} />
+                  </button>
+                )}
               </div>
 
-              <div style={{ marginBottom:16 }}>
-                <label style={lbl}>Note <span style={{ opacity:0.45, fontWeight:400, textTransform:"none", letterSpacing:0 }}>(optional)</span></label>
-                <input style={inp} placeholder="Brief note for this amendment…"
-                  value={form.note} onChange={e=>setForm({...form,note:e.target.value})}/>
-              </div>
-
-              <div style={{ marginBottom:20 }}>
-                <label style={lbl}>Amount</label>
-                <div style={{ position:"relative" }}>
-                  <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)",
-                    fontWeight:800, color:T.primary600, fontSize:17, pointerEvents:"none" }}>₹</span>
-                  <input type="text" inputMode="numeric" style={{ ...inp, paddingLeft:30 }}
-                    placeholder="0" value={form.amount}
-                    onChange={e=>{ if(/^\d*$/.test(e.target.value)) setForm({...form,amount:e.target.value}); }}/>
-                </div>
-                <p style={{ margin:"5px 0 0", fontSize:11, color:T.neutral400 }}>Whole numbers only — no decimals</p>
-              </div>
-
-              {error && (
-                <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", borderRadius:T.rmd,
-                  background:T.error50, border:`1px solid ${T.error100}`, color:T.error700, fontSize:13, marginBottom:16 }}>
-                  <Svg d={IC.alert} size={14}/>{error}
-                </div>
-              )}
-
-              <button type="button" onClick={handleSubmit} disabled={loading} style={{
-                width:"100%", height:46, borderRadius:T.rlg, border:"none",
-                background:"var(--color-primary)", color:"#fff", fontWeight:700, fontSize:14,
-                cursor:loading?"not-allowed":"pointer", display:"flex", alignItems:"center",
-                justifyContent:"center", gap:8, opacity:loading?0.75:1,
-                boxShadow:`0 4px 16px rgb(${primaryRgb}/.3)`, fontFamily:"inherit",
-                transition:"all 150ms" }}>
-                {loading?<><Spinner size={16}/>Generating…</>:<><Svg d={IC.link} size={15}/>Generate Payment Link</>}
+              {/* Refresh */}
+              <button onClick={() => { setPayPage(1); fetchPayments(); }} disabled={tLoading}
+                className={`flex items-center gap-1.5 h-9 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold cursor-pointer font-[inherit] hover:border-slate-300 transition-all ${tLoading ? "opacity-60" : ""}`}>
+                <Icon d={ICONS.refresh} size={13} className={tLoading ? "animate-spin" : ""} />
+                <span className="hidden sm:inline">Refresh</span>
               </button>
             </div>
           </div>
 
-          {/* TABLE CARD */}
-          <div style={card}>
-            <div style={{ padding:"13px 18px", borderBottom:`1px solid ${T.neutral200}`,
-              display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10 }}>
-              <div>
-                <p style={{ margin:0, fontSize:14, fontWeight:700, color:T.neutral900 }}>Recent Payments</p>
-                <p style={{ margin:"2px 0 0", fontSize:12, color:T.neutral400 }}>
-                  {payPagination ? `${payPagination.total} total · page ${payPagination.page} of ${payPagination.totalPages}` : "Loading…"}
-                </p>
-              </div>
-              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:6, height:36, padding:"0 12px", borderRadius:T.rmd,
-                  border:tableSearch?`1.5px solid ${T.primary500}`:`1.5px solid ${T.neutral200}`,
-                  background:tableSearch?T.primary50:T.neutral50, transition:"all 150ms",
-                  boxShadow:tableSearch?`0 0 0 3px rgb(${primaryRgb}/.08)`:"" }}>
-                  <span style={{ color:tableSearch?T.primary500:T.neutral400 }}>
-                    {tLoading?<Spinner size={13} color={T.primary500}/>:<Svg d={IC.search} size={13}/>}
-                  </span>
-                  <input type="text" value={tableSearch} onChange={e=>setTSearch(e.target.value)}
-                    placeholder="Search payments…"
-                    style={{ border:"none", outline:"none", background:"transparent", fontSize:12,
-                      color:T.neutral900, fontFamily:"inherit", width:mobile?100:160 }}/>
-                  {tableSearch && (
-                    <button type="button" onClick={()=>setTSearch("")}
-                      style={{ border:"none", background:"none", cursor:"pointer", color:T.neutral400, display:"flex", padding:0 }}>
-                      <Svg d={IC.x} size={12}/>
-                    </button>
-                  )}
+          {/* ── Desktop table ──────────────────── */}
+          <div className="hidden md:block overflow-x-auto">
+            {tLoading && payments.length === 0 ? (
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr>
+                    {TABLE_HEADERS.map((h) => (
+                      <th key={h} className="px-3.5 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest whitespace-nowrap border-b"
+                        style={{ color: "var(--primary-700)", background: "var(--primary-50)", borderColor: "var(--primary-100)" }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>{Array.from({ length: 5 }, (_, i) => <SkeletonRow key={i} />)}</tbody>
+              </table>
+            ) : payments.length === 0 ? (
+              <div className="text-center py-16 px-5">
+                <div className="w-12 h-12 rounded-full border-2 border-dashed border-slate-200 flex items-center justify-center mx-auto mb-3 text-slate-300">
+                  <Icon d={ICONS.search} size={20} />
                 </div>
-                <button onClick={()=>{ setPayPage(1); fetchPayments(); }} disabled={tLoading} style={{
-                  display:"inline-flex", alignItems:"center", gap:5, height:36, padding:"0 12px",
-                  borderRadius:T.rmd, border:`1.5px solid ${T.neutral200}`, background:T.neutral0,
-                  color:T.neutral600, fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit",
-                  opacity:tLoading?0.6:1 }}>
-                  <div className={tLoading?"spin":""} style={{ display:"flex" }}><Svg d={IC.refresh} size={13}/></div>
-                  {!mobile&&"Refresh"}
-                </button>
-              </div>
-            </div>
-
-            {/* Desktop table */}
-            {!mobile && (
-              <div style={{ overflowX:"auto" }}>
-                {tLoading&&payments.length===0 ? (
-                  <div style={{ padding:16 }}>
-                    {[1,2,3].map(i=><div key={i} style={{ height:54, borderRadius:T.rmd, background:T.neutral100, marginBottom:8, animation:"pulse 1.4s infinite" }}/>)}
-                  </div>
-                ) : payments.length===0 ? (
-                  <div style={{ textAlign:"center", padding:"52px 20px" }}>
-                    <div style={{ width:48, height:48, borderRadius:T.rfull, border:`2px dashed ${T.neutral200}`,
-                      display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 10px", color:T.neutral300 }}>
-                      <Svg d={IC.search} size={20}/>
-                    </div>
-                    <p style={{ fontSize:14, color:T.neutral500, fontWeight:500, margin:0 }}>
-                      {tableSearch?`No results for "${tableSearch}"`:"No payments found"}
-                    </p>
-                    {tableSearch&&(
-                      <button type="button" onClick={()=>setTSearch("")}
-                        style={{ marginTop:8, background:"none", border:"none", color:T.primary600, fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
-                        Clear search
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, opacity:tLoading?0.6:1, transition:"opacity 200ms" }}>
-                    <thead>
-                      <tr>{["User","Created By","Amount","Type","Status","Order ID","Payment Link","Paid At","Created"].map(h=>(
-                        <th key={h} style={th}>{h}</th>
-                      ))}</tr>
-                    </thead>
-                    <tbody>
-                      {payments.map(p=>{
-                        const link=p.razorpayPaymentLinkId, id=p.paymentId;
-                        return (
-                          <tr key={id} className="tr fadein">
-                            <td style={td}>
-                              {p.user?.name?(
-                                <div style={{ display:"flex", alignItems:"center", gap:10, minWidth:160 }}>
-                                  <Avatar name={p.user.name}/>
-                                  <div>
-                                    <p style={{ margin:0, fontWeight:600, color:T.neutral900 }}>{p.user.name}</p>
-                                    {p.user.email&&<p style={{ margin:"2px 0 0", fontSize:11, color:T.neutral400 }}>{p.user.email}</p>}
-                                    {p.user.phoneNumber&&<span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:T.neutral400, marginTop:2 }}><Svg d={IC.phone} size={9}/>{p.user.phoneNumber}</span>}
-                                  </div>
-                                </div>
-                              ):<span style={{ color:T.neutral300 }}>—</span>}
-                            </td>
-                            <td style={td}>
-                              {p.createdBy?.name?(
-                                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                                  <Avatar name={p.createdBy.name} size="sm"/>
-                                  <span style={{ fontWeight:500, color:T.neutral700 }}>{p.createdBy.name}</span>
-                                </div>
-                              ):<span style={{ color:T.neutral300 }}>—</span>}
-                            </td>
-                            <td style={td}><span style={{ fontWeight:800, color:T.primary700, fontSize:15, fontVariantNumeric:"tabular-nums" }}>₹{(p.amount||0).toLocaleString("en-IN")}</span></td>
-                            <td style={td}><span style={{ padding:"3px 8px", borderRadius:T.rsm, background:T.primary50, color:T.primary700, fontSize:10, fontWeight:700, border:`1px solid ${T.primary200}` }}>{p.type}</span></td>
-                            <td style={td}><StatusBadge s={p.status}/></td>
-                            <td style={td}>
-                              {p.razorpayOrderId?(
-                                <div style={{ display:"flex", alignItems:"center", gap:6, minWidth:145 }}>
-                                  <span style={{ fontFamily:"monospace", fontSize:11, color:T.neutral500, overflow:"hidden", textOverflow:"ellipsis", maxWidth:100, whiteSpace:"nowrap" }}>{p.razorpayOrderId}</span>
-                                  <CopyBtn text={p.razorpayOrderId} id={`ord-${id}`} copied={copied} onCopy={doCopy}/>
-                                </div>
-                              ):<span style={{ color:T.neutral300 }}>—</span>}
-                            </td>
-                            <td style={td}>
-                              {link?(
-                                <div style={{ display:"flex", alignItems:"center", gap:6, minWidth:155 }}>
-                                  <a href={link} target="_blank" rel="noopener noreferrer"
-                                    style={{ display:"flex", alignItems:"center", gap:4, fontFamily:"monospace", fontSize:11, color:T.primary600, textDecoration:"none", maxWidth:100, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                                    <Svg d={IC.external} size={10}/>{link}
-                                  </a>
-                                  <CopyBtn text={link} id={id} copied={copied} onCopy={doCopy}/>
-                                </div>
-                              ):<span style={{ color:T.neutral300 }}>—</span>}
-                            </td>
-                            <td style={td}>
-                              {p.paidAt?(
-                                <div><p style={{ margin:0, fontSize:12, color:T.neutral800, fontWeight:500 }}>{fmtDate(p.paidAt)}</p>
-                                  <span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:T.neutral400, marginTop:2 }}><Svg d={IC.clock} size={9}/>{fmtTime(p.paidAt)}</span>
-                                </div>
-                              ):<span style={{ color:T.neutral300 }}>—</span>}
-                            </td>
-                            <td style={td}>
-                              <p style={{ margin:0, fontSize:12, color:T.neutral800, fontWeight:500 }}>{fmtDate(p.createdAt)}</p>
-                              <span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:T.neutral400, marginTop:2 }}><Svg d={IC.clock} size={9}/>{fmtTime(p.createdAt)}</span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <p className="text-sm text-slate-500 font-medium m-0">
+                  {tableSearch ? `No results for "${tableSearch}"` : "No payments found"}
+                </p>
+                {tableSearch && (
+                  <button type="button" onClick={() => setTSearch("")}
+                    className="mt-2 bg-transparent border-none text-sm font-semibold cursor-pointer font-[inherit]"
+                    style={{ color: "var(--color-primary-hover)" }}>
+                    Clear search
+                  </button>
                 )}
               </div>
-            )}
+            ) : (
+              <table className="w-full border-collapse text-sm" style={{ opacity: tLoading ? 0.6 : 1, transition: "opacity 200ms" }}>
+                <thead>
+                  <tr>
+                    {TABLE_HEADERS.map((h) => (
+                      <th key={h} className="px-3.5 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest whitespace-nowrap border-b"
+                        style={{ color: "var(--primary-700)", background: "var(--primary-50)", borderColor: "var(--primary-100)" }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((p) => {
+                    const isExternal = !p.user;
+                    return (
+                      <tr key={p.paymentId} className="row-hover transition-colors">
 
-            {/* Mobile cards */}
-            {mobile && (
-              <div style={{ padding:12, opacity:tLoading?0.6:1, transition:"opacity 200ms" }}>
-                {tLoading&&payments.length===0?[1,2,3].map(i=><div key={i} style={{ height:100, borderRadius:T.rmd, background:T.neutral100, marginBottom:8, animation:"pulse 1.4s infinite" }}/>)
-                :payments.length===0?(
-                  <div style={{ textAlign:"center", padding:"40px 20px" }}>
-                    <p style={{ color:T.neutral500, fontSize:14, fontWeight:500 }}>{tableSearch?`No results for "${tableSearch}"`:"No payments found"}</p>
-                  </div>
-                ):payments.map(p=>{
-                  const link=p.razorpayPaymentLinkId, id=p.paymentId;
-                  return (
-                    <div key={id} className="fadein" style={{ borderRadius:T.rlg, border:`1.5px solid ${T.neutral200}`, background:T.neutral0, padding:13, marginBottom:10, boxShadow:T.shadowSm }}>
-                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:10 }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          {p.user?.name&&<Avatar name={p.user.name}/>}
-                          <div>
-                            <p style={{ margin:0, fontWeight:700, color:T.neutral900, fontSize:14 }}>{p.user?.name||"—"}</p>
-                            {p.user?.email&&<p style={{ margin:"2px 0 0", fontSize:11, color:T.neutral400 }}>{p.user.email}</p>}
-                            {p.user?.phoneNumber&&<span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:T.neutral400, marginTop:2 }}><Svg d={IC.phone} size={9}/>{p.user.phoneNumber}</span>}
+                        {/* User */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
+                            {isExternal ? (
+                              <div className="w-10 h-10 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center flex-shrink-0 text-slate-400">
+                                <Icon d={ICONS.globe} size={16} />
+                              </div>
+                            ) : <Avatar name={p.user.name} photo={p.user.photoUrl} />}
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <p className="m-0 font-semibold text-slate-900">{isExternal ? "External" : p.user?.name}</p>
+                                {isExternal && <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-slate-100 text-slate-500 border border-slate-200">External</span>}
+                              </div>
+                              {!isExternal && p.user?.email && <p className="m-0 text-[11px] text-slate-400 mt-0.5">{p.user.email}</p>}
+                              {!isExternal && p.user?.phoneNumber && (
+                                <span className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
+                                  <Icon d={ICONS.phone} size={9} />{p.user.phoneNumber}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <StatusBadge s={p.status}/>
-                      </div>
-                      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:T.rmd, background:T.neutral50, border:`1px solid ${T.neutral100}`, marginBottom:8 }}>
-                        <span style={{ fontSize:19, fontWeight:800, color:T.primary700 }}>₹{(p.amount||0).toLocaleString("en-IN")}</span>
-                        <span style={{ padding:"2px 8px", borderRadius:T.rsm, background:T.primary50, color:T.primary700, fontSize:10, fontWeight:700, border:`1px solid ${T.primary200}` }}>{p.type}</span>
-                        {p.createdBy?.name&&<span style={{ display:"flex", alignItems:"center", gap:5, marginLeft:"auto", fontSize:11, color:T.neutral500 }}><Avatar name={p.createdBy.name} size="xs"/>{p.createdBy.name}</span>}
-                      </div>
-                      {p.razorpayOrderId&&(
-                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 10px", borderRadius:T.rmd, background:T.neutral50, border:`1px solid ${T.neutral100}`, marginBottom:6 }}>
-                          <div style={{ minWidth:0 }}>
-                            <span style={{ fontSize:9, fontWeight:700, color:T.neutral400, letterSpacing:"0.08em", textTransform:"uppercase" }}>Order ID</span>
-                            <p style={{ margin:"1px 0 0", fontFamily:"monospace", fontSize:11, color:T.neutral600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:180 }}>{p.razorpayOrderId}</p>
-                          </div>
-                          <CopyBtn text={p.razorpayOrderId} id={`ord-${id}`} copied={copied} onCopy={doCopy}/>
-                        </div>
-                      )}
-                      {link&&(
-                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 10px", borderRadius:T.rmd, background:T.primary50, border:`1px solid ${T.primary200}`, marginBottom:6 }}>
-                          <div style={{ minWidth:0, flex:1 }}>
-                            <span style={{ fontSize:9, fontWeight:700, color:T.primary700, letterSpacing:"0.08em", textTransform:"uppercase" }}>Payment Link</span>
-                            <p style={{ margin:"1px 0 0", fontFamily:"monospace", fontSize:11, color:T.primary700, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:180 }}>{link}</p>
-                          </div>
-                          <CopyBtn text={link} id={id} copied={copied} onCopy={doCopy}/>
-                        </div>
-                      )}
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:8 }}>
-                        <span style={{ display:"flex", alignItems:"center", gap:4, fontSize:11, color:T.neutral400 }}><Svg d={IC.clock} size={10}/>Created {fmtDate(p.createdAt)} · {fmtTime(p.createdAt)}</span>
-                        {p.paidAt&&<span style={{ fontSize:11, color:T.success700, fontWeight:700 }}>✓ Paid {fmtDate(p.paidAt)}</span>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                        </td>
 
-            {payPagination&&(
-              <div style={{ borderTop:`1px solid ${T.neutral100}`, padding:"0 14px 4px" }}>
-                <PaginBar page={payPagination.page} totalPages={payPagination.totalPages} onPage={setPayPage} loading={tLoading}/>
-              </div>
+                        {/* Created By */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          {p.createdBy?.name ? (
+                            <div className="flex items-center gap-2">
+                              <Avatar name={p.createdBy.name} photo={p.createdBy.photoUrl} size="sm" />
+                              <span className="font-medium text-slate-700 whitespace-nowrap">{p.createdBy.name}</span>
+                            </div>
+                          ) : <span className="text-slate-300">—</span>}
+                        </td>
+
+                        {/* Amount & Link — highlighted */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          <div className="rounded-xl border px-3 py-2" style={{ background: "var(--primary-50)", borderColor: "var(--primary-200)", minWidth: 210 }}>
+                            <span className="font-extrabold text-[16px] tabular-nums block mb-1.5" style={{ color: "var(--primary-700)" }}>
+                              ₹{(p.amount || 0).toLocaleString("en-IN")}
+                            </span>
+                            {p.razorpayPaymentLink ? (
+                              <div className="flex items-center gap-1.5">
+                                <a href={p.razorpayPaymentLink} target="_blank" rel="noopener noreferrer"
+                                  className="flex items-center gap-1 font-mono text-[11px] no-underline truncate" style={{ color: "var(--primary-600)", maxWidth: 130 }}>
+                                  <Icon d={ICONS.external} size={9} />{p.razorpayPaymentLink}
+                                </a>
+                                <CopyBtn text={p.razorpayPaymentLink} id={p.paymentId} copied={copied} onCopy={doCopy} />
+                              </div>
+                            ) : <span className="text-[11px] text-slate-300">No link</span>}
+                          </div>
+                        </td>
+
+                        {/* Type */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap"
+                            style={{ background: "var(--primary-50)", color: "var(--primary-700)", borderColor: "var(--primary-200)" }}>
+                            {p.type}
+                          </span>
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          <StatusBadge s={p.status} />
+                        </td>
+
+                        {/* Order ID */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          {p.razorpayOrderId ? (
+                            <div className="flex items-center gap-1.5" style={{ minWidth: 155 }}>
+                              <span className="font-mono text-[11px] text-slate-500 truncate" style={{ maxWidth: 90 }}>{p.razorpayOrderId}</span>
+                              <CopyBtn text={p.razorpayOrderId} id={`ord-${p.paymentId}`} copied={copied} onCopy={doCopy} />
+                            </div>
+                          ) : <span className="text-slate-300">—</span>}
+                        </td>
+
+                        {/* Paid At */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          {p.paidAt ? (
+                            <div>
+                              <p className="m-0 text-xs font-medium text-slate-800 whitespace-nowrap">{fmtDate(p.paidAt)}</p>
+                              <span className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
+                                <Icon d={ICONS.clock} size={9} />{fmtTime(p.paidAt)}
+                              </span>
+                            </div>
+                          ) : <span className="text-slate-300">—</span>}
+                        </td>
+
+                        {/* Created */}
+                        <td className="px-3.5 py-3 border-b border-slate-100 align-middle">
+                          <p className="m-0 text-xs font-medium text-slate-800 whitespace-nowrap">{fmtDate(p.createdAt)}</p>
+                          <span className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
+                            <Icon d={ICONS.clock} size={9} />{fmtTime(p.createdAt)}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
+
+          {/* ── Mobile Cards ─────────────────────── */}
+          <div className={`md:hidden p-3 transition-opacity duration-200 ${tLoading ? "opacity-60" : "opacity-100"}`}>
+            {tLoading && payments.length === 0
+              ? Array.from({ length: 3 }, (_, i) => <div key={i} className="h-28 rounded-2xl bg-slate-100 mb-3 animate-pulse" />)
+              : payments.length === 0
+              ? <div className="text-center py-12"><p className="text-sm text-slate-500 font-medium m-0">{tableSearch ? `No results for "${tableSearch}"` : "No payments found"}</p></div>
+              : payments.map((p) => <PaymentCard key={p.paymentId} p={p} copied={copied} onCopy={doCopy} />)
+            }
+          </div>
+
+          {payPagination && (
+            <div className="border-t border-slate-100 px-4 pb-1">
+              <PaginBar page={payPagination.page} totalPages={payPagination.totalPages} onPage={setPayPage} loading={tLoading} />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* SUCCESS MODAL */}
-      {successLink&&(
-        <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"center",
-          justifyContent:"center", padding:20, background:"rgba(26,26,46,0.6)", backdropFilter:"blur(5px)" }}
-          onClick={()=>setSuccess(null)}>
-          <div className="slideup" onClick={e=>e.stopPropagation()}
-            style={{ background:T.neutral0, borderRadius:T.rxl, border:`1px solid ${T.neutral200}`,
-              boxShadow:T.shadowXl, width:"100%", maxWidth:420, padding:"30px 26px" }}>
-            <div style={{ width:64, height:64, borderRadius:T.rfull, background:"var(--color-primary)",
-              display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", color:"#fff",
-              boxShadow:`0 8px 24px rgb(${primaryRgb}/.35)` }}>
-              <Svg d={IC.check} size={28} sw={2.5}/>
+      {/* ── SUCCESS MODAL ───────────────────────────────────── */}
+      {successLink && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-[rgba(26,26,46,0.6)] backdrop-blur-md"
+          onClick={() => setSuccess(null)}>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md p-7 animate-[slideup_0.28s_cubic-bezier(0.34,1.56,0.64,1)]"
+            onClick={(e) => e.stopPropagation()}>
+
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-white"
+              style={{ background: "var(--color-primary)", boxShadow: "0 8px 24px rgba(239,68,68,0.35)" }}>
+              <Icon d={ICONS.check} size={28} sw={2.5} />
             </div>
-            <h3 style={{ textAlign:"center", margin:"0 0 4px", fontSize:22, fontWeight:800, color:T.neutral900, letterSpacing:"-0.02em" }}>
+
+            <h3 className="text-center m-0 mb-1 text-[22px] font-extrabold text-slate-900 tracking-tight">
               Link Generated! 🎉
             </h3>
-            <p style={{ textAlign:"center", margin:"0 0 22px", color:T.neutral400, fontSize:13 }}>
+            <p className="text-center m-0 mb-5 text-slate-400 text-sm">
               Your amendment payment link is ready to share.
             </p>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:20,
-              padding:"14px 0", marginBottom:20, borderTop:`1px solid ${T.neutral100}`, borderBottom:`1px solid ${T.neutral100}` }}>
-              <div style={{ textAlign:"center" }}>
-                <p style={{ margin:0, fontSize:10, color:T.neutral400, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Amount</p>
-                <p style={{ margin:"4px 0 0", fontSize:26, fontWeight:800, color:T.primary700 }}>₹{Number(successLink.amount||0).toLocaleString("en-IN")}</p>
+
+            {/* Use _amount (captured before submit) to avoid API returning 0 */}
+            <div className="flex items-center justify-center gap-5 py-4 mb-5 border-t border-b border-slate-100">
+              <div className="text-center">
+                <p className="m-0 text-[10px] text-slate-400 font-bold uppercase tracking-widest">Amount</p>
+                <p className="m-0 mt-1 text-[28px] font-extrabold" style={{ color: "var(--primary-700)" }}>
+                  ₹{(successLink._amount ?? successLink.amount ?? 0).toLocaleString("en-IN")}
+                </p>
               </div>
-              {successLink.note&&(
-                <><div style={{ width:1, height:36, background:T.neutral200 }}/>
-                <div style={{ textAlign:"center" }}>
-                  <p style={{ margin:0, fontSize:10, color:T.neutral400, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Note</p>
-                  <p style={{ margin:"4px 0 0", fontSize:14, fontWeight:600, color:T.neutral800 }}>{successLink.note}</p>
-                </div></>
+              {(successLink._note || successLink.note) && (
+                <>
+                  <div className="w-px h-9 bg-slate-200" />
+                  <div className="text-center">
+                    <p className="m-0 text-[10px] text-slate-400 font-bold uppercase tracking-widest">Note</p>
+                    <p className="m-0 mt-1 text-sm font-semibold text-slate-800 max-w-[160px] break-words">
+                      {successLink._note || successLink.note}
+                    </p>
+                  </div>
+                </>
               )}
             </div>
-            {(successLink.razorpayPaymentLinkId||successLink.paymentLink)&&(
-              <div style={{ borderRadius:T.rmd, border:`1.5px solid ${T.primary200}`, background:T.primary50, padding:"12px 14px", marginBottom:20 }}>
-                <p style={{ margin:"0 0 6px", fontSize:9, fontWeight:700, color:T.primary700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Payment Link</p>
-                <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
-                  <p style={{ flex:1, margin:0, fontFamily:"monospace", fontSize:12, color:T.neutral700, wordBreak:"break-all", lineHeight:1.6 }}>
-                    {successLink.razorpayPaymentLinkId||successLink.paymentLink}
-                  </p>
-                  <CopyBtn text={successLink.razorpayPaymentLinkId||successLink.paymentLink} id="modal" copied={copied} onCopy={doCopy}/>
+
+            {(successLink.razorpayPaymentLink || successLink.paymentLink) && (
+              <div className="rounded-xl border p-4 mb-5"
+                style={{ borderColor: "var(--primary-200)", background: "var(--primary-50)" }}>
+                <p className="m-0 mb-2 text-[9px] font-bold uppercase tracking-widest" style={{ color: "var(--primary-700)" }}>
+                  Payment Link
+                </p>
+                <div className="flex items-start gap-2.5">
+                  <a href={successLink.razorpayPaymentLink || successLink.paymentLink}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex-1 font-mono text-xs break-all leading-relaxed no-underline"
+                    style={{ color: "var(--primary-600)" }}>
+                    {successLink.razorpayPaymentLink || successLink.paymentLink}
+                  </a>
+                  <CopyBtn
+                    text={successLink.razorpayPaymentLink || successLink.paymentLink}
+                    id="modal" copied={copied} onCopy={doCopy} />
                 </div>
               </div>
             )}
-            <button type="button" onClick={()=>setSuccess(null)} style={{
-              width:"100%", height:46, borderRadius:T.rlg, border:"none",
-              background:"var(--color-primary)", color:"#fff", fontWeight:700, fontSize:14,
-              cursor:"pointer", boxShadow:`0 4px 14px rgb(${primaryRgb}/.3)`, fontFamily:"inherit" }}>
+
+            <button type="button" onClick={() => setSuccess(null)}
+              className="w-full h-11 rounded-xl border-none text-white font-bold text-sm cursor-pointer font-[inherit] transition-all active:scale-[0.97]"
+              style={{ background: "var(--color-primary)", boxShadow: "0 4px 14px rgba(239,68,68,0.3)" }}>
               Done
             </button>
           </div>

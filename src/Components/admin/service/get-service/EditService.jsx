@@ -1,1420 +1,2850 @@
-// EditService.jsx
-// Fixes:
-//  1. axiosInstance import: removed @src alias → relative path
-//  2. Success popup navigate('/service/view/...') → navigate(`/services/${serviceId}`)  (matches ViewService route)
-//  3. Success popup navigate('/service-hub')      → navigate('/services')               (matches Service list route)
+// ServiceDetailView.jsx
+// View + inline edit per section.
+// APIs used (exactly as spec):
+//   PUT /service/:serviceId                  — info, pricing, photo, docs, points
+//   PUT /service/:serviceId/input-fields     — { fields: [...] }
+//   PUT /service/:serviceId/track-steps      — { steps: [...] }
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useParams } from "react-router-dom";
 import {
-  Plus, Edit2, Trash2, MoreVertical, ChevronDown, X, Upload,
-  Percent, CheckCircle, CheckSquare, Square
-} from 'lucide-react';
-import axiosInstance from '@src/providers/axiosInstance'; // ← fixed: was @src/providers/axiosInstance
-import Cropper from 'react-easy-crop';
+  Pencil,
+  X,
+  Check,
+  Plus,
+  Trash2,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle2,
+  FormInput,
+  ListChecks,
+  FileText,
+  CreditCard,
+  LayoutList,
+  Repeat2,
+  Zap,
+  Tag,
+  Percent,
+  Receipt,
+  Clock,
+  CalendarDays,
+  ShieldCheck,
+  ThumbsUp,
+  Layers,
+  Camera,
+  Upload,
+  ChevronDown,
+} from "lucide-react";
+import Cropper from "react-easy-crop";
+import axiosInstance from "@src/providers/axiosInstance";
+import PageHeader from "../../page-header/PageHeader";
 
+/* ─── constants ──────────────────────────────────────────────────────── */
+const FREQ_LABEL = {
+  MONTHLY: "Every Month",
+  QUARTERLY: "Every 3 Months",
+  YEARLY: "Every Year",
+};
+const DUR_LABEL = { MONTH: "months", YEAR: "years" };
+const FREQ_OPTS = [
+  { v: "MONTHLY", l: "Monthly" },
+  { v: "QUARTERLY", l: "Quarterly" },
+  { v: "YEARLY", l: "Yearly" },
+];
+const DUR_OPTS = [
+  { v: "MONTH", l: "Months" },
+  { v: "YEAR", l: "Years" },
+];
+const SVC_TYPES = [
+  { v: "ONE_TIME", l: "One-time" },
+  { v: "RECURRING", l: "Recurring" },
+];
+const FIELD_TYPES = [
+  "text",
+  "email",
+  "number",
+  "textarea",
+  "select",
+  "radio",
+  "checkbox",
+  "date",
+  "file",
+  "password",
+];
+const DOC_TYPES = ["file", "text"];
+const STEP_COLORS = [
+  "var(--color-primary)",
+  "var(--success-500)",
+  "var(--warning-500)",
+  "var(--info-500)",
+];
+const BULLET_COLORS = [
+  "var(--color-primary)",
+  "var(--success-500)",
+  "var(--warning-500)",
+  "var(--info-500)",
+  "var(--error-500)",
+];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ServiceInfo step
-// ─────────────────────────────────────────────────────────────────────────────
-const ServiceInfo = ({ basicInfo, setBasicInfo, categories, filteredSubcategories, stepErrors, goToNextStep, goToPreviousStep, currentStep }) => {
-  const [showCropModal, setShowCropModal] = useState(false);
+const TARGET_WIDTH = 1024;
+const TARGET_HEIGHT = 512;
+
+/* ─── getCroppedImg helper ───────────────────────────────────────────── */
+async function getCroppedImg(
+  imageSrc,
+  croppedAreaPixels,
+  fileName = "service-photo.jpg",
+) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.addEventListener("load", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = TARGET_WIDTH;
+      canvas.height = TARGET_HEIGHT;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(
+        image,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height,
+        0,
+        0,
+        TARGET_WIDTH,
+        TARGET_HEIGHT,
+      );
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Canvas is empty"));
+            return;
+          }
+          const file = new File([blob], fileName, {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+          resolve({ file, previewUrl: URL.createObjectURL(file) });
+        },
+        "image/jpeg",
+        0.92,
+      );
+    });
+    image.addEventListener("error", reject);
+    image.src = imageSrc;
+  });
+}
+
+/* ─── helpers ────────────────────────────────────────────────────────── */
+const normBool = (v) => v === true || v === "true";
+const inr = (v) => {
+  const n = parseFloat(v);
+  return isNaN(n) ? "—" : "₹" + n.toLocaleString("en-IN");
+};
+const discPct = (ip, op) => {
+  const i = parseFloat(ip),
+    o = parseFloat(op);
+  return !isNaN(i) && !isNaN(o) && i > 0
+    ? Math.max(0, Math.round(((i - o) / i) * 100))
+    : 0;
+};
+const withGst = (op, gst, on) => {
+  const o = parseFloat(op);
+  if (isNaN(o) || o <= 0) return 0;
+  if (on) {
+    const g = parseFloat(gst);
+    if (!isNaN(g) && g > 0) return Math.round(o + (o * g) / 100);
+  }
+  return Math.round(o);
+};
+
+/* ─── shared input styles ────────────────────────────────────────────── */
+const inp = {
+  width: "100%",
+  padding: "8px 12px",
+  fontSize: 13,
+  border: "1px solid var(--neutral-200)",
+  borderRadius: 8,
+  outline: "none",
+  fontFamily: "var(--font-sans)",
+  background: "var(--neutral-0)",
+  color: "var(--neutral-900)",
+  boxSizing: "border-box",
+};
+const sel = { ...inp, appearance: "none", paddingRight: 28, cursor: "pointer" };
+
+/* ─── Toast ──────────────────────────────────────────────────────────── */
+function Toast({ msg, type, onClose }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 2800);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  const ok = type === "ok";
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "11px 16px",
+        borderRadius: 12,
+        background: "var(--neutral-0)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+        border: `1px solid ${ok ? "var(--success-100)" : "var(--error-100)"}`,
+        fontSize: 13,
+        fontWeight: 600,
+        color: ok ? "var(--success-700)" : "var(--error-700)",
+        animation: "svcFadeUp 0.22s ease both",
+      }}
+    >
+      {ok ? <Check size={15} /> : <AlertCircle size={15} />}
+      {msg}
+      <button
+        onClick={onClose}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 2,
+          color: "inherit",
+          opacity: 0.5,
+          lineHeight: 0,
+        }}
+      >
+        <X size={13} />
+      </button>
+    </div>
+  );
+}
+
+/* ─── Section card with optional Edit button ─────────────────────────── */
+function Section({ icon: Icon, title, onEdit, editOpen, delay = 0, children }) {
+  return (
+    <div
+      className="svc-animate"
+      style={{
+        "--delay": `${delay}ms`,
+        background: "var(--neutral-0)",
+        borderRadius: 14,
+        border: `1px solid ${editOpen ? "var(--color-primary-border)" : "var(--neutral-100)"}`,
+        overflow: "hidden",
+        boxShadow: "var(--shadow-sm)",
+        transition: "border-color 0.2s",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "11px 18px",
+          background: editOpen ? "var(--primary-50)" : "var(--neutral-50)",
+          borderBottom: `1px solid ${editOpen ? "var(--color-primary-border)" : "var(--neutral-100)"}`,
+          transition: "background 0.2s",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          {Icon && (
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 7,
+                background: editOpen
+                  ? "var(--color-primary)"
+                  : "var(--color-primary-muted)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                transition: "background 0.2s",
+              }}
+            >
+              <Icon
+                size={13}
+                color={editOpen ? "#fff" : "var(--color-primary)"}
+                strokeWidth={2.2}
+              />
+            </div>
+          )}
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.07em",
+              textTransform: "uppercase",
+              color: editOpen ? "var(--color-primary)" : "var(--neutral-500)",
+            }}
+          >
+            {title}
+          </span>
+        </div>
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "5px 11px",
+              borderRadius: 7,
+              cursor: "pointer",
+              fontSize: 12,
+              fontWeight: 600,
+              background: editOpen ? "var(--color-primary)" : "transparent",
+              color: editOpen ? "#fff" : "var(--neutral-400)",
+              border: editOpen
+                ? "1px solid var(--color-primary)"
+                : "1px solid var(--neutral-200)",
+              transition: "all 0.15s",
+              fontFamily: "var(--font-sans)",
+            }}
+          >
+            {editOpen ? (
+              <X size={12} strokeWidth={2.5} />
+            ) : (
+              <Pencil size={12} strokeWidth={2.5} />
+            )}
+            {editOpen ? "Cancel" : "Edit"}
+          </button>
+        )}
+      </div>
+      <div style={{ padding: 20 }}>{children}</div>
+    </div>
+  );
+}
+
+/* ─── Save footer ────────────────────────────────────────────────────── */
+function EditFooter({ onSave, saving }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 8,
+        marginTop: 18,
+        paddingTop: 16,
+        borderTop: "1px solid var(--neutral-100)",
+      }}
+    >
+      <button
+        onClick={onSave}
+        disabled={saving}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 7,
+          padding: "9px 18px",
+          borderRadius: 9,
+          cursor: saving ? "not-allowed" : "pointer",
+          background: "var(--color-primary)",
+          color: "#fff",
+          border: "none",
+          fontSize: 13,
+          fontWeight: 700,
+          opacity: saving ? 0.65 : 1,
+          fontFamily: "var(--font-sans)",
+        }}
+      >
+        {saving ? (
+          <RefreshCw
+            size={13}
+            style={{ animation: "svcSpin 0.7s linear infinite" }}
+          />
+        ) : (
+          <Check size={13} />
+        )}
+        {saving ? "Saving…" : "Save Changes"}
+      </button>
+    </div>
+  );
+}
+
+/* ─── Label ──────────────────────────────────────────────────────────── */
+function Label({ children, req }) {
+  return (
+    <label
+      style={{
+        display: "block",
+        fontSize: 12,
+        fontWeight: 600,
+        color: "var(--neutral-600)",
+        marginBottom: 5,
+      }}
+    >
+      {children}
+      {req && (
+        <span style={{ color: "var(--error-500)", marginLeft: 2 }}>*</span>
+      )}
+    </label>
+  );
+}
+
+/* ─── Select wrapper (chevron icon) ──────────────────────────────────── */
+function SelWrap({ children }) {
+  return (
+    <div style={{ position: "relative" }}>
+      {children}
+      <ChevronDown
+        size={13}
+        style={{
+          position: "absolute",
+          right: 9,
+          top: "50%",
+          transform: "translateY(-50%)",
+          color: "var(--neutral-400)",
+          pointerEvents: "none",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ─── Toggle ─────────────────────────────────────────────────────────── */
+function Toggle({ checked, onChange, label }) {
+  return (
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        cursor: "pointer",
+        userSelect: "none",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => onChange(!checked)}
+        style={{
+          position: "relative",
+          width: 36,
+          height: 20,
+          borderRadius: 10,
+          border: "none",
+          cursor: "pointer",
+          background: checked ? "var(--color-primary)" : "var(--neutral-200)",
+          transition: "background 0.2s",
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            position: "absolute",
+            top: 3,
+            left: checked ? 17 : 3,
+            width: 14,
+            height: 14,
+            borderRadius: "50%",
+            background: "#fff",
+            transition: "left 0.2s",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+          }}
+        />
+      </button>
+      <span
+        style={{ fontSize: 13, color: "var(--neutral-700)", fontWeight: 500 }}
+      >
+        {label}
+      </span>
+    </label>
+  );
+}
+
+/* ─── InfoRow ────────────────────────────────────────────────────────── */
+function InfoRow({ label, children, last }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 16,
+        padding: "9px 0",
+        borderBottom: last ? "none" : "1px solid var(--neutral-100)",
+      }}
+    >
+      <span
+        style={{
+          fontSize: 13,
+          color: "var(--neutral-400)",
+          flexShrink: 0,
+          paddingTop: 1,
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: "var(--neutral-800)",
+          textAlign: "right",
+        }}
+      >
+        {children ?? "—"}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Badge ──────────────────────────────────────────────────────────── */
+function Badge({ children, variant = "neutral" }) {
+  const map = {
+    neutral: {
+      bg: "var(--neutral-100)",
+      color: "var(--neutral-600)",
+      border: "var(--neutral-200)",
+    },
+    primary: {
+      bg: "var(--primary-100)",
+      color: "var(--color-primary-text)",
+      border: "var(--color-primary-border)",
+    },
+    success: {
+      bg: "var(--success-50)",
+      color: "var(--success-700)",
+      border: "var(--success-100)",
+    },
+    warning: {
+      bg: "var(--warning-50)",
+      color: "var(--warning-700)",
+      border: "var(--warning-100)",
+    },
+    error: {
+      bg: "var(--error-50)",
+      color: "var(--error-700)",
+      border: "var(--error-100)",
+    },
+  };
+  const s = map[variant] ?? map.neutral;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "3px 10px",
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        whiteSpace: "nowrap",
+        background: s.bg,
+        color: s.color,
+        border: `1px solid ${s.border}`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/* ─── Loader / Error ─────────────────────────────────────────────────── */
+function Loader() {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 12,
+      }}
+    >
+      <RefreshCw
+        size={28}
+        color="var(--color-primary)"
+        style={{ animation: "svcSpin 0.8s linear infinite" }}
+      />
+      <p
+        style={{
+          fontSize: 13,
+          color: "var(--neutral-400)",
+          fontWeight: 500,
+          margin: 0,
+        }}
+      >
+        Loading service…
+      </p>
+    </div>
+  );
+}
+function ErrorState({ message, onRetry }) {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        padding: 24,
+      }}
+    >
+      <AlertCircle size={36} color="var(--error-500)" />
+      <p
+        style={{
+          fontSize: 16,
+          fontWeight: 700,
+          color: "var(--neutral-800)",
+          margin: 0,
+        }}
+      >
+        Couldn't load this service
+      </p>
+      <p
+        style={{
+          fontSize: 13,
+          color: "var(--neutral-400)",
+          textAlign: "center",
+          maxWidth: 300,
+          margin: 0,
+        }}
+      >
+        {message}
+      </p>
+      <button
+        onClick={onRetry}
+        style={{
+          marginTop: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 20px",
+          background: "var(--color-primary)",
+          color: "#fff",
+          border: "none",
+          borderRadius: 10,
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: "pointer",
+          fontFamily: "var(--font-sans)",
+        }}
+      >
+        <RefreshCw size={14} /> Try again
+      </button>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ════════════════════════════════════════════════════════════════════════ */
+export default function ServiceDetailView() {
+  const { serviceId } = useParams();
+
+  /* ── remote data ── */
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [svc, setSvc] = useState(null);
+  const [fields, setFields] = useState([]);
+  const [steps, setSteps] = useState([]);
+  const [docs, setDocs] = useState([]);
+  const [subName, setSubName] = useState("");
+  const [subcategories, setSubs] = useState([]);
+
+  /* ── which section is currently being edited ── */
+  const [editSection, setEditSection] = useState(null);
+
+  /* ── draft states (one per section) ── */
+  const [infoDraft, setInfoDraft] = useState({});
+  const [priceDraft, setPriceDraft] = useState({});
+  const [pointsDraft, setPointsDraft] = useState([]);
+  const [fieldsDraft, setFieldsDraft] = useState([]);
+  const [stepsDraft, setStepsDraft] = useState([]);
+  const [docsDraft, setDocsDraft] = useState([]);
+  const [photoDraft, setPhotoDraft] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
+
+  /* ── crop state ── */
+  const [rawImageSrc, setRawImageSrc] = useState("");
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [originalImage, setOriginalImage] = useState(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
   const [uploadingImage, setUploadingImage] = useState(false);
-  const fileInputRef = useRef(null);
 
-  const serviceTypeOptions = [
-    { value: 'ONE_TIME',  label: 'One Time'  },
-    { value: 'RECURRING', label: 'Recurring' },
-  ];
-  const frequencyOptions = [
-    { value: 'MONTHLY',   label: 'Monthly'   },
-    { value: 'QUARTERLY', label: 'Quarterly' },
-    { value: 'YEARLY',    label: 'Yearly'    },
-  ];
-  const durationUnitOptions = [
-    { value: 'MONTH', label: 'Months' },
-    { value: 'YEAR',  label: 'Years'  },
-  ];
+  /* ── saving + toast ── */
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
+  const photoRef = useRef(null);
+  const rawFileRef = useRef(null);
 
-  const createCroppedImage = useCallback(async () => {
-    if (!originalImage || !croppedAreaPixels) return null;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const image = new Image();
-    return new Promise((resolve, reject) => {
-      image.onload = () => {
-        canvas.width  = croppedAreaPixels.width;
-        canvas.height = croppedAreaPixels.height;
-        ctx.drawImage(image,
-          croppedAreaPixels.x, croppedAreaPixels.y,
-          croppedAreaPixels.width, croppedAreaPixels.height,
-          0, 0, croppedAreaPixels.width, croppedAreaPixels.height
-        );
-        canvas.toBlob(blob => {
-          resolve(new File([blob], `cropped-${Date.now()}.jpg`, { type: 'image/jpeg' }));
-        }, 'image/jpeg', 0.95);
+  const ok$ = (msg) => setToast({ msg, type: "ok" });
+  const err$ = (msg) => setToast({ msg, type: "err" });
+
+  /* ─── fetch all data ── */
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [svcRes, subRes] = await Promise.all([
+        axiosInstance.get(`/service/${serviceId}`),
+        axiosInstance.get("/subcategory"),
+      ]);
+      if (!svcRes.data.success) throw new Error("Service not found");
+      const s = svcRes.data.service;
+      const norm = {
+        ...s,
+        documentsRequired: normBool(s.documentsRequired),
+        isGstApplicable: normBool(s.isGstApplicable),
+        individualPrice: s.individualPrice?.toString() ?? "",
+        offerPrice: s.offerPrice?.toString() ?? "",
+        gstPercentage: s.gstPercentage?.toString() ?? "18",
+        points: (() => {
+          if (Array.isArray(s.points)) return s.points;
+          if (typeof s.points === "string") {
+            try {
+              const p = JSON.parse(s.points);
+              return Array.isArray(p) ? p : [];
+            } catch {
+              return [];
+            }
+          }
+          return [];
+        })(),
       };
-      image.onerror = reject;
-      image.src = URL.createObjectURL(originalImage);
-    });
-  }, [originalImage, croppedAreaPixels]);
+      setSvc(norm);
+      if (Array.isArray(s.inputFields)) setFields(s.inputFields);
+      if (Array.isArray(s.trackSteps))
+        setSteps([...s.trackSteps].sort((a, b) => a.order - b.order));
+      if (s.requiredDocuments) {
+        try {
+          const parsed =
+            typeof s.requiredDocuments === "string"
+              ? JSON.parse(s.requiredDocuments)
+              : s.requiredDocuments;
+          if (Array.isArray(parsed))
+            setDocs(
+              parsed.map((d, i) => ({
+                id: i,
+                name: typeof d === "string" ? d : (d.documentName ?? ""),
+                inputType: d.inputType ?? "file",
+              })),
+            );
+        } catch {
+          /* skip invalid JSON */
+        }
+      }
+      if (subRes.data.success) {
+        setSubs(subRes.data.subcategories);
+        const sub = subRes.data.subcategories.find(
+          (x) => x.subCategoryId === s.subCategoryId,
+        );
+        if (sub) setSubName(sub.subCategoryName);
+      }
+    } catch (e) {
+      setError(e.message ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }, [serviceId]);
 
-  const handleCropComplete = async () => {
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.activeElement.type === "number") {
+        document.activeElement.blur();
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel);
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  /* ─── open section → populate draft ── */
+  const open = (section) => {
+    setEditSection(section);
+    if (section === "info") {
+      setInfoDraft({
+        name: svc.name ?? "",
+        description: svc.description ?? "",
+        serviceType: svc.serviceType ?? "ONE_TIME",
+        subCategoryId: svc.subCategoryId ?? "",
+        frequency: svc.frequency ?? "",
+        duration: svc.duration?.toString() ?? "",
+        durationUnit: svc.durationUnit ?? "MONTH",
+      });
+    }
+    if (section === "photo") {
+      setPhotoDraft(null);
+      setPhotoPreview(svc.photoUrl ?? "");
+    }
+    if (section === "points") setPointsDraft([...(svc.points ?? [])]);
+    if (section === "pricing") {
+      setPriceDraft({
+        individualPrice: svc.individualPrice ?? "",
+        offerPrice: svc.offerPrice ?? "",
+        isGstApplicable: svc.isGstApplicable ?? false,
+        gstPercentage: svc.gstPercentage ?? "18",
+      });
+    }
+    if (section === "fields") setFieldsDraft(fields.map((f) => ({ ...f })));
+    if (section === "steps") setStepsDraft(steps.map((s) => ({ ...s })));
+    if (section === "docs") setDocsDraft(docs.map((d) => ({ ...d })));
+  };
+  const close = () => setEditSection(null);
+  const isOpen = (s) => editSection === s;
+
+  /* ─── PUT /service/:id ── */
+  const putSvc = async (body) => {
+    const r = await axiosInstance.put(`/service/${serviceId}`, body);
+    if (!r.data.success) throw new Error(r.data.error ?? "Update failed");
+  };
+
+  /* ─── SAVE: Info ── */
+  const saveInfo = async () => {
+    setSaving(true);
+    try {
+      const body = {
+        name: infoDraft.name.trim(),
+        description: infoDraft.description.trim(),
+        serviceType: infoDraft.serviceType,
+        subCategoryId: infoDraft.subCategoryId,
+        ...(infoDraft.serviceType === "RECURRING"
+          ? {
+              frequency: infoDraft.frequency,
+              duration: infoDraft.duration?.toString() || "0",
+              durationUnit: infoDraft.durationUnit,
+            }
+          : { frequency: null, duration: null, durationUnit: null }),
+      };
+      await putSvc(body);
+      setSvc((p) => ({ ...p, ...body }));
+      const sub = subcategories.find(
+        (x) => x.subCategoryId === body.subCategoryId,
+      );
+      if (sub) setSubName(sub.subCategoryName);
+      ok$("Service info saved");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Photo ── */
+  const savePhoto = async () => {
+    if (!photoDraft) {
+      close();
+      return;
+    }
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("name", svc?.name ?? "service");
+      fd.append("photoUrl", photoDraft, photoDraft.name);
+      const r = await axiosInstance.put(`/service/${serviceId}`, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (!r.data.success) throw new Error("Image upload failed");
+      setSvc((p) => ({ ...p, photoUrl: photoPreview }));
+      ok$("Photo updated");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Points ── */
+  const savePoints = async () => {
+    setSaving(true);
+    try {
+      const pts = pointsDraft.filter((p) => p.trim());
+      await putSvc({ points: JSON.stringify(pts) });
+      setSvc((p) => ({ ...p, points: pts }));
+      ok$("Highlights saved");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Pricing ── */
+  const savePricing = async () => {
+    setSaving(true);
+    try {
+      const op = parseFloat(priceDraft.offerPrice);
+      const ip = parseFloat(priceDraft.individualPrice);
+      const g = priceDraft.isGstApplicable
+        ? parseFloat(priceDraft.gstPercentage)
+        : 0;
+      const fin = withGst(op, g, priceDraft.isGstApplicable);
+      await putSvc({
+        individualPrice: String(ip),
+        offerPrice: String(op),
+        isGstApplicable: String(priceDraft.isGstApplicable),
+        gstPercentage: String(g),
+        finalIndividualPrice: String(fin),
+      });
+      setSvc((p) => ({ ...p, ...priceDraft, finalIndividualPrice: fin }));
+      ok$("Pricing updated");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Input fields → PUT /service/:id/input-fields ── */
+  const saveFields = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        fields: fieldsDraft.map((f) => ({
+          label: f.label,
+          type: f.type,
+          placeholder: f.placeholder ?? "",
+          required: !!f.required,
+          ...(f.masterFieldId ? { masterFieldId: f.masterFieldId } : {}),
+          ...(f.options?.length ? { options: f.options } : {}),
+        })),
+      };
+      const r = await axiosInstance.put(
+        `/service/${serviceId}/input-fields`,
+        payload,
+      );
+      if (!r.data.success)
+        throw new Error(r.data.error ?? "Failed to save fields");
+      setFields(fieldsDraft);
+      ok$("Input fields saved");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Track steps → PUT /service/:id/track-steps ── */
+  const saveSteps = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        steps: stepsDraft.map((s, i) => ({
+          title: s.title,
+          description: s.description,
+          order: i + 1,
+        })),
+      };
+      const r = await axiosInstance.put(
+        `/service/${serviceId}/track-steps`,
+        payload,
+      );
+      if (!r.data.success)
+        throw new Error(r.data.error ?? "Failed to save steps");
+      setSteps(stepsDraft.map((s, i) => ({ ...s, order: i + 1 })));
+      ok$("Steps saved");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── SAVE: Required docs → PUT /service/:id ── */
+  const saveDocs = async () => {
+    setSaving(true);
+    try {
+      const filtered = docsDraft.filter((d) => d.name?.trim());
+      const docsPayload = filtered.map((d) => ({
+        documentName: d.name.trim(),
+        inputType: d.inputType,
+      }));
+      await putSvc({
+        documentsRequired: String(filtered.length > 0),
+        requiredDocuments: JSON.stringify(docsPayload),
+      });
+      setSvc((p) => ({ ...p, documentsRequired: filtered.length > 0 }));
+      setDocs(filtered.map((d, i) => ({ ...d, id: i })));
+      ok$("Documents saved");
+      close();
+    } catch (e) {
+      err$(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ─── crop handlers ── */
+  const handlePhotoFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    rawFileRef.current = file;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () =>
+      setImageDimensions({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      });
+    img.src = url;
+    setRawImageSrc(url);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setShowCropper(true);
+    if (photoRef.current) photoRef.current.value = "";
+  };
+
+  const onCropComplete = useCallback((_, px) => setCroppedAreaPixels(px), []);
+
+  const handleCropConfirm = async () => {
     try {
       setUploadingImage(true);
-      const croppedFile = await createCroppedImage();
-      if (!croppedFile) throw new Error('Failed to create cropped image');
-      const blobUrl = URL.createObjectURL(croppedFile);
-      setBasicInfo(prev => ({ ...prev, photoUrl: blobUrl, photoFile: croppedFile, photoChanged: true }));
-      setShowCropModal(false);
-      setOriginalImage(null);
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      setCroppedAreaPixels(null);
-    } catch (err) {
-      console.error('Crop error:', err);
+      const { file, previewUrl } = await getCroppedImg(
+        rawImageSrc,
+        croppedAreaPixels,
+        rawFileRef.current?.name || "service-photo.jpg",
+      );
+      if (photoPreview?.startsWith("blob:")) URL.revokeObjectURL(photoPreview);
+      setPhotoDraft(file);
+      setPhotoPreview(previewUrl);
+      setShowCropper(false);
+      URL.revokeObjectURL(rawImageSrc);
+      setRawImageSrc("");
+      setImageDimensions({ width: 0, height: 0 });
+    } catch {
+      err$("Image crop failed");
     } finally {
       setUploadingImage(false);
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(file.type) || file.size > 5 * 1024 * 512) return;
-    setOriginalImage(file);
-    setBasicInfo(prev => ({ ...prev, photoUrl: URL.createObjectURL(file), photoFile: null, photoChanged: true }));
-    setShowCropModal(true);
+  const handleCancelCrop = () => {
+    setShowCropper(false);
+    URL.revokeObjectURL(rawImageSrc);
+    setRawImageSrc("");
+    setImageDimensions({ width: 0, height: 0 });
   };
 
-  const handleRemoveImage = () => {
-    if (basicInfo.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(basicInfo.photoUrl);
-    setBasicInfo(prev => ({ ...prev, photoUrl: '', photoFile: null, photoChanged: true }));
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    setOriginalImage(null);
-    setShowCropModal(false);
-  };
+  /* ─── draft helpers ── */
+  const fUpd = (i, k, v) =>
+    setFieldsDraft((p) =>
+      p.map((f, idx) => (idx === i ? { ...f, [k]: v } : f)),
+    );
+  const fDel = (i) => setFieldsDraft((p) => p.filter((_, idx) => idx !== i));
+  const fAdd = () =>
+    setFieldsDraft((p) => [
+      ...p,
+      { label: "", type: "text", placeholder: "", required: false },
+    ]);
 
-  const handleCancelCrop = () => { setShowCropModal(false); handleRemoveImage(); };
+  const sUpd = (i, k, v) =>
+    setStepsDraft((p) => p.map((s, idx) => (idx === i ? { ...s, [k]: v } : s)));
+  const sDel = (i) => setStepsDraft((p) => p.filter((_, idx) => idx !== i));
+  const sAdd = () =>
+    setStepsDraft((p) => [
+      ...p,
+      { title: "", description: "", order: p.length + 1 },
+    ]);
 
-  const field = (label, required, error, children) => (
-    <div>
-      <label className="block text-sm font-medium mb-2 text-gray-800">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {children}
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-    </div>
-  );
+  const dUpd = (i, k, v) =>
+    setDocsDraft((p) => p.map((d, idx) => (idx === i ? { ...d, [k]: v } : d)));
+  const dDel = (i) => setDocsDraft((p) => p.filter((_, idx) => idx !== i));
+  const dAdd = () =>
+    setDocsDraft((p) => [
+      ...p,
+      { id: Date.now(), name: "", inputType: "file" },
+    ]);
 
-  const inputCls = (err) =>
-    `w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 ${
-      err ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-          : 'border-gray-300 focus:border-[#6869AC] focus:ring-[#6869AC]'
-    }`;
+  const pUpd = (i, v) =>
+    setPointsDraft((p) => p.map((x, idx) => (idx === i ? v : x)));
+  const pDel = (i) => setPointsDraft((p) => p.filter((_, idx) => idx !== i));
+  const pAdd = () => setPointsDraft((p) => [...p, ""]);
 
-  const selectCls = (err) =>
-    `w-full px-4 py-2 border rounded-lg appearance-none bg-white pr-10 text-sm focus:outline-none focus:ring-1 ${
-      err ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-          : 'border-gray-300 focus:border-[#6869AC] focus:ring-[#6869AC]'
-    }`;
+  /* ─── render guards ── */
+  if (loading) return <Loader />;
+  if (error || !svc) return <ErrorState message={error} onRetry={fetchAll} />;
 
+  const isRecurring = svc.serviceType === "RECURRING";
+  const disc = discPct(svc.individualPrice, svc.offerPrice);
+  const total = withGst(svc.offerPrice, svc.gstPercentage, svc.isGstApplicable);
+
+  /* ─────────────────────────── RENDER ─────────────────────────────── */
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Service Information</h2>
-        <p className="text-sm text-gray-600">Update the basic details about your service.</p>
-      </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--neutral-50)",
+        fontFamily: "var(--font-sans)",
+      }}
+    >
+      <style>{`
+        @keyframes svcSpin   { to { transform: rotate(360deg); } }
+        @keyframes svcFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .svc-animate  { animation: svcFadeUp 0.3s ease both; animation-delay: var(--delay, 0ms); }
+        .edit-inp:focus { border-color: var(--color-primary) !important; box-shadow: 0 0 0 3px var(--color-primary-muted); outline: none; }
+        .del-btn:hover  { background: var(--error-50) !important; color: var(--error-600) !important; }
+        .add-btn:hover  { border-color: var(--color-primary) !important; color: var(--color-primary) !important; }
+        @media (max-width: 768px) {
+          .svc-grid { grid-template-columns: 1fr !important; }
+          .svc-hero { height: 200px !important; }
+        }
+      `}</style>
 
-      <div className="space-y-4">
-        {/* Image upload */}
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-800">
-            Service Image <span className="text-red-500">*</span>
-          </label>
-          <div className="flex flex-col items-center">
-            {basicInfo.photoUrl && !showCropModal ? (
-              <div className="relative w-full max-w-md">
-                <img src={basicInfo.photoUrl} alt="Service preview" className="w-full h-64 object-cover rounded-lg border border-gray-300" />
-                <button onClick={handleRemoveImage} type="button"
-                  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+      {/* ── Crop Modal ── */}
+      {showCropper && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.65)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 50,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 16,
+              padding: 24,
+              width: "100%",
+              maxWidth: 800,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            }}
+          >
+            {/* Modal header */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: "var(--neutral-900)",
+                }}
+              >
+                Crop to {TARGET_WIDTH}×{TARGET_HEIGHT}
+              </h3>
+              <button
+                onClick={handleCancelCrop}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 4,
+                  lineHeight: 0,
+                }}
+              >
+                <X size={18} color="var(--neutral-500)" />
+              </button>
+            </div>
+
+            {/* Image dimension info */}
+            {imageDimensions.width > 0 && (
+              <div
+                style={{
+                  marginBottom: 12,
+                  padding: "9px 14px",
+                  borderRadius: 9,
+                  background: "#eff6ff",
+                  border: "1px solid #bfdbfe",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#1e40af",
+                  }}
+                >
+                  Original: {imageDimensions.width}×{imageDimensions.height}px ·
+                  Target: {TARGET_WIDTH}×{TARGET_HEIGHT}px
+                </p>
+                <span
+                  style={{
+                    padding: "2px 9px",
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background:
+                      imageDimensions.width >= TARGET_WIDTH
+                        ? "#dcfce7"
+                        : "#fef9c3",
+                    color:
+                      imageDimensions.width >= TARGET_WIDTH
+                        ? "#166534"
+                        : "#854d0e",
+                  }}
+                >
+                  {imageDimensions.width >= TARGET_WIDTH
+                    ? "Good Size"
+                    : "Small Image"}
+                </span>
               </div>
-            ) : (
-              <div onClick={() => fileInputRef.current?.click()}
-                className={`w-full max-w-md h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer ${
-                  stepErrors.photoUrl ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#6869AC]'
-                }`}>
-                <input type="file" ref={fileInputRef} onChange={handleImageUpload}
-                  accept="image/*" className="hidden" disabled={uploadingImage || showCropModal} />
+            )}
+
+            {/* Cropper canvas */}
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: 360,
+                marginBottom: 16,
+              }}
+            >
+              <Cropper
+                image={rawImageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={TARGET_WIDTH / TARGET_HEIGHT}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                cropShape="rect"
+                showGrid
+                style={{
+                  containerStyle: {
+                    width: "100%",
+                    height: "100%",
+                    position: "relative",
+                    background: "#f3f4f6",
+                  },
+                }}
+              />
+            </div>
+
+            {/* Zoom slider */}
+            <div style={{ marginBottom: 20 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--neutral-600)",
+                  marginBottom: 6,
+                }}
+              >
+                Zoom
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.1"
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                style={{ width: "100%", accentColor: "var(--color-primary)" }}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={handleCropConfirm}
+                disabled={uploadingImage}
+                style={{
+                  flex: 1,
+                  padding: "11px 0",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: uploadingImage ? "not-allowed" : "pointer",
+                  background: uploadingImage
+                    ? "var(--neutral-400)"
+                    : "var(--color-primary)",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
                 {uploadingImage ? (
-                  <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6869AC]" />
-                    <p className="mt-2 text-sm text-gray-600">Processing image...</p>
-                  </div>
-                ) : (
                   <>
-                    <Upload className="w-12 h-12 text-gray-400 mb-2" />
-                    <p className="text-sm font-medium text-gray-700">Click to update service image</p>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
+                    <RefreshCw
+                      size={14}
+                      style={{ animation: "svcSpin 0.7s linear infinite" }}
+                    />{" "}
+                    Processing…
                   </>
+                ) : (
+                  "Crop & Use"
                 )}
-              </div>
-            )}
-            {stepErrors.photoUrl && <p className="mt-1 text-sm text-red-600">{stepErrors.photoUrl}</p>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {field('Service Type', true, stepErrors.serviceType,
-            <div className="relative">
-              <select value={basicInfo.serviceType}
-                onChange={e => setBasicInfo(p => ({ ...p, serviceType: e.target.value }))}
-                className={selectCls(stepErrors.serviceType)}>
-                {serviceTypeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          )}
-
-          {field('Select Category', true, stepErrors.categoryId,
-            <div className="relative">
-              <select value={basicInfo.categoryId}
-                onChange={e => setBasicInfo(p => ({ ...p, categoryId: e.target.value }))}
-                className={selectCls(stepErrors.categoryId)}>
-                <option value="">Select category</option>
-                {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
-              </select>
-              <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {field('Select Sub Category', true, stepErrors.subCategoryId,
-            <div className="relative">
-              <select value={basicInfo.subCategoryId}
-                onChange={e => setBasicInfo(p => ({ ...p, subCategoryId: e.target.value }))}
-                className={selectCls(stepErrors.subCategoryId)}
-                disabled={!basicInfo.categoryId}>
-                <option value="">Select subcategory</option>
-                {filteredSubcategories.map(s => <option key={s.subCategoryId} value={s.subCategoryId}>{s.subCategoryName}</option>)}
-              </select>
-              <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">Documents Required</label>
-            <div className="flex items-center mt-2">
-              <input type="checkbox" checked={basicInfo.documentsRequired}
-                onChange={e => setBasicInfo(p => ({ ...p, documentsRequired: e.target.checked }))}
-                className="w-4 h-4 text-[#6869AC] rounded border-gray-300 focus:ring-[#6869AC]" />
-              <span className="ml-2 text-sm text-gray-700">Service requires document upload</span>
-            </div>
-          </div>
-        </div>
-
-        {basicInfo.serviceType === 'RECURRING' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4">
-            {field('Frequency', true, stepErrors.frequency,
-              <div className="relative">
-                <select value={basicInfo.frequency}
-                  onChange={e => setBasicInfo(p => ({ ...p, frequency: e.target.value }))}
-                  className={selectCls(stepErrors.frequency)}>
-                  <option value="">Select frequency</option>
-                  {frequencyOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            )}
-            {field('Duration Unit', true, stepErrors.durationUnit,
-              <div className="relative">
-                <select value={basicInfo.durationUnit}
-                  onChange={e => setBasicInfo(p => ({ ...p, durationUnit: e.target.value }))}
-                  className={selectCls(stepErrors.durationUnit)}>
-                  <option value="">Select unit</option>
-                  {durationUnitOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            )}
-            {field('Duration Value', true, stepErrors.duration,
-              <input type="number" min="1" value={basicInfo.duration || ''}
-                onChange={e => setBasicInfo(p => ({ ...p, duration: e.target.value }))}
-                placeholder="e.g., 12" className={inputCls(stepErrors.duration)} />
-            )}
-          </div>
-        )}
-
-        {field('Service Name', true, stepErrors.name,
-          <input type="text" value={basicInfo.name}
-            onChange={e => setBasicInfo(p => ({ ...p, name: e.target.value }))}
-            placeholder="New GST Registration – Your Business"
-            className={inputCls(stepErrors.name)} />
-        )}
-
-        {field('Description', true, stepErrors.description,
-          <textarea value={basicInfo.description}
-            onChange={e => setBasicInfo(p => ({ ...p, description: e.target.value }))}
-            placeholder="Register your business with GST..."
-            className={`${inputCls(stepErrors.description)} h-32 resize-none`} />
-        )}
-      </div>
-
-      <div className="flex justify-between pt-6 border-t border-gray-200">
-        <button onClick={goToPreviousStep} disabled={currentStep === 1}
-          className={`px-6 py-2 rounded-lg font-medium ${currentStep === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}>
-          Previous
-        </button>
-        <button onClick={goToNextStep} className="px-6 py-2 rounded-lg font-medium bg-[#6869AC] text-white hover:opacity-90">
-          Next
-        </button>
-      </div>
-
-      {showCropModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Crop Image</h3>
-              <button onClick={handleCancelCrop} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-5 h-5 text-gray-500" />
               </button>
-            </div>
-            <div className="relative w-full h-96 mb-4">
-              <Cropper image={basicInfo.photoUrl} crop={crop} zoom={zoom} aspect={4 / 3}
-                onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom}
-                cropShape="rect" showGrid={true} />
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Zoom</label>
-              <input type="range" min="1" max="3" step="0.1" value={zoom}
-                onChange={e => setZoom(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-            </div>
-            <div className="flex gap-3">
-              <button onClick={handleCropComplete} disabled={uploadingImage}
-                className="flex-1 py-3 rounded-lg text-white text-sm font-medium bg-[#6869AC] hover:opacity-90 disabled:bg-gray-400">
-                {uploadingImage ? 'Processing...' : 'Apply Crop'}
-              </button>
-              <button onClick={handleCancelCrop}
-                className="px-6 py-3 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50">
+              <button
+                onClick={handleCancelCrop}
+                style={{
+                  padding: "11px 22px",
+                  borderRadius: 10,
+                  border: "1px solid var(--neutral-300)",
+                  background: "#fff",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
                 Cancel
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
-  );
-};
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PricingSetup step  (unchanged logic, just included for completeness)
-// ─────────────────────────────────────────────────────────────────────────────
-const PricingSetup = ({ basicInfo, setBasicInfo, priceMode, setPriceMode, discountPercentage, setDiscountPercentage, stepErrors, goToNextStep, goToPreviousStep }) => {
-  const calcDiscountPct = () => {
-    const ip = parseFloat(basicInfo.individualPrice), op = parseFloat(basicInfo.offerPrice);
-    return (!isNaN(ip) && !isNaN(op) && ip > 0) ? Math.round(((ip - op) / ip) * 100) : 0;
-  };
-  const calcOfferFromPct = () => {
-    const ip = parseFloat(basicInfo.individualPrice), d = parseFloat(discountPercentage);
-    return (!isNaN(ip) && !isNaN(d) && d >= 0 && d <= 100) ? Math.round(ip - ip * d / 100) : 0;
-  };
-  const calcFinalWithGST = () => {
-    let base = priceMode === 'fixed' ? parseFloat(basicInfo.offerPrice) : calcOfferFromPct();
-    if (isNaN(base) || base <= 0) base = parseFloat(basicInfo.individualPrice);
-    const gst = parseFloat(basicInfo.gstPercentage);
-    return (!isNaN(base) && base > 0 && !isNaN(gst) && gst >= 0) ? Math.round(base + base * gst / 100) : 0;
-  };
-  const handleModeChange = (mode) => {
-    setPriceMode(mode);
-    if (mode === 'fixed') setDiscountPercentage('');
-    else setBasicInfo(p => ({ ...p, offerPrice: '' }));
-  };
-  const handleDiscountChange = (val) => {
-    setDiscountPercentage(val);
-    const d = parseFloat(val);
-    if (!isNaN(d) && d >= 0 && d <= 100) {
-      const ip = parseFloat(basicInfo.individualPrice);
-      if (!isNaN(ip)) setBasicInfo(p => ({ ...p, offerPrice: Math.round(ip - ip * d / 100).toString() }));
-    } else setBasicInfo(p => ({ ...p, offerPrice: '' }));
-  };
+      <PageHeader title="Service Details" subtitle={svc.name} />
 
-  const ic = (err) => `w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 ${err ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-[#6869AC] focus:ring-[#6869AC]'}`;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Pricing Setup</h2>
-        <p className="text-sm text-gray-600">Update your pricing strategy for this service.</p>
-      </div>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-800">Pricing Mode</label>
-          <div className="flex gap-2">
-            {['fixed', 'percentage'].map(m => (
-              <button key={m} onClick={() => handleModeChange(m)}
-                className={`px-3 py-1.5 text-xs rounded-lg ${priceMode === m ? 'bg-[#6869AC] text-white' : 'bg-gray-200 text-gray-700'}`}>
-                {m === 'fixed' ? 'Fixed Price' : 'Discount %'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">Actual Price <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-              <input type="number" min="1" value={basicInfo.individualPrice}
-                onChange={e => setBasicInfo(p => ({ ...p, individualPrice: e.target.value }))}
-                placeholder="1099" className={`${ic(stepErrors.individualPrice)} pl-7`} />
-            </div>
-            {stepErrors.individualPrice && <p className="mt-1 text-sm text-red-600">{stepErrors.individualPrice}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">
-              {priceMode === 'percentage' ? 'Discount Percentage' : 'Offer Price'} <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              {priceMode === 'percentage' ? (
-                <>
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2"><Percent className="w-4 h-4 text-gray-500" /></span>
-                  <input type="number" min="1" max="100" value={discountPercentage}
-                    onChange={e => handleDiscountChange(e.target.value)} placeholder="35"
-                    className={`${ic(stepErrors.discountPercentage)} pl-9`} />
-                </>
-              ) : (
-                <>
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                  <input type="number" min="1" value={basicInfo.offerPrice}
-                    onChange={e => setBasicInfo(p => ({ ...p, offerPrice: e.target.value }))}
-                    placeholder="700" className={`${ic(stepErrors.offerPrice)} pl-7`} />
-                </>
-              )}
-            </div>
-            {priceMode === 'fixed' && basicInfo.individualPrice && basicInfo.offerPrice && (
-              <p className="text-xs text-gray-500 mt-1">Discount: {calcDiscountPct()}%</p>
-            )}
-            {priceMode === 'percentage' && discountPercentage && basicInfo.individualPrice && (
-              <p className="text-xs text-gray-500 mt-1">Offer Price: ₹{calcOfferFromPct()}</p>
-            )}
-            {stepErrors.discountPercentage && <p className="mt-1 text-sm text-red-600">{stepErrors.discountPercentage}</p>}
-            {stepErrors.offerPrice && <p className="mt-1 text-sm text-red-600">{stepErrors.offerPrice}</p>}
-          </div>
-        </div>
-
-        <div className="border-t border-gray-200 pt-4">
-          <div className="flex items-center mb-4">
-            <input type="checkbox" checked={basicInfo.isGstApplicable}
-              onChange={e => setBasicInfo(p => ({ ...p, isGstApplicable: e.target.checked }))}
-              className="w-4 h-4 text-[#6869AC] rounded border-gray-300 focus:ring-[#6869AC]" />
-            <span className="ml-2 text-sm font-medium text-gray-800">GST Applicable</span>
-          </div>
-          {basicInfo.isGstApplicable && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-800">GST Percentage <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <input type="number" min="0" max="100" step="0.01" value={basicInfo.gstPercentage}
-                    onChange={e => setBasicInfo(p => ({ ...p, gstPercentage: e.target.value }))}
-                    placeholder="18" className={ic(stepErrors.gstPercentage)} />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
-                </div>
-                {stepErrors.gstPercentage && <p className="mt-1 text-sm text-red-600">{stepErrors.gstPercentage}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-800">Final Price (Incl. GST)</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                  <input type="text" value={calcFinalWithGST()} readOnly
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 bg-gray-50 rounded-lg text-sm" />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex justify-between pt-6 border-t border-gray-200">
-        <button onClick={goToPreviousStep} className="px-6 py-2 rounded-lg font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">Previous</button>
-        <button onClick={goToNextStep} className="px-6 py-2 rounded-lg font-medium bg-[#6869AC] text-white hover:opacity-90">Next</button>
-      </div>
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DatasetSetup step  (unchanged from original — full copy kept for completeness)
-// ─────────────────────────────────────────────────────────────────────────────
-const DatasetSetup = ({
-  selectedMasterFields, setSelectedMasterFields,
-  customFields, setCustomFields,
-  newCustomField, setNewCustomField,
-  masterFields, stepErrors, goToNextStep, goToPreviousStep
-}) => {
-  const [showMasterFieldsModal, setShowMasterFieldsModal] = useState(false);
-  const [customFieldNewOptions, setCustomFieldNewOptions] = useState({});
-
-  const fieldTypeOptions = [
-    { value: 'text', label: 'Text Field' }, { value: 'email', label: 'Email Field' },
-    { value: 'number', label: 'Number Field' }, { value: 'textarea', label: 'Text Area' },
-    { value: 'select', label: 'Dropdown Select' }, { value: 'radio', label: 'Radio Buttons' },
-    { value: 'checkbox', label: 'Checkbox' }, { value: 'date', label: 'Date Field' },
-    { value: 'file', label: 'File Upload' }, { value: 'password', label: 'Password' },
-  ];
-  const isOptionField = (type) => ['select', 'radio', 'checkbox'].includes(type);
-
-  const toggleMasterField = (field) => {
-    setSelectedMasterFields(prev => {
-      const exists = prev.find(f => f.masterFieldId === field.masterFieldId);
-      return exists ? prev.filter(f => f.masterFieldId !== field.masterFieldId)
-                    : [...prev, { masterFieldId: field.masterFieldId, required: true }];
-    });
-  };
-  const toggleMasterFieldRequired = (id) =>
-    setSelectedMasterFields(prev => prev.map(f => f.masterFieldId === id ? { ...f, required: !f.required } : f));
-  const isMasterFieldSelected = (id) => selectedMasterFields.some(f => f.masterFieldId === id);
-
-  const addCustomField = () => {
-    if (!newCustomField.label.trim()) return;
-    const f = {
-      label: newCustomField.label.trim(), type: newCustomField.type,
-      placeholder: newCustomField.placeholder || `Enter ${newCustomField.label.toLowerCase()}`,
-      required: newCustomField.required,
-    };
-    if (isOptionField(newCustomField.type)) {
-      const valid = newCustomField.options.filter(o => o?.trim());
-      if (valid.length) f.options = valid;
-    }
-    setCustomFields(prev => [...prev, f]);
-    setNewCustomField({ label: '', type: 'text', placeholder: '', required: false, options: [] });
-    setCustomFieldNewOptions(p => ({ ...p, new: '' }));
-  };
-
-  const removeCustomField = (i) => setCustomFields(prev => prev.filter((_, idx) => idx !== i));
-  const updateCustomField = (i, key, val) => {
-    setCustomFields(prev => {
-      const u = [...prev]; u[i][key] = val;
-      if (key === 'type') {
-        if (!isOptionField(val)) delete u[i].options;
-        else if (!u[i].options) u[i].options = ['Option 1', 'Option 2'];
-      }
-      return u;
-    });
-  };
-
-  const handleNewOptionInput = (idx, val) => setCustomFieldNewOptions(p => ({ ...p, [idx]: val }));
-
-  const addOptionToField = (idx) => {
-    const val = (customFieldNewOptions[idx] || '').trim();
-    if (!val) return;
-    setCustomFields(prev => {
-      const u = [...prev];
-      u[idx].options = [...(u[idx].options || []), val];
-      return u;
-    });
-    handleNewOptionInput(idx, '');
-  };
-
-  const addOptionToNew = () => {
-    const val = (customFieldNewOptions['new'] || '').trim();
-    if (!val) return;
-    setNewCustomField(p => ({ ...p, options: [...p.options, val] }));
-    handleNewOptionInput('new', '');
-  };
-
-  const cls = 'w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-[#6869AC] focus:ring-1 focus:ring-[#6869AC]';
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Dataset Setup</h2>
-          <p className="text-sm text-gray-600">Update pre-defined fields or custom input fields.</p>
-        </div>
-        <button onClick={() => setShowMasterFieldsModal(true)}
-          className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm bg-white text-[#6869AC] border border-[#6869AC] hover:bg-gray-50">
-          <Plus className="w-4 h-4 mr-1" /> Select Pre-defined Fields
-        </button>
-      </div>
-
-      {selectedMasterFields.length > 0 && (
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-800 mb-3">Selected Pre-defined Fields</h3>
-          <div className="space-y-2">
-            {selectedMasterFields.map(field => {
-              const mf = masterFields.find(f => f.masterFieldId === field.masterFieldId);
-              return (
-                <div key={field.masterFieldId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">{mf?.label || field.masterFieldId}</span>
-                      <span className="text-xs px-2 py-0.5 bg-gray-200 rounded text-gray-600">{mf?.type}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${field.required ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                        {field.required ? 'Required' : 'Optional'}
-                      </span>
-                    </div>
+      <div
+        style={{
+          maxWidth: "80rem",
+          margin: "0 auto",
+          padding: "24px 16px 56px",
+        }}
+      >
+        <div
+          className="svc-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0,1fr) 320px",
+            gap: 16,
+            alignItems: "start",
+          }}
+        >
+          {/* ══════════ LEFT ══════════ */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* ── Hero / Service Info card ── */}
+            <div
+              className="svc-animate"
+              style={{
+                "--delay": "0ms",
+                background: "var(--neutral-0)",
+                borderRadius: 14,
+                border: `1px solid ${isOpen("info") || isOpen("photo") ? "var(--color-primary-border)" : "var(--neutral-100)"}`,
+                overflow: "hidden",
+                boxShadow: "var(--shadow-sm)",
+                transition: "border-color 0.2s",
+              }}
+            >
+              {/* Card header */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "11px 18px",
+                  background:
+                    isOpen("info") || isOpen("photo")
+                      ? "var(--primary-50)"
+                      : "var(--neutral-50)",
+                  borderBottom: `1px solid ${isOpen("info") || isOpen("photo") ? "var(--color-primary-border)" : "var(--neutral-100)"}`,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                  <div
+                    style={{
+                      width: 26,
+                      height: 26,
+                      borderRadius: 7,
+                      background:
+                        isOpen("info") || isOpen("photo")
+                          ? "var(--color-primary)"
+                          : "var(--color-primary-muted)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Layers
+                      size={13}
+                      color={
+                        isOpen("info") || isOpen("photo")
+                          ? "#fff"
+                          : "var(--color-primary)"
+                      }
+                      strokeWidth={2.2}
+                    />
                   </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => toggleMasterFieldRequired(field.masterFieldId)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full ${field.required ? 'bg-[#6869AC]' : 'bg-gray-300'}`}>
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${field.required ? 'translate-x-6' : 'translate-x-1'}`} />
-                    </button>
-                    <button onClick={() => toggleMasterField({ masterFieldId: field.masterFieldId })}
-                      className="p-1 text-red-500 hover:bg-red-50 rounded">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.07em",
+                      textTransform: "uppercase",
+                      color:
+                        isOpen("info") || isOpen("photo")
+                          ? "var(--color-primary)"
+                          : "var(--neutral-500)",
+                    }}
+                  >
+                    Service Info
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <div className="border border-gray-200 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-800 mb-4">Custom Fields</h3>
-
-        <form onSubmit={e => { e.preventDefault(); addCustomField(); }}
-          className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700">Field Label <span className="text-red-500">*</span></label>
-              <input type="text" value={newCustomField.label}
-                onChange={e => setNewCustomField(p => ({ ...p, label: e.target.value }))}
-                placeholder="e.g., Company Name" className={cls} />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700">Field Type <span className="text-red-500">*</span></label>
-              <select value={newCustomField.type}
-                onChange={e => {
-                  const t = e.target.value;
-                  setNewCustomField(p => ({ ...p, type: t, options: isOptionField(t) ? ['Option 1', 'Option 2'] : [] }));
-                }} className={cls}>
-                {fieldTypeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="mb-3">
-            <label className="block text-xs font-medium mb-1 text-gray-700">Placeholder</label>
-            <input type="text" value={newCustomField.placeholder}
-              onChange={e => setNewCustomField(p => ({ ...p, placeholder: e.target.value }))}
-              placeholder="e.g., Enter your company name" className={cls} />
-          </div>
-
-          {isOptionField(newCustomField.type) && (
-            <div className="mb-3">
-              <label className="block text-xs font-medium mb-1 text-gray-700">Options</label>
-              <div className="space-y-2 mb-2">
-                {newCustomField.options.map((opt, i) => (
-                  <div key={i} className="flex gap-2">
-                    <input type="text" value={opt}
-                      onChange={e => setNewCustomField(p => ({ ...p, options: p.options.map((o, idx) => idx === i ? e.target.value : o) }))}
-                      className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none" />
-                    {newCustomField.options.length > 2 && (
-                      <button type="button" onClick={() => setNewCustomField(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i) }))}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"><X className="w-4 h-4" /></button>
+                {/* Two buttons: Photo + Edit */}
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button
+                    onClick={() => (isOpen("photo") ? close() : open("photo"))}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "5px 11px",
+                      borderRadius: 7,
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily: "var(--font-sans)",
+                      background: isOpen("photo")
+                        ? "var(--color-primary)"
+                        : "transparent",
+                      color: isOpen("photo") ? "#fff" : "var(--neutral-400)",
+                      border: isOpen("photo")
+                        ? "1px solid var(--color-primary)"
+                        : "1px solid var(--neutral-200)",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {isOpen("photo") ? (
+                      <X size={12} strokeWidth={2.5} />
+                    ) : (
+                      <Camera size={12} strokeWidth={2.5} />
                     )}
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input type="text" value={customFieldNewOptions['new'] || ''} placeholder="Add an option"
-                  onChange={e => handleNewOptionInput('new', e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addOptionToNew())}
-                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm" />
-                <button type="button" onClick={addOptionToNew}
-                  className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded">Add Option</button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <input type="checkbox" checked={newCustomField.required}
-                onChange={e => setNewCustomField(p => ({ ...p, required: e.target.checked }))}
-                className="w-4 h-4 text-[#6869AC] rounded border-gray-300" />
-              <span className="text-sm">Required field</span>
-            </div>
-            <button type="submit" disabled={!newCustomField.label.trim()}
-              className="px-4 py-2 text-sm text-white rounded bg-[#6869AC] hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">
-              <Plus className="w-4 h-4 inline mr-1" /> Add Custom Field
-            </button>
-          </div>
-        </form>
-
-        {customFields.length > 0 && (
-          <div className="space-y-4">
-            {customFields.map((f, i) => (
-              <div key={i} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">{f.label}</span>
-                    <span className="text-xs px-2 py-0.5 bg-gray-200 rounded text-gray-600">{f.type}</span>
-                    {f.required && <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded">Required</span>}
-                  </div>
-                  <button onClick={() => removeCustomField(i)} className="p-1 text-red-500 hover:bg-red-50 rounded">
-                    <Trash2 className="w-4 h-4" />
+                    {isOpen("photo") ? "Cancel" : "Edit Photo"}
+                  </button>
+                  <button
+                    onClick={() => (isOpen("info") ? close() : open("info"))}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "5px 11px",
+                      borderRadius: 7,
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily: "var(--font-sans)",
+                      background: isOpen("info")
+                        ? "var(--color-primary)"
+                        : "transparent",
+                      color: isOpen("info") ? "#fff" : "var(--neutral-400)",
+                      border: isOpen("info")
+                        ? "1px solid var(--color-primary)"
+                        : "1px solid var(--neutral-200)",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {isOpen("info") ? (
+                      <X size={12} strokeWidth={2.5} />
+                    ) : (
+                      <Pencil size={12} strokeWidth={2.5} />
+                    )}
+                    {isOpen("info") ? "Cancel" : "Edit Info"}
                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-xs font-medium mb-1 text-gray-700">Field Label</label>
-                    <input type="text" value={f.label} onChange={e => updateCustomField(i, 'label', e.target.value)} className={cls} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium mb-1 text-gray-700">Field Type</label>
-                    <select value={f.type} onChange={e => updateCustomField(i, 'type', e.target.value)} className={cls}>
-                      {fieldTypeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label className="block text-xs font-medium mb-1 text-gray-700">Placeholder</label>
-                  <input type="text" value={f.placeholder || ''} onChange={e => updateCustomField(i, 'placeholder', e.target.value)} className={cls} />
-                </div>
-                {isOptionField(f.type) && (
-                  <div className="mb-3">
-                    <label className="block text-xs font-medium mb-1 text-gray-700">Options</label>
-                    <div className="space-y-2 mb-2">
-                      {f.options?.map((opt, oi) => (
-                        <div key={oi} className="flex gap-2">
-                          <input type="text" value={opt}
-                            onChange={e => setCustomFields(prev => {
-                              const u = [...prev]; u[i].options[oi] = e.target.value; return u;
-                            })} className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm" />
-                          <button type="button"
-                            onClick={() => setCustomFields(prev => {
-                              const u = [...prev]; u[i].options = u[i].options.filter((_, idx) => idx !== oi); return u;
-                            })} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><X className="w-4 h-4" /></button>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <input type="text" placeholder="Add an option" value={customFieldNewOptions[i] || ''}
-                        onChange={e => handleNewOptionInput(i, e.target.value)}
-                        onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addOptionToField(i))}
-                        className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm" />
-                      <button type="button" onClick={() => addOptionToField(i)}
-                        className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded">Add Option</button>
-                    </div>
+              </div>
+
+              {/* Photo */}
+              <div
+                className="svc-hero"
+                style={{
+                  height: 230,
+                  background: "var(--primary-50)",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {(isOpen("photo") ? photoPreview : svc.photoUrl) ? (
+                  <img
+                    src={isOpen("photo") ? photoPreview : svc.photoUrl}
+                    alt={svc.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Layers
+                      size={40}
+                      color="var(--color-primary-border)"
+                      strokeWidth={1.5}
+                    />
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={f.required}
-                    onChange={e => updateCustomField(i, 'required', e.target.checked)}
-                    className="w-4 h-4 text-[#6869AC] rounded border-gray-300" />
-                  <span className="text-sm">Required field</span>
+                <div style={{ position: "absolute", top: 12, left: 12 }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "5px 12px",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: "rgba(0,0,0,0.55)",
+                      backdropFilter: "blur(6px)",
+                      color: "#fff",
+                    }}
+                  >
+                    {isRecurring ? (
+                      <>
+                        <Repeat2 size={12} strokeWidth={2.5} /> Recurring
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={12} strokeWidth={2.5} /> One-time
+                      </>
+                    )}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
 
-      <div className="flex justify-between pt-6 border-t border-gray-200">
-        <button onClick={goToPreviousStep} className="px-6 py-2 rounded-lg font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">Previous</button>
-        <button onClick={goToNextStep} className="px-6 py-2 rounded-lg font-medium bg-[#6869AC] text-white hover:opacity-90">Next</button>
-      </div>
+              {/* Photo edit panel */}
+              {isOpen("photo") && (
+                <div
+                  style={{
+                    padding: 20,
+                    borderBottom: "1px solid var(--neutral-100)",
+                  }}
+                >
+                  {/* Hidden file input — now triggers crop flow */}
+                  <input
+                    ref={photoRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handlePhotoFile}
+                  />
+                  <div
+                    onClick={() => photoRef.current?.click()}
+                    style={{
+                      border: "2px dashed var(--neutral-200)",
+                      borderRadius: 10,
+                      padding: "18px 12px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.borderColor =
+                        "var(--color-primary)")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.borderColor = "var(--neutral-200)")
+                    }
+                  >
+                    <Upload
+                      size={20}
+                      color="var(--neutral-300)"
+                      style={{ marginBottom: 6 }}
+                    />
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "var(--neutral-500)",
+                      }}
+                    >
+                      {photoDraft
+                        ? photoDraft.name
+                        : "Click to choose a new image"}
+                    </p>
+                    <p
+                      style={{
+                        margin: "3px 0 0",
+                        fontSize: 11,
+                        color: "var(--neutral-400)",
+                      }}
+                    >
+                      PNG · JPG · WebP — cropped to {TARGET_WIDTH}×
+                      {TARGET_HEIGHT}px
+                    </p>
+                  </div>
+                  <EditFooter onSave={savePhoto} saving={saving} />
+                </div>
+              )}
 
-      {showMasterFieldsModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Select Pre-defined Fields</h3>
-              <button onClick={() => setShowMasterFieldsModal(false)} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">{selectedMasterFields.length} selected</p>
-            <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {masterFields.map(field => {
-                  const sel = isMasterFieldSelected(field.masterFieldId);
-                  const sf = selectedMasterFields.find(f => f.masterFieldId === field.masterFieldId);
-                  return (
-                    <div key={field.masterFieldId}
-                      onClick={() => toggleMasterField(field)}
-                      className={`border rounded-lg p-3 cursor-pointer transition-colors ${sel ? 'border-[#6869AC] bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                      <div className="flex items-start gap-3">
-                        <div className="mt-1">
-                          {sel ? <CheckSquare className="w-4 h-4 text-[#6869AC]" /> : <Square className="w-4 h-4 text-gray-400" />}
+              {/* Info body — view or edit */}
+              <div style={{ padding: 20 }}>
+                {!isOpen("info") ? (
+                  /* View */
+                  <>
+                    <h1
+                      style={{
+                        margin: "0 0 8px",
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: "var(--neutral-900)",
+                        lineHeight: 1.25,
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {svc.name}
+                    </h1>
+                    <p
+                      style={{
+                        margin: "0 0 18px",
+                        fontSize: 14,
+                        color: "var(--neutral-500)",
+                        lineHeight: 1.65,
+                      }}
+                    >
+                      {svc.description}
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {subName && (
+                        <Badge variant="primary">
+                          <Layers size={11} strokeWidth={2.5} />
+                          {subName}
+                        </Badge>
+                      )}
+                      {isRecurring && svc.frequency && (
+                        <Badge variant="neutral">
+                          <CalendarDays size={11} strokeWidth={2.5} />
+                          {FREQ_LABEL[svc.frequency] ?? svc.frequency}
+                        </Badge>
+                      )}
+                      {isRecurring && svc.duration && (
+                        <Badge variant="neutral">
+                          <Clock size={11} strokeWidth={2.5} />
+                          {svc.duration}{" "}
+                          {DUR_LABEL[svc.durationUnit] ?? svc.durationUnit}
+                        </Badge>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  /* Edit */
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 14,
+                    }}
+                  >
+                    <div>
+                      <Label req>Service Name</Label>
+                      <input
+                        className="edit-inp"
+                        value={infoDraft.name}
+                        onChange={(e) =>
+                          setInfoDraft((p) => ({ ...p, name: e.target.value }))
+                        }
+                        style={inp}
+                        placeholder="e.g. Website Development"
+                      />
+                    </div>
+                    <div>
+                      <Label req>Description</Label>
+                      <textarea
+                        className="edit-inp"
+                        value={infoDraft.description}
+                        onChange={(e) =>
+                          setInfoDraft((p) => ({
+                            ...p,
+                            description: e.target.value,
+                          }))
+                        }
+                        rows={3}
+                        style={{ ...inp, resize: "vertical" }}
+                        placeholder="Describe this service…"
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 12,
+                      }}
+                    >
+                      <div>
+                        <Label req>Service Type</Label>
+                        <SelWrap>
+                          <select
+                            className="edit-inp"
+                            value={infoDraft.serviceType}
+                            onChange={(e) =>
+                              setInfoDraft((p) => ({
+                                ...p,
+                                serviceType: e.target.value,
+                              }))
+                            }
+                            style={sel}
+                          >
+                            {SVC_TYPES.map((o) => (
+                              <option key={o.v} value={o.v}>
+                                {o.l}
+                              </option>
+                            ))}
+                          </select>
+                        </SelWrap>
+                      </div>
+                      <div>
+                        <Label>Subcategory</Label>
+                        <SelWrap>
+                          <select
+                            className="edit-inp"
+                            value={infoDraft.subCategoryId}
+                            onChange={(e) =>
+                              setInfoDraft((p) => ({
+                                ...p,
+                                subCategoryId: e.target.value,
+                              }))
+                            }
+                            style={sel}
+                          >
+                            <option value="">Select…</option>
+                            {subcategories.map((s) => (
+                              <option
+                                key={s.subCategoryId}
+                                value={s.subCategoryId}
+                              >
+                                {s.subCategoryName}
+                              </option>
+                            ))}
+                          </select>
+                        </SelWrap>
+                      </div>
+                    </div>
+                    {infoDraft.serviceType === "RECURRING" && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr 1fr",
+                          gap: 12,
+                          paddingTop: 12,
+                          borderTop: "1px solid var(--neutral-100)",
+                        }}
+                      >
+                        <div>
+                          <Label>Frequency</Label>
+                          <SelWrap>
+                            <select
+                              className="edit-inp"
+                              value={infoDraft.frequency}
+                              onChange={(e) =>
+                                setInfoDraft((p) => ({
+                                  ...p,
+                                  frequency: e.target.value,
+                                }))
+                              }
+                              style={sel}
+                            >
+                              <option value="">Select…</option>
+                              {FREQ_OPTS.map((o) => (
+                                <option key={o.v} value={o.v}>
+                                  {o.l}
+                                </option>
+                              ))}
+                            </select>
+                          </SelWrap>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{field.label}</span>
-                              <span className="text-xs px-2 py-0.5 bg-gray-200 rounded text-gray-600">{field.type}</span>
+                        <div>
+                          <Label>Duration</Label>
+                          <input
+                            className="edit-inp"
+                            type="number"
+                            min="1"
+                            value={infoDraft.duration}
+                            onChange={(e) =>
+                              setInfoDraft((p) => ({
+                                ...p,
+                                duration: e.target.value,
+                              }))
+                            }
+                            style={inp}
+                            placeholder="e.g. 30"
+                          />
+                        </div>
+                        <div>
+                          <Label>Unit</Label>
+                          <SelWrap>
+                            <select
+                              className="edit-inp"
+                              value={infoDraft.durationUnit}
+                              onChange={(e) =>
+                                setInfoDraft((p) => ({
+                                  ...p,
+                                  durationUnit: e.target.value,
+                                }))
+                              }
+                              style={sel}
+                            >
+                              {DUR_OPTS.map((o) => (
+                                <option key={o.v} value={o.v}>
+                                  {o.l}
+                                </option>
+                              ))}
+                            </select>
+                          </SelWrap>
+                        </div>
+                      </div>
+                    )}
+                    <EditFooter onSave={saveInfo} saving={saving} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── What's Included (points) ── */}
+            <Section
+              icon={CheckCircle2}
+              title="What's Included"
+              delay={60}
+              onEdit={() => (isOpen("points") ? close() : open("points"))}
+              editOpen={isOpen("points")}
+            >
+              {!isOpen("points") ? (
+                svc.points.length === 0 ? (
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--neutral-400)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    No highlights added yet.
+                  </p>
+                ) : (
+                  svc.points.map((pt, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 12,
+                        padding: "9px 0",
+                        borderBottom:
+                          i < svc.points.length - 1
+                            ? "1px solid var(--neutral-100)"
+                            : "none",
+                      }}
+                    >
+                      <CheckCircle2
+                        size={16}
+                        strokeWidth={2.2}
+                        style={{
+                          color: BULLET_COLORS[i % BULLET_COLORS.length],
+                          flexShrink: 0,
+                          marginTop: 2,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 14,
+                          color: "var(--neutral-700)",
+                          lineHeight: 1.55,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {pt}
+                      </span>
+                    </div>
+                  ))
+                )
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                >
+                  {pointsDraft.map((pt, i) => (
+                    <div
+                      key={i}
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      <input
+                        className="edit-inp"
+                        value={pt}
+                        onChange={(e) => pUpd(i, e.target.value)}
+                        placeholder={`Highlight ${i + 1}`}
+                        style={{ ...inp, flex: 1 }}
+                      />
+                      <button
+                        className="del-btn"
+                        onClick={() => pDel(i)}
+                        style={{
+                          padding: "6px 8px",
+                          border: "1px solid var(--neutral-200)",
+                          borderRadius: 7,
+                          background: "transparent",
+                          cursor: "pointer",
+                          color: "var(--neutral-400)",
+                          lineHeight: 0,
+                        }}
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    className="add-btn"
+                    onClick={pAdd}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "8px 12px",
+                      border: "1.5px dashed var(--neutral-200)",
+                      borderRadius: 8,
+                      background: "transparent",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "var(--neutral-400)",
+                      fontFamily: "var(--font-sans)",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Plus size={13} /> Add Highlight
+                  </button>
+                  <EditFooter onSave={savePoints} saving={saving} />
+                </div>
+              )}
+            </Section>
+
+            {/* ── Input Fields ── */}
+            <Section
+              icon={FormInput}
+              title="What You Need to Fill In"
+              delay={120}
+              onEdit={() => (isOpen("fields") ? close() : open("fields"))}
+              editOpen={isOpen("fields")}
+            >
+              {!isOpen("fields") ? (
+                fields.length === 0 ? (
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--neutral-400)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    No input fields configured.
+                  </p>
+                ) : (
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    {fields.map((f, i) => (
+                      <div
+                        key={f.fieldId ?? i}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 12,
+                          padding: "10px 14px",
+                          borderRadius: 10,
+                          background: f.required
+                            ? "var(--primary-50)"
+                            : "var(--neutral-50)",
+                          border: `1px solid ${f.required ? "var(--color-primary-border)" : "var(--neutral-100)"}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: 8,
+                              background: f.required
+                                ? "var(--primary-100)"
+                                : "var(--neutral-100)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <FormInput
+                              size={14}
+                              strokeWidth={2}
+                              color={
+                                f.required
+                                  ? "var(--color-primary)"
+                                  : "var(--neutral-400)"
+                              }
+                            />
+                          </div>
+                          <div>
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: 13,
+                                fontWeight: 600,
+                                color: "var(--neutral-800)",
+                              }}
+                            >
+                              {f.label}
+                            </p>
+                            <p
+                              style={{
+                                margin: "2px 0 0",
+                                fontSize: 11,
+                                color: "var(--neutral-400)",
+                                fontFamily: "var(--font-mono)",
+                              }}
+                            >
+                              {f.type}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant={f.required ? "primary" : "neutral"}>
+                          {f.required ? "Required" : "Optional"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
+                >
+                  {fieldsDraft.map((f, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        border: "1px solid var(--neutral-200)",
+                        borderRadius: 10,
+                        padding: 14,
+                        background: "var(--neutral-50)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 120px auto",
+                          gap: 8,
+                          alignItems: "end",
+                        }}
+                      >
+                        <div>
+                          <Label req>Label</Label>
+                          <input
+                            className="edit-inp"
+                            value={f.label}
+                            onChange={(e) => fUpd(i, "label", e.target.value)}
+                            style={inp}
+                            placeholder="e.g. Full Name"
+                          />
+                        </div>
+                        <div>
+                          <Label>Type</Label>
+                          <SelWrap>
+                            <select
+                              className="edit-inp"
+                              value={f.type}
+                              onChange={(e) => fUpd(i, "type", e.target.value)}
+                              style={sel}
+                            >
+                              {FIELD_TYPES.map((t) => (
+                                <option key={t} value={t}>
+                                  {t}
+                                </option>
+                              ))}
+                            </select>
+                          </SelWrap>
+                        </div>
+                        <button
+                          className="del-btn"
+                          onClick={() => fDel(i)}
+                          style={{
+                            padding: "8px 10px",
+                            border: "1px solid var(--neutral-200)",
+                            borderRadius: 8,
+                            background: "transparent",
+                            cursor: "pointer",
+                            color: "var(--neutral-400)",
+                            lineHeight: 0,
+                            marginBottom: 1,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr auto",
+                          gap: 12,
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <div>
+                          <Label>Placeholder</Label>
+                          <input
+                            className="edit-inp"
+                            value={f.placeholder ?? ""}
+                            onChange={(e) =>
+                              fUpd(i, "placeholder", e.target.value)
+                            }
+                            style={inp}
+                            placeholder="e.g. Enter your name"
+                          />
+                        </div>
+                        <div style={{ paddingTop: 18 }}>
+                          <Toggle
+                            checked={!!f.required}
+                            onChange={(v) => fUpd(i, "required", v)}
+                            label="Required"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="add-btn"
+                    onClick={fAdd}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "9px 14px",
+                      border: "1.5px dashed var(--neutral-200)",
+                      borderRadius: 9,
+                      background: "transparent",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "var(--neutral-400)",
+                      fontFamily: "var(--font-sans)",
+                    }}
+                  >
+                    <Plus size={13} /> Add Field
+                  </button>
+                  <EditFooter onSave={saveFields} saving={saving} />
+                </div>
+              )}
+            </Section>
+
+            {/* ── Track Steps ── */}
+            <Section
+              icon={ListChecks}
+              title="How It Works — Step by Step"
+              delay={180}
+              onEdit={() => (isOpen("steps") ? close() : open("steps"))}
+              editOpen={isOpen("steps")}
+            >
+              {!isOpen("steps") ? (
+                steps.length === 0 ? (
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--neutral-400)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    No steps defined yet.
+                  </p>
+                ) : (
+                  steps.map((s, i) => {
+                    const color = STEP_COLORS[i % STEP_COLORS.length];
+                    return (
+                      <div
+                        key={s.stepId ?? i}
+                        style={{ display: "flex", gap: 12 }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            flexShrink: 0,
+                            width: 32,
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: "50%",
+                              background: color,
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 13,
+                              fontWeight: 800,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {s.order}
+                          </div>
+                          {i < steps.length - 1 && (
+                            <div
+                              style={{
+                                width: 2,
+                                flex: 1,
+                                background: "var(--neutral-100)",
+                                marginTop: 5,
+                                borderRadius: 2,
+                                minHeight: 16,
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            flex: 1,
+                            paddingBottom: i < steps.length - 1 ? 16 : 0,
+                            paddingTop: 4,
+                          }}
+                        >
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "var(--neutral-900)",
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {s.title}
+                          </p>
+                          {s.description && (
+                            <p
+                              style={{
+                                margin: "3px 0 0",
+                                fontSize: 12,
+                                color: "var(--neutral-400)",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {s.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
+                >
+                  {stepsDraft.map((s, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "flex-start",
+                        border: "1px solid var(--neutral-200)",
+                        borderRadius: 10,
+                        padding: 12,
+                        background: "var(--neutral-50)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: "50%",
+                          background: STEP_COLORS[i % STEP_COLORS.length],
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 12,
+                          fontWeight: 800,
+                          flexShrink: 0,
+                          marginTop: 4,
+                        }}
+                      >
+                        {i + 1}
+                      </div>
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 6,
+                        }}
+                      >
+                        <input
+                          className="edit-inp"
+                          value={s.title}
+                          onChange={(e) => sUpd(i, "title", e.target.value)}
+                          style={inp}
+                          placeholder="Step title"
+                        />
+                        <textarea
+                          className="edit-inp"
+                          value={s.description}
+                          onChange={(e) =>
+                            sUpd(i, "description", e.target.value)
+                          }
+                          rows={2}
+                          style={{ ...inp, resize: "none" }}
+                          placeholder="Short description"
+                        />
+                      </div>
+                      <button
+                        className="del-btn"
+                        onClick={() => sDel(i)}
+                        disabled={stepsDraft.length <= 1}
+                        style={{
+                          padding: "6px 8px",
+                          border: "1px solid var(--neutral-200)",
+                          borderRadius: 8,
+                          background: "transparent",
+                          cursor:
+                            stepsDraft.length <= 1 ? "not-allowed" : "pointer",
+                          color: "var(--neutral-400)",
+                          lineHeight: 0,
+                          opacity: stepsDraft.length <= 1 ? 0.35 : 1,
+                        }}
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    className="add-btn"
+                    onClick={sAdd}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "9px 14px",
+                      border: "1.5px dashed var(--neutral-200)",
+                      borderRadius: 9,
+                      background: "transparent",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "var(--neutral-400)",
+                      fontFamily: "var(--font-sans)",
+                    }}
+                  >
+                    <Plus size={13} /> Add Step
+                  </button>
+                  <EditFooter onSave={saveSteps} saving={saving} />
+                </div>
+              )}
+            </Section>
+
+            {/* ── Required Documents (recurring only) ── */}
+            {isRecurring && (
+              <Section
+                icon={FileText}
+                title="Documents You'll Need"
+                delay={240}
+                onEdit={() => (isOpen("docs") ? close() : open("docs"))}
+                editOpen={isOpen("docs")}
+              >
+                {!isOpen("docs") ? (
+                  !svc.documentsRequired || docs.length === 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "12px 14px",
+                        background: "var(--success-50)",
+                        borderRadius: 10,
+                        border: "1px solid var(--success-100)",
+                      }}
+                    >
+                      <ThumbsUp
+                        size={16}
+                        color="var(--success-600)"
+                        strokeWidth={2.2}
+                      />
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 14,
+                          color: "var(--success-700)",
+                          fontWeight: 500,
+                        }}
+                      >
+                        No documents needed — nice and easy!
+                      </p>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
+                      {docs
+                        .filter((d) => d.name?.trim())
+                        .map((d) => (
+                          <div
+                            key={d.id}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              padding: "10px 14px",
+                              background: "var(--warning-50)",
+                              border: "1px solid var(--warning-100)",
+                              borderRadius: 10,
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: 8,
+                                background: "var(--warning-100)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <FileText
+                                size={14}
+                                strokeWidth={2.2}
+                                color="var(--warning-700)"
+                              />
                             </div>
-                            {sel && (
-                              <button onClick={e => { e.stopPropagation(); toggleMasterFieldRequired(field.masterFieldId); }}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full ${sf?.required ? 'bg-[#6869AC]' : 'bg-gray-300'}`}>
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${sf?.required ? 'translate-x-6' : 'translate-x-1'}`} />
-                              </button>
+                            <span
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 600,
+                                color: "var(--neutral-800)",
+                                flex: 1,
+                              }}
+                            >
+                              {d.name}
+                            </span>
+                            <Badge variant="warning">{d.inputType}</Badge>
+                          </div>
+                        ))}
+                    </div>
+                  )
+                ) : (
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    {docsDraft.map((d, i) => (
+                      <div
+                        key={d.id ?? i}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <input
+                          className="edit-inp"
+                          value={d.name}
+                          onChange={(e) => dUpd(i, "name", e.target.value)}
+                          style={{ ...inp, flex: 1 }}
+                          placeholder="e.g. Aadhaar Card"
+                        />
+                        <SelWrap>
+                          <select
+                            className="edit-inp"
+                            value={d.inputType}
+                            onChange={(e) =>
+                              dUpd(i, "inputType", e.target.value)
+                            }
+                            style={{ ...sel, width: 90 }}
+                          >
+                            {DOC_TYPES.map((t) => (
+                              <option key={t} value={t}>
+                                {t}
+                              </option>
+                            ))}
+                          </select>
+                        </SelWrap>
+                        <button
+                          className="del-btn"
+                          onClick={() => dDel(i)}
+                          style={{
+                            padding: "7px 9px",
+                            border: "1px solid var(--neutral-200)",
+                            borderRadius: 7,
+                            background: "transparent",
+                            cursor: "pointer",
+                            color: "var(--neutral-400)",
+                            lineHeight: 0,
+                          }}
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      className="add-btn"
+                      onClick={dAdd}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "9px 14px",
+                        border: "1.5px dashed var(--neutral-200)",
+                        borderRadius: 9,
+                        background: "transparent",
+                        cursor: "pointer",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "var(--neutral-400)",
+                        fontFamily: "var(--font-sans)",
+                      }}
+                    >
+                      <Plus size={13} /> Add Document
+                    </button>
+                    <EditFooter onSave={saveDocs} saving={saving} />
+                  </div>
+                )}
+              </Section>
+            )}
+          </div>
+
+          {/* ══════════ RIGHT ══════════ */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* ── Pricing ── */}
+            <Section
+              icon={CreditCard}
+              title="Pricing"
+              delay={40}
+              onEdit={() => (isOpen("pricing") ? close() : open("pricing"))}
+              editOpen={isOpen("pricing")}
+            >
+              {!isOpen("pricing") ? (
+                <>
+                  <div
+                    style={{
+                      background: "var(--primary-50)",
+                      border: "1px solid var(--color-primary-border)",
+                      borderRadius: 12,
+                      padding: "18px 16px",
+                      textAlign: "center",
+                      marginBottom: 16,
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "var(--neutral-400)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      You Pay
+                    </p>
+                    <p
+                      style={{
+                        margin: "6px 0 8px",
+                        fontSize: 30,
+                        fontWeight: 800,
+                        color: "var(--neutral-900)",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {inr(svc.offerPrice)}
+                    </p>
+                    {disc > 0 && (
+                      <Badge variant="success">
+                        <Tag size={11} strokeWidth={2.5} />
+                        {disc}% cheaper
+                      </Badge>
+                    )}
+                  </div>
+                  <InfoRow label="Original price">
+                    <span
+                      style={{
+                        textDecoration: "line-through",
+                        color: "var(--neutral-300)",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {inr(svc.individualPrice)}
+                    </span>
+                  </InfoRow>
+                  <InfoRow label="Offer price">
+                    <span
+                      style={{ color: "var(--color-primary)", fontWeight: 700 }}
+                    >
+                      {inr(svc.offerPrice)}
+                    </span>
+                  </InfoRow>
+                  <InfoRow
+                    label="GST"
+                    last={!svc.isGstApplicable || total <= 0}
+                  >
+                    {svc.isGstApplicable ? (
+                      <Badge variant="warning">
+                        <Percent size={11} strokeWidth={2.5} />
+                        {svc.gstPercentage}% added
+                      </Badge>
+                    ) : (
+                      <Badge variant="neutral">Not applicable</Badge>
+                    )}
+                  </InfoRow>
+                  {svc.isGstApplicable && total > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "11px 0 0",
+                        marginTop: 4,
+                        borderTop: "2px dashed var(--neutral-100)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: "var(--neutral-800)",
+                        }}
+                      >
+                        <Receipt
+                          size={14}
+                          strokeWidth={2.2}
+                          color="var(--neutral-500)"
+                        />{" "}
+                        Total with GST
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 17,
+                          fontWeight: 800,
+                          color: "var(--neutral-900)",
+                        }}
+                      >
+                        {inr(total)}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 14 }}
+                >
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 10,
+                    }}
+                  >
+                    <div>
+                      <Label req>Listed Price (₹)</Label>
+                      <input
+                        className="edit-inp"
+                        type="number"
+                        value={priceDraft.individualPrice}
+                        onChange={(e) =>
+                          setPriceDraft((p) => ({
+                            ...p,
+                            individualPrice: e.target.value,
+                          }))
+                        }
+                        style={inp}
+                        placeholder="10000"
+                      />
+                    </div>
+                    <div>
+                      <Label req>Offer Price (₹)</Label>
+                      <input
+                        className="edit-inp"
+                        type="number"
+                        value={priceDraft.offerPrice}
+                        onChange={(e) =>
+                          setPriceDraft((p) => ({
+                            ...p,
+                            offerPrice: e.target.value,
+                          }))
+                        }
+                        style={inp}
+                        placeholder="8000"
+                      />
+                    </div>
+                  </div>
+                  {priceDraft.individualPrice &&
+                    priceDraft.offerPrice &&
+                    discPct(priceDraft.individualPrice, priceDraft.offerPrice) >
+                      0 && (
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "var(--success-600)",
+                        }}
+                      >
+                        {discPct(
+                          priceDraft.individualPrice,
+                          priceDraft.offerPrice,
+                        )}
+                        % discount
+                      </p>
+                    )}
+                  <div
+                    style={{
+                      paddingTop: 10,
+                      borderTop: "1px solid var(--neutral-100)",
+                    }}
+                  >
+                    <Toggle
+                      checked={priceDraft.isGstApplicable}
+                      onChange={(v) =>
+                        setPriceDraft((p) => ({ ...p, isGstApplicable: v }))
+                      }
+                      label="GST Applicable"
+                    />
+                    {priceDraft.isGstApplicable && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: 10,
+                          marginTop: 12,
+                        }}
+                      >
+                        <div>
+                          <Label req>GST Rate (%)</Label>
+                          <input
+                            className="edit-inp"
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={priceDraft.gstPercentage}
+                            onChange={(e) =>
+                              setPriceDraft((p) => ({
+                                ...p,
+                                gstPercentage: e.target.value,
+                              }))
+                            }
+                            style={inp}
+                            placeholder="18"
+                          />
+                        </div>
+                        <div>
+                          <Label>Total incl. GST</Label>
+                          <div
+                            style={{
+                              ...inp,
+                              background: "var(--neutral-50)",
+                              color: "var(--neutral-700)",
+                              fontWeight: 700,
+                              borderColor: "var(--neutral-100)",
+                            }}
+                          >
+                            {inr(
+                              withGst(
+                                priceDraft.offerPrice,
+                                priceDraft.gstPercentage,
+                                priceDraft.isGstApplicable,
+                              ),
                             )}
                           </div>
-                          {field.placeholder && <p className="text-xs text-gray-500">{field.placeholder}</p>}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="flex gap-2 pt-4 border-t mt-4">
-              <button onClick={() => setShowMasterFieldsModal(false)}
-                className="flex-1 py-2 rounded-lg text-white text-sm font-medium bg-[#6869AC] hover:opacity-90">
-                Add Selected Fields ({selectedMasterFields.length})
-              </button>
-              <button onClick={() => setShowMasterFieldsModal(false)}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50">Cancel</button>
-            </div>
+                    )}
+                  </div>
+                  <EditFooter onSave={savePricing} saving={saving} />
+                </div>
+              )}
+            </Section>
+
+            {/* ── Quick Facts (read-only) ── */}
+            <Section icon={LayoutList} title="Quick Facts" delay={100}>
+              <InfoRow label="Service type">
+                <Badge variant={isRecurring ? "primary" : "neutral"}>
+                  {isRecurring ? (
+                    <>
+                      <Repeat2 size={11} strokeWidth={2.5} /> Recurring
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={11} strokeWidth={2.5} /> One-time
+                    </>
+                  )}
+                </Badge>
+              </InfoRow>
+              <InfoRow label="Steps to complete">{steps.length} steps</InfoRow>
+              <InfoRow label="Fields to fill">{fields.length} fields</InfoRow>
+              {isRecurring && svc.frequency && (
+                <InfoRow label="Billing">
+                  {FREQ_LABEL[svc.frequency] ?? svc.frequency}
+                </InfoRow>
+              )}
+              {isRecurring && svc.duration && (
+                <InfoRow label="Contract length">
+                  {svc.duration} {DUR_LABEL[svc.durationUnit] ?? ""}
+                </InfoRow>
+              )}
+              <InfoRow label="Documents needed" last>
+                {svc.documentsRequired ? (
+                  <Badge variant="warning">
+                    <ShieldCheck size={11} strokeWidth={2.5} />
+                    Yes
+                  </Badge>
+                ) : (
+                  <Badge variant="success">
+                    <ShieldCheck size={11} strokeWidth={2.5} />
+                    None
+                  </Badge>
+                )}
+              </InfoRow>
+            </Section>
           </div>
         </div>
+      </div>
+
+      {toast && (
+        <Toast
+          msg={toast.msg}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ChecklistSetup step
-// ─────────────────────────────────────────────────────────────────────────────
-const ChecklistSetup = ({ trackSteps, setTrackSteps, goToNextStep, goToPreviousStep, stepErrors }) => {
-  const addStep = () => setTrackSteps(prev => [...prev, { title: '', description: '', order: prev.length + 1 }]);
-
-  const updateStep = (i, key, val) => setTrackSteps(prev => {
-    const u = [...prev]; u[i][key] = val; return u;
-  });
-
-  const removeStep = (i) => {
-    if (trackSteps.length <= 1) return;
-    setTrackSteps(trackSteps.filter((_, idx) => idx !== i).map((s, idx) => ({ ...s, order: idx + 1 })));
-  };
-
-  const moveStep = (i, dir) => {
-    const j = i + dir;
-    if (j < 0 || j >= trackSteps.length) return;
-    const u = [...trackSteps];
-    [u[i], u[j]] = [u[j], u[i]];
-    setTrackSteps(u.map((s, idx) => ({ ...s, order: idx + 1 })));
-  };
-
-  const ic = (err) => `w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-1 ${err ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-[#6869AC] focus:ring-[#6869AC]'}`;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Checklist Setup</h2>
-        <p className="text-sm text-gray-600">Define the steps customers will follow for this service.</p>
-      </div>
-
-      <div className="space-y-4">
-        {trackSteps.map((step, i) => (
-          <div key={i} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#6869AC] text-white text-sm font-medium">
-                  {step.order}
-                </div>
-                <div className="flex gap-2 mt-1">
-                  <button onClick={() => moveStep(i, -1)} disabled={i === 0}
-                    className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded disabled:opacity-50">Move Up</button>
-                  <button onClick={() => moveStep(i, 1)} disabled={i === trackSteps.length - 1}
-                    className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded disabled:opacity-50">Move Down</button>
-                </div>
-              </div>
-              <button onClick={() => removeStep(i)} className="p-1 text-red-500 hover:bg-red-50 rounded">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium mb-1 text-gray-700">Step Title <span className="text-red-500">*</span></label>
-                <input type="text" value={step.title} onChange={e => updateStep(i, 'title', e.target.value)}
-                  placeholder="e.g., Data & Document Intake" className={ic(stepErrors[`step_${i}_title`])} />
-                {stepErrors[`step_${i}_title`] && <p className="mt-1 text-xs text-red-600">{stepErrors[`step_${i}_title`]}</p>}
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1 text-gray-700">Step Description <span className="text-red-500">*</span></label>
-                <textarea value={step.description} onChange={e => updateStep(i, 'description', e.target.value)}
-                  placeholder="e.g., Share your basic details and upload the necessary documents"
-                  className={`${ic(stepErrors[`step_${i}_description`])} h-20 resize-none`} />
-                {stepErrors[`step_${i}_description`] && <p className="mt-1 text-xs text-red-600">{stepErrors[`step_${i}_description`]}</p>}
-              </div>
-            </div>
-          </div>
-        ))}
-        <button onClick={addStep}
-          className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center hover:border-[#6869AC] hover:bg-gray-50">
-          <Plus className="w-6 h-6 text-gray-400 mb-1" />
-          <span className="text-sm text-gray-600">Add Another Step</span>
-        </button>
-      </div>
-
-      <div className="flex justify-between pt-6 border-t border-gray-200">
-        <button onClick={goToPreviousStep} className="px-6 py-2 rounded-lg font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">Previous</button>
-        <button onClick={goToNextStep} className="px-6 py-2 rounded-lg font-medium bg-[#6869AC] text-white hover:opacity-90">Next</button>
-      </div>
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ReviewPublish step
-// ─────────────────────────────────────────────────────────────────────────────
-const ReviewPublish = ({
-  basicInfo, categories, filteredSubcategories,
-  selectedMasterFields, customFields, trackSteps,
-  priceMode, discountPercentage, masterFields, newCustomField,
-  loading, error, goToPreviousStep, goToStep,
-  submissionStatus, showSuccessPopup, serviceId,
-  navigate, handleUpdateService
-}) => {
-  const getCatName = () => categories.find(c => c.categoryId === basicInfo.categoryId)?.categoryName || 'Not selected';
-  const getSubName = () => filteredSubcategories.find(s => s.subCategoryId === basicInfo.subCategoryId)?.subCategoryName || 'Not selected';
-  const getMFName  = (id) => masterFields.find(f => f.masterFieldId === id)?.label || id;
-  const hasUnsaved = newCustomField.label?.trim() !== '';
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Review & Update</h2>
-          <p className="text-sm text-gray-600">Review all information before updating your service.</p>
-        </div>
-        <button onClick={goToPreviousStep}
-          className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-          ← Back
-        </button>
-      </div>
-
-      <div className="space-y-6">
-        {/* Service Info */}
-        <div className="border border-gray-200 rounded-lg p-4 relative">
-          <button onClick={() => goToStep(1)} className="absolute top-4 right-4 flex items-center gap-1 text-sm text-[#6869AC] hover:text-[#595a9c]">
-            <Edit2 className="w-4 h-4" /> Edit
-          </button>
-          <h3 className="font-semibold text-gray-900 mb-3">Service Information</h3>
-          {basicInfo.photoUrl && (
-            <div className="mb-4">
-              <p className="text-xs text-gray-500 mb-1">{basicInfo.photoChanged ? '✓ Image updated' : 'Original image'}</p>
-              <img src={basicInfo.photoUrl} alt="Service" className="w-full max-w-xs h-48 object-cover rounded-lg border border-gray-200" />
-            </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div><p className="text-gray-500">Service Type</p><p className="font-medium">{basicInfo.serviceType === 'ONE_TIME' ? 'One Time' : 'Recurring'}</p></div>
-            <div><p className="text-gray-500">Category</p><p className="font-medium">{getCatName()}</p></div>
-            <div><p className="text-gray-500">Subcategory</p><p className="font-medium">{getSubName()}</p></div>
-            <div><p className="text-gray-500">Documents Required</p><p className="font-medium">{basicInfo.documentsRequired ? 'Yes' : 'No'}</p></div>
-            <div className="md:col-span-2"><p className="text-gray-500">Service Name</p><p className="font-medium">{basicInfo.name}</p></div>
-            <div className="md:col-span-2"><p className="text-gray-500">Description</p><p className="font-medium">{basicInfo.description}</p></div>
-          </div>
-        </div>
-
-        {/* Pricing */}
-        <div className="border border-gray-200 rounded-lg p-4 relative">
-          <button onClick={() => goToStep(2)} className="absolute top-4 right-4 flex items-center gap-1 text-sm text-[#6869AC] hover:text-[#595a9c]">
-            <Edit2 className="w-4 h-4" /> Edit
-          </button>
-          <h3 className="font-semibold text-gray-900 mb-3">Pricing</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div><p className="text-gray-500">Actual Price</p><p className="font-medium">₹{basicInfo.individualPrice || '0'}</p></div>
-            <div><p className="text-gray-500">Offer Price</p><p className="font-medium">₹{basicInfo.offerPrice || '0'}</p></div>
-            <div><p className="text-gray-500">GST Applicable</p><p className="font-medium">{basicInfo.isGstApplicable ? 'Yes' : 'No'}</p></div>
-            {basicInfo.isGstApplicable && (
-              <div><p className="text-gray-500">GST %</p><p className="font-medium">{basicInfo.gstPercentage}%</p></div>
-            )}
-          </div>
-        </div>
-
-        {/* Dataset */}
-        <div className="border border-gray-200 rounded-lg p-4 relative">
-          <button onClick={() => goToStep(3)} className="absolute top-4 right-4 flex items-center gap-1 text-sm text-[#6869AC] hover:text-[#595a9c]">
-            <Edit2 className="w-4 h-4" /> Edit
-          </button>
-          <h3 className="font-semibold text-gray-900 mb-3">Dataset Setup</h3>
-          {selectedMasterFields.length === 0 && customFields.length === 0 && !hasUnsaved
-            ? <p className="text-sm text-gray-500 italic">No fields configured</p>
-            : (
-              <>
-                {selectedMasterFields.length > 0 && (
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-2">Pre-defined Fields ({selectedMasterFields.length})</p>
-                    {selectedMasterFields.map((f, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 bg-gray-50 rounded mb-1 text-sm">
-                        <span>{getMFName(f.masterFieldId)}</span>
-                        <span className={`text-xs px-2 py-1 rounded ${f.required ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                          {f.required ? 'Required' : 'Optional'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {customFields.length > 0 && (
-                  <div>
-                    <p className="text-sm text-gray-500 mb-2">Custom Fields ({customFields.length})</p>
-                    {customFields.map((f, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 bg-gray-50 rounded mb-1 text-sm">
-                        <div><span className="font-medium">{f.label}</span><span className="text-xs ml-2 text-gray-500">({f.type})</span></div>
-                        <span className={`text-xs px-2 py-1 rounded ${f.required ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                          {f.required ? 'Required' : 'Optional'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-        </div>
-
-        {/* Checklist */}
-        <div className="border border-gray-200 rounded-lg p-4 relative">
-          <button onClick={() => goToStep(4)} className="absolute top-4 right-4 flex items-center gap-1 text-sm text-[#6869AC] hover:text-[#595a9c]">
-            <Edit2 className="w-4 h-4" /> Edit
-          </button>
-          <h3 className="font-semibold text-gray-900 mb-3">Checklist Steps ({trackSteps.length})</h3>
-          <div className="space-y-3">
-            {trackSteps.map((step, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#6869AC] text-white text-sm font-medium flex-shrink-0">
-                  {step.order}
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{step.title}</p>
-                  <p className="text-xs text-gray-600 mt-1">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <button onClick={goToPreviousStep} disabled={loading || submissionStatus === 'loading'}
-            className="flex-1 py-3 rounded-lg font-semibold text-gray-700 text-sm border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            ← Back
-          </button>
-          <button onClick={handleUpdateService} disabled={loading || submissionStatus === 'loading'}
-            className="flex-1 py-3 rounded-lg font-semibold text-white text-sm bg-[#6869AC] hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">
-            {submissionStatus === 'loading' ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Updating...
-              </span>
-            ) : 'Update Service'}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Success popup ── */}
-      {showSuccessPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-              <CheckCircle className="h-10 w-10 text-green-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Service Updated Successfully!</h3>
-            <p className="text-gray-600 mb-6">Your service has been updated successfully.</p>
-            <div className="flex gap-3">
-              {/* ── FIXED: was /service/view/:id → now /services/:id (matches ViewService route) ── */}
-              <button
-                onClick={() => navigate(`/services/${serviceId}`)}
-                className="flex-1 py-3 rounded-lg font-semibold text-[#6869AC] text-sm border border-[#6869AC] hover:bg-[#6869AC] hover:text-white transition-colors"
-              >
-                View Service
-              </button>
-              {/* ── FIXED: was /service-hub → now /services (matches Service list route) ── */}
-              <button
-                onClick={() => navigate('/services')}
-                className="flex-1 py-3 rounded-lg font-semibold text-white text-sm bg-[#6869AC] hover:opacity-90"
-              >
-                Back to Services
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main EditService component
-// ─────────────────────────────────────────────────────────────────────────────
-const EditService = () => {
-  const { serviceId } = useParams();
-  const navigate = useNavigate();
-
-  const [currentStep, setCurrentStep]     = useState(1);
-  const [categories, setCategories]       = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [filteredSubcategories, setFilteredSubcategories] = useState([]);
-  const [masterFields, setMasterFields]   = useState([]);
-  const [loading, setLoading]             = useState(false);
-  const [error, setError]                 = useState('');
-  const [stepErrors, setStepErrors]       = useState({});
-  const [submissionStatus, setSubmissionStatus] = useState('idle');
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-
-  const [basicInfo, setBasicInfo] = useState({
-    serviceId, categoryId: '', subCategoryId: '',
-    name: '', description: '',
-    individualPrice: '', offerPrice: '',
-    employeeId: 'cmjjl771p0005g11eu3q8t2rq',
-    serviceType: 'ONE_TIME',
-    frequency: '', duration: '', durationUnit: '',
-    documentsRequired: true, isGstApplicable: true,
-    gstPercentage: 18, finalIndividualPrice: '',
-    photoFile: null, photoUrl: '', photoChanged: false,
-  });
-
-  const [priceMode, setPriceMode]                 = useState('fixed');
-  const [discountPercentage, setDiscountPercentage] = useState('');
-  const [selectedMasterFields, setSelectedMasterFields] = useState([]);
-  const [customFields, setCustomFields]           = useState([]);
-  const [newCustomField, setNewCustomField]       = useState({ label: '', type: 'text', placeholder: '', required: false, options: [] });
-  const [trackSteps, setTrackSteps]               = useState([
-    { title: 'Data & Document Intake', order: 1, description: 'Share your basic details and upload the necessary documents to begin' },
-    { title: 'Verification & Preparation', order: 2, description: 'Verification of information and application setup' },
-    { title: 'Document Delivery', order: 3, description: 'Receive your official certificate' },
-  ]);
-
-  useEffect(() => {
-    fetchCategories();
-    fetchSubcategories();
-    fetchMasterFields();
-    fetchServiceData();
-  }, [serviceId]);
-
-  useEffect(() => {
-    setFilteredSubcategories(
-      basicInfo.categoryId ? subcategories.filter(s => s.categoryId === basicInfo.categoryId) : []
-    );
-  }, [basicInfo.categoryId, subcategories]);
-
-  useEffect(() => {
-    if (priceMode === 'percentage' && basicInfo.individualPrice && discountPercentage) {
-      const ip = parseFloat(basicInfo.individualPrice), d = parseFloat(discountPercentage);
-      if (!isNaN(ip) && !isNaN(d) && d > 0 && d <= 100)
-        setBasicInfo(p => ({ ...p, offerPrice: Math.round(ip - ip * d / 100).toString() }));
-    }
-    if (basicInfo.individualPrice && basicInfo.isGstApplicable && basicInfo.gstPercentage) {
-      const ip = parseFloat(basicInfo.individualPrice), gst = parseFloat(basicInfo.gstPercentage);
-      if (!isNaN(ip) && !isNaN(gst) && gst >= 0)
-        setBasicInfo(p => ({ ...p, finalIndividualPrice: Math.round(ip + ip * gst / 100).toString() }));
-    }
-  }, [basicInfo.individualPrice, discountPercentage, priceMode, basicInfo.isGstApplicable, basicInfo.gstPercentage]);
-
-  const fetchServiceData = async () => {
-    try {
-      setLoading(true);
-      const res = await axiosInstance.get(`/service/${serviceId}`);
-      if (res.data.success) {
-        const s = res.data.service;
-        setBasicInfo(p => ({
-          ...p,
-          categoryId: s.categoryId || '', subCategoryId: s.subCategoryId || '',
-          name: s.name || '', description: s.description || '',
-          individualPrice: s.individualPrice?.toString() || '',
-          offerPrice: s.offerPrice?.toString() || '',
-          serviceType: s.serviceType || 'ONE_TIME',
-          frequency: s.frequency || '', duration: s.duration?.toString() || '',
-          durationUnit: s.durationUnit || '',
-          documentsRequired: s.documentsRequired ?? true,
-          isGstApplicable: s.isGstApplicable ?? true,
-          gstPercentage: s.gstPercentage?.toString() || '18',
-          finalIndividualPrice: s.finalIndividualPrice?.toString() || '',
-          photoUrl: s.photoUrl || '',
-        }));
-        if (s.individualPrice && s.offerPrice) {
-          const d = ((s.individualPrice - s.offerPrice) / s.individualPrice) * 100;
-          if (Math.round(d) > 0) { setPriceMode('percentage'); setDiscountPercentage(Math.round(d).toString()); }
-        }
-        await fetchInputFields();
-        await fetchTrackSteps();
-      }
-    } catch (err) { console.error(err); setError('Failed to load service data'); }
-    finally { setLoading(false); }
-  };
-
-  const fetchInputFields = async () => {
-    try {
-      const res = await axiosInstance.get(`/service/${serviceId}/input-fields`);
-      if (res.data.success) {
-        const master = [], custom = [];
-        (res.data.fields || []).forEach(f => {
-          if (f.masterFieldId) master.push({ masterFieldId: f.masterFieldId, required: f.required || false });
-          else custom.push({ label: f.label, type: f.type, placeholder: f.placeholder || '', required: f.required || false, options: f.options || [] });
-        });
-        setSelectedMasterFields(master);
-        setCustomFields(custom);
-      }
-    } catch (err) { console.error(err); }
-  };
-
-  const fetchTrackSteps = async () => {
-    try {
-      const res = await axiosInstance.get(`/service/${serviceId}/track-steps`);
-      if (res.data.success && res.data.steps?.length) {
-        setTrackSteps(res.data.steps.map(s => ({ title: s.title, description: s.description, order: s.order })).sort((a, b) => a.order - b.order));
-      }
-    } catch (err) { console.error(err); }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const res = await axiosInstance.get('/category');
-      if (res.data.success) setCategories(res.data.categories);
-    } catch (err) { console.error(err); }
-  };
-
-  const fetchSubcategories = async () => {
-    try {
-      const res = await axiosInstance.get('/subcategory');
-      if (res.data.success) setSubcategories(res.data.subcategories);
-    } catch (err) { console.error(err); }
-  };
-
-  const fetchMasterFields = async () => {
-    try {
-      const res = await axiosInstance.get('/master-fields');
-      if (res.data.success) setMasterFields(res.data.masterFields);
-    } catch (err) { console.error(err); }
-  };
-
-  const validateCurrentStep = () => {
-    const errors = {};
-    if (currentStep === 1) {
-      if (!basicInfo.serviceType) errors.serviceType = 'Required';
-      if (!basicInfo.categoryId) errors.categoryId = 'Required';
-      if (!basicInfo.subCategoryId) errors.subCategoryId = 'Required';
-      if (!basicInfo.name) errors.name = 'Required';
-      if (!basicInfo.description) errors.description = 'Required';
-      if (!basicInfo.photoUrl) errors.photoUrl = 'Required';
-      if (basicInfo.serviceType === 'RECURRING') {
-        if (!basicInfo.frequency) errors.frequency = 'Required';
-        if (!basicInfo.duration) errors.duration = 'Required';
-        if (!basicInfo.durationUnit) errors.durationUnit = 'Required';
-      }
-    }
-    if (currentStep === 2) {
-      if (!basicInfo.individualPrice || parseFloat(basicInfo.individualPrice) <= 0) errors.individualPrice = 'Valid price required';
-      if (priceMode === 'fixed' && (!basicInfo.offerPrice || parseFloat(basicInfo.offerPrice) <= 0)) errors.offerPrice = 'Valid offer price required';
-      if (priceMode === 'percentage' && (!discountPercentage || parseFloat(discountPercentage) <= 0 || parseFloat(discountPercentage) > 100)) errors.discountPercentage = 'Valid discount (1–100) required';
-      if (basicInfo.isGstApplicable && (!basicInfo.gstPercentage || parseFloat(basicInfo.gstPercentage) < 0)) errors.gstPercentage = 'Valid GST required';
-    }
-    if (currentStep === 4) {
-      trackSteps.forEach((step, i) => {
-        if (!step.title?.trim()) errors[`step_${i}_title`] = 'Required';
-        if (!step.description?.trim()) errors[`step_${i}_description`] = 'Required';
-      });
-    }
-    setStepErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const goToStep = (n) => setCurrentStep(n);
-  const goToPreviousStep = () => currentStep > 1 && setCurrentStep(p => p - 1);
-  const goToNextStep = () => { if (validateCurrentStep() && currentStep < 5) { setCurrentStep(p => p + 1); setStepErrors({}); } };
-
-
-const handleUpdateService = async () => {
-  setError(''); 
-  setSubmissionStatus('loading'); 
-  setLoading(true);
-  
-  try {
-    let finalCustomFields = [...customFields];
-    if (newCustomField.label?.trim()) {
-      const f = { 
-        label: newCustomField.label.trim(), 
-        type: newCustomField.type, 
-        placeholder: newCustomField.placeholder || '', 
-        required: newCustomField.required 
-      };
-      if (['select', 'radio', 'checkbox'].includes(newCustomField.type)) {
-        const valid = newCustomField.options.filter(o => o?.trim());
-        if (valid.length) f.options = valid;
-      }
-      finalCustomFields.push(f);
-    }
-
-    const serviceData = {
-      name: basicInfo.name.trim(), 
-      description: basicInfo.description.trim(),
-      serviceType: basicInfo.serviceType,
-      documentsRequired: basicInfo.documentsRequired,
-      individualPrice: parseFloat(basicInfo.individualPrice),
-      offerPrice: parseFloat(basicInfo.offerPrice),
-      isGstApplicable: basicInfo.isGstApplicable,
-      gstPercentage: basicInfo.isGstApplicable ? parseFloat(basicInfo.gstPercentage) : 0,
-      finalIndividualPrice: parseFloat(basicInfo.finalIndividualPrice || basicInfo.offerPrice),
-      employeeId: basicInfo.employeeId,
-      subCategoryId: basicInfo.subCategoryId,
-    };
-    
-    if (basicInfo.serviceType === 'RECURRING') {
-      serviceData.frequency = basicInfo.frequency;
-      serviceData.duration = parseInt(basicInfo.duration);
-      serviceData.durationUnit = basicInfo.durationUnit;
-    }
-
-    // Update service details
-    const svcRes = await axiosInstance.put(`/service/${serviceId}`, serviceData);
-    const svcData = svcRes.data;
-    
-    if (!svcData.success) {
-      throw new Error(svcData.error || svcData.message || 'Service update failed');
-    }
-
-    // Update image if changed
-    if (basicInfo.photoChanged && basicInfo.photoFile) {
-      const fd = new FormData(); 
-      fd.append('photoUrl', basicInfo.photoFile, basicInfo.photoFile.name);
-      
-      await axiosInstance.put(`/service/${serviceId}/image`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }).catch(console.warn);
-    }
-
-    // Update input fields
-    if (finalCustomFields.length > 0 || selectedMasterFields.length > 0) {
-      const payload = [
-        ...finalCustomFields.map(f => {
-          const obj = { 
-            label: f.label, 
-            type: f.type, 
-            placeholder: f.placeholder || '', 
-            required: f.required || false 
-          };
-          if (['select', 'radio', 'checkbox'].includes(f.type) && f.options?.length) {
-            obj.options = f.options;
-          }
-          return obj;
-        }),
-        ...selectedMasterFields.map(f => {
-          const mf = masterFields.find(m => m.masterFieldId === f.masterFieldId);
-          const obj = { 
-            masterFieldId: f.masterFieldId, 
-            required: f.required || false 
-          };
-          if (mf?.options?.length) obj.options = mf.options;
-          return obj;
-        }),
-      ];
-      
-      // Delete existing and create new
-      await axiosInstance.delete(`/service/${serviceId}/input-fields`).catch(console.warn);
-      await axiosInstance.post(`/service/${serviceId}/input-fields`, { fields: payload })
-        .catch(console.warn);
-    }
-
-    // Update track steps
-    if (trackSteps.length > 0) {
-      await axiosInstance.delete(`/service/${serviceId}/track-steps`).catch(console.warn);
-      await axiosInstance.post(`/service/${serviceId}/track-steps`, {
-        steps: trackSteps.map(s => ({ 
-          title: s.title, 
-          description: s.description, 
-          order: s.order 
-        }))
-      }).catch(console.warn);
-    }
-
-    setSubmissionStatus('success');
-    setShowSuccessPopup(true);
-    
-  } catch (err) {
-    console.error(err);
-    // Enhanced error handling for axios
-    const errorMessage = err.response?.data?.error || 
-                        err.response?.data?.message || 
-                        err.message || 
-                        'Failed to update service. Please try again.';
-    setError(errorMessage);
-    setSubmissionStatus('error');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  if (loading && !basicInfo.name) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6869AC]" />
-      </div>
-    );
-  }
-
-  const steps = ['Basic Info', 'Pricing', 'Dataset', 'Checklist', 'Review'];
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Edit Service</h1>
-              <p className="text-sm text-gray-600 mt-1">Update service details and configuration</p>
-            </div>
-            <span className="text-sm text-gray-500">Service ID: {serviceId}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Progress */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            {steps.map((label, idx) => {
-              const n = idx + 1;
-              return (
-                <div key={n} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === n ? 'bg-[#6869AC] text-white' : currentStep > n ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                    {currentStep > n ? '✓' : n}
-                  </div>
-                  <div className="ml-2 text-sm font-medium hidden sm:block">{label}</div>
-                  {n < 5 && <div className={`ml-2 w-8 sm:w-16 h-0.5 ${currentStep > n ? 'bg-green-300' : 'bg-gray-200'}`} />}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          {currentStep === 1 && <ServiceInfo basicInfo={basicInfo} setBasicInfo={setBasicInfo} categories={categories} filteredSubcategories={filteredSubcategories} stepErrors={stepErrors} goToNextStep={goToNextStep} goToPreviousStep={goToPreviousStep} currentStep={currentStep} />}
-          {currentStep === 2 && <PricingSetup basicInfo={basicInfo} setBasicInfo={setBasicInfo} priceMode={priceMode} setPriceMode={setPriceMode} discountPercentage={discountPercentage} setDiscountPercentage={setDiscountPercentage} stepErrors={stepErrors} goToNextStep={goToNextStep} goToPreviousStep={goToPreviousStep} />}
-          {currentStep === 3 && <DatasetSetup selectedMasterFields={selectedMasterFields} setSelectedMasterFields={setSelectedMasterFields} customFields={customFields} setCustomFields={setCustomFields} newCustomField={newCustomField} setNewCustomField={setNewCustomField} masterFields={masterFields} stepErrors={stepErrors} goToNextStep={goToNextStep} goToPreviousStep={goToPreviousStep} />}
-          {currentStep === 4 && <ChecklistSetup trackSteps={trackSteps} setTrackSteps={setTrackSteps} goToNextStep={goToNextStep} goToPreviousStep={goToPreviousStep} stepErrors={stepErrors} />}
-          {currentStep === 5 && <ReviewPublish basicInfo={basicInfo} categories={categories} filteredSubcategories={filteredSubcategories} selectedMasterFields={selectedMasterFields} customFields={customFields} trackSteps={trackSteps} priceMode={priceMode} discountPercentage={discountPercentage} masterFields={masterFields} newCustomField={newCustomField} loading={loading} error={error} goToPreviousStep={goToPreviousStep} goToStep={goToStep} submissionStatus={submissionStatus} showSuccessPopup={showSuccessPopup} serviceId={serviceId} navigate={navigate} handleUpdateService={handleUpdateService} />}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default EditService;
+}

@@ -1,13 +1,8 @@
 import React from 'react';
-import { ArrowUpRight, Linkedin, Mail } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-
-
-
-
-
 
 
 const Contact = () => {
@@ -15,20 +10,20 @@ const Contact = () => {
 const [success, setSuccess] = useState(false);
 const [errorMsg, setErrorMsg] = useState("");
   const navigate=useNavigate()
- const cards = [
+const cards = [
   {
     title: "Book a Consultation",
     description:
-      "Have questions about GST registration, filings, or compliance? Speak directly with our experts and get clear, practical guidance tailored to your business.",
+      "Have questions about GST registration, filings, or compliance? Speak directly with our team and get clear, practical guidance tailored to your business.",
     buttonText: "Schedule a Call",
     link: "/"
   },
   {
-    title: "Explore Our Services",
+    title: "Learn More About Us",
     description:
-      "Discover our complete range of GST and business compliance solutions, designed to simplify regulations, reduce risk, and keep your business running smoothly.",
-    buttonText: "View Services",
-    link: "/servicehub"
+      "Discover who we are, our experience in GST and business compliance, and how we help businesses stay legally compliant and financially organized.",
+    buttonText: "About Us",
+    link: "/about"
   }
 ];
 
@@ -95,7 +90,8 @@ const [errorMsg, setErrorMsg] = useState("");
     <div className="flex flex-col items-center w-full overflow-x-hidden bg-white">
 
       {/* SECTION ONE: Contact Header */}
-      <section className="mt-[60px] relative bg-[#FCFCFD]  border-[4px] md:border-[6px] flex flex-col lg:flex-row justify-around border-black/5  px-4 lg:mx-20 mx-4 lg:px-12   rounded-[16px] p-8 md:p-18  gap-10">
+      <section className="mt-[60px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="relative bg-[#FCFCFD] border-[4px] md:border-[6px] flex flex-col lg:flex-row justify-around border-black/5 rounded-[16px] p-8 md:p-14 gap-10">
         <img src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Abstract%20Design.png" className=' absolute top-0 left-0 w-16' alt="" />
         {/* Red Badge Section */}
         <div className='flex flex-col items-center lg:items-start relative  shrink-0'>
@@ -123,10 +119,12 @@ const [errorMsg, setErrorMsg] = useState("");
             <img className='rounded-full bg-[#FFF6D7] p-[10px] md:p-[12px] w-[40px] h-[40px] md:w-[52px] md:h-[52px] object-contain hover:scale-110 transition-transform cursor-pointer' src="https://img.icons8.com/?size=100&id=98960&format=png&color=000000" alt="li" />
           </div>
         </div>
+      </div>
       </section>
 
       {/* SECTION TWO: Info Cards */}
-      <section className='mt-[60px] container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[20px] lg:px-12 px-4 w-full'>
+      <section className='mt-[60px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-[20px]'>
         {[
           { label: "Address", value: "Somewhere in the World" },
           { label: "Email Here", value: "support@forhelp.com" },
@@ -138,12 +136,13 @@ const [errorMsg, setErrorMsg] = useState("");
             <p className='text-[#1A1A1A] text-[14px] md:text-[16px] font-medium text-center truncate w-full'>{item.value}</p>
           </div>
         ))}
+      </div>
       </section>
 
       {/* SECTION THREE: Form Section */}
-      <section className="w-full bg-gray-50  flex  px-4 lg:px-12 items-center justify-center md:py-20 mt-[60px]">
-       <div className='container mx-auto  '>
-         <div className="bg-white rounded-3xl   lg:p-12 p-4 w-full flex flex-col md:flex-row justify-center   gap-8 shadow-sm border border-gray-100">
+      <section className="w-full bg-gray-50 flex items-center justify-center md:py-20 mt-[60px]">
+       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full'>
+         <div className="bg-white rounded-3xl lg:p-12 p-4 w-full flex flex-col md:flex-row justify-center gap-8 shadow-sm border border-gray-100">
 
           {/* Left Side */}
           <div className="w-full md:w-2/5 flex flex-col gap-4">
@@ -274,7 +273,7 @@ const [errorMsg, setErrorMsg] = useState("");
       </section>
 
       {/* SECTION FOUR: Volunteer & Donation Cards */}
-      <section className="w-full px-4 container mx-auto lg:px-12  mt-5 lg:mt-10">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 lg:mt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {cards.map((card, index) => (
             <div key={index} className="bg-[#FCFCFD] w-full rounded-[1.5rem] md:rounded-[2rem] p-8 md:p-12 border border-black/5 border-[2px] flex flex-col items-start justify-between min-h-fit">
@@ -294,7 +293,7 @@ const [errorMsg, setErrorMsg] = useState("");
       </section>
 
       {/* SECTION FIVE: Final CTA */}
-      <section className="w-full px-4 lg:px-12 container mx-auto mt-12  mb-[60px]">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-[60px]">
         <div className="relative w-full min-h-[400px] rounded-[2rem] overflow-hidden flex flex-col items-center justify-center p-6 md:p-12 text-center border border-gray-100 bg-gradient-to-br from-[#E2E8F0] via-[#F8FAFC] to-[#F1F5F9]">
 
           {/* Decorative Patterns (Hidden on very small screens for cleaner UI) */}
@@ -310,7 +309,7 @@ const [errorMsg, setErrorMsg] = useState("");
                Get Your Registrations & Compliance Handled by Professionals
             </h2>
             <p className="text-[#4C4C4D] text-[15px] md:text-[16px] max-w-2xl">
-               Avoid delays, errors, and regulatory stress. Our experts ensure a smooth, accurate, and hassle-free process for your business.
+               Avoid delays, errors, and regulatory stress. Our team ensure a smooth, accurate, and hassle-free process for your business.
 
 
 
@@ -321,7 +320,7 @@ const [errorMsg, setErrorMsg] = useState("");
                    Get started with professional assistance
               </span>
               <button onClick={()=>navigate('/')} className="flex items-center gap-3 bg-[#D11C16] hover:bg-red-700 text-white px-5 md:px-8 py-3 rounded-full transition-all  ">
-                <span className="text-[14px]">Get Expert Assistance</span>
+                <span className="text-[14px]">Get Your Assistance</span>
                 <ArrowUpRight className='bg-white text-black rounded-full p-1' size={20} />
               </button>
             </div>

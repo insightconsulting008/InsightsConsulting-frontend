@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '@src/providers/axiosInstance';
+import PageHeader from '../page-header/PageHeader';
 import {
   Clock, Calendar, FileText, CheckCircle, X, Search, Filter,
   ChevronRight as ChevronRightIcon, Play, Check, Layers, Headphones,
@@ -654,13 +655,14 @@ export default function MyService() {
         onRemoveFile={handleRemove}
       />
 
+      <PageHeader
+        title="My Services"
+        subtitle="Track and manage all your purchased services"
+      />
+
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-extrabold text-gray-900">My Services</h1>
-              <p className="text-sm text-gray-400 mt-0.5">Track and manage all your purchased services</p>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-4 mb-4">
             <div className="flex items-center gap-2.5">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={14}/>

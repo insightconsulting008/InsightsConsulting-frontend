@@ -1,7 +1,8 @@
 import axiosInstance from "@src/providers/axiosInstance";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import PageHeader from '../page-header/PageHeader';
 
 const ACTION_MAP = {
   STATUS_CHANGED:    { badge: "bg-primary-50 text-primary-700 border border-primary-200",  dot: "bg-primary"    },
@@ -84,48 +85,14 @@ export default function DetailReport() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Nav */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
-          <span className="font-bold text-primary text-sm">AdminPanel</span>
-          <div className="flex items-center gap-2 text-sm">
-            <button
-              onClick={() => navigate("/reports")}
-              className="text-primary hover:underline font-medium"
-            >
-              Application History
-            </button>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-700 font-medium">Detail</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Application Detail"
+        subtitle={applicationId ? applicationId : ''}
+        onBack={() => navigate("/reports")}
+        breadcrumbs={[{ label: "Application History", href: "/reports" }, { label: "Detail" }]}
+      />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-
-        {/* Back + page heading */}
-        <button
-          onClick={() => navigate("/reports")}
-          className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary transition-colors mb-6 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Application History
-        </button>
-
-        <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Application Detail</h1>
-            {applicationId && (
-              <p className="text-xs text-gray-400 font-mono mt-1">{applicationId}</p>
-            )}
-          </div>
-          {!loading && latestHistory && (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${getAction(latestHistory.action).badge}`}>
-              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getAction(latestHistory.action).dot}`} />
-              {latestHistory.action?.replace(/_/g, " ")}
-            </span>
-          )}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Error */}
         {error && (

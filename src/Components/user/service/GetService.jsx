@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@src/providers/axiosInstance";
+import PageHeader from '../page-header/PageHeader';
 import {
   X, Phone, Search, Clock, FileText, Shield, CheckCircle,
   ArrowRight, Tag, Calendar, BadgeCheck, Loader2, Package,
@@ -34,6 +35,10 @@ export default function GetService() {
   const [serviceStats, setServiceStats] = useState({ total: 0, filtered: 0, bundles: 0 });
   const [viewMode, setViewMode] = useState("services");
   const [bundlesLoading, setBundlesLoading] = useState(false);
+
+  // All-services cache used for cross-page category filtering
+  const [allServices, setAllServices] = useState([]);
+  const [allServicesLoaded, setAllServicesLoaded] = useState(false);
 
   // Payment states
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -122,9 +127,26 @@ export default function GetService() {
     }
   };
 
+  /* ── FETCH ALL SERVICES (for cross-page category filtering) ── */
+  const fetchAllServices = useCallback(async () => {
+    if (allServicesLoaded) return;
+    try {
+      const res = await axiosInstance.get(`/service?limit=999&page=1`);
+      setAllServices(res.data.services ?? []);
+      setAllServicesLoaded(true);
+    } catch (e) {
+      console.error("Failed to fetch all services for filter:", e);
+    }
+  }, [allServicesLoaded]);
+
   /* ── CLIENT-SIDE CATEGORY FILTER FOR SERVICES ── */
   useEffect(() => {
-    let r = services;
+    // When a category filter is active, filter against the full dataset (allServices)
+    // so we don't miss services that live on other pages.
+    const isFiltered = selectedCategory !== "all" || selectedSubCategory !== "all";
+    const base = isFiltered && allServicesLoaded ? allServices : services;
+
+    let r = base;
     if (selectedCategory !== "all") {
       const ids = subCategories.filter(s => s.categoryId === selectedCategory).map(s => s.subCategoryId);
       r = r.filter(s => ids.includes(s.subCategoryId));
@@ -133,20 +155,25 @@ export default function GetService() {
       r = r.filter(s => s.subCategoryId === selectedSubCategory);
     }
     setFilteredServices(r);
-  }, [selectedCategory, selectedSubCategory, services, subCategories]);
+  }, [selectedCategory, selectedSubCategory, services, allServices, allServicesLoaded, subCategories]);
 
   /* ── CLIENT-SIDE CATEGORY FILTER FOR BUNDLES ── */
   useEffect(() => {
+    // Bundle services from the API only carry {serviceId, name} — no subCategoryId.
+    // Build a serviceId → subCategoryId lookup from allServices to fix this.
+    const svcMap = {};
+    allServices.forEach(s => { svcMap[s.serviceId] = s.subCategoryId; });
+
     let r = bundles;
     if (selectedCategory !== "all") {
       const ids = subCategories.filter(s => s.categoryId === selectedCategory).map(s => s.subCategoryId);
-      r = r.filter(b => b.services?.some(s => ids.includes(s.subCategoryId)));
+      r = r.filter(b => b.services?.some(s => ids.includes(svcMap[s.serviceId])));
     }
     if (selectedSubCategory !== "all") {
-      r = r.filter(b => b.services?.some(s => s.subCategoryId === selectedSubCategory));
+      r = r.filter(b => b.services?.some(s => svcMap[s.serviceId] === selectedSubCategory));
     }
     setFilteredBundles(r);
-  }, [selectedCategory, selectedSubCategory, bundles, subCategories]);
+  }, [selectedCategory, selectedSubCategory, bundles, subCategories, allServices]);
 
   /* ── UPDATE STATS ── */
   useEffect(() => {
@@ -178,6 +205,8 @@ export default function GetService() {
     setSelectedCategory(catId);
     setSelectedSubCategory("all");
     setCurrentPage(1);
+    // Ensure full service list is loaded for cross-page filtering
+    if (catId !== "all") fetchAllServices();
   };
 
   const openService = async (serviceId) => {
@@ -315,6 +344,7 @@ export default function GetService() {
   /* ── SEARCH STATUS INDICATOR ── */
   const isSearching = paginationLoading || bundlesLoading;
   const hasActiveSearch = debouncedSearch.length > 0;
+  const isFiltered = selectedCategory !== "all" || selectedSubCategory !== "all";
 
   return (
     <div className="min-h-screen" style={{ background: "var(--neutral-50)" }}>
@@ -499,14 +529,15 @@ export default function GetService() {
         </div>
       )}
 
-      {/* ── HEADER ── */}
+      <PageHeader
+        title="Our Services"
+        subtitle="Browse our curated list of professional services and bundles"
+      />
+
+      {/* ── FILTERS ── */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">Our Services</h1>
-              <p className="text-gray-500 text-sm">Browse our curated list of professional services and bundles</p>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-end mb-4 gap-3">
             <div className="lg:w-2/3 flex flex-col lg:flex-row lg:items-end gap-3">
               {/* ── SEARCH INPUT with live backend indicator ── */}
               <div className="relative flex-1">
@@ -534,10 +565,12 @@ export default function GetService() {
               </div>
               {/* Count badge */}
               <div className="flex-shrink-0 text-sm text-gray-500 bg-primary-50 border border-primary-100 px-4 py-2.5 rounded-xl whitespace-nowrap">
-                {hasActiveSearch ? (
+                {hasActiveSearch || isFiltered ? (
                   <>
                     Found <span className="font-bold text-primary">
-                      {viewMode === "services" ? totalServices : filteredBundles.length}
+                      {viewMode === "services"
+                        ? (isFiltered ? filteredServices.length : totalServices)
+                        : filteredBundles.length}
                     </span> results
                     {hasActiveSearch && <span className="text-primary-400"> for "{debouncedSearch}"</span>}
                   </>
@@ -727,8 +760,8 @@ export default function GetService() {
                 ))}
               </div>
 
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
+              {/* Pagination Controls — hidden when category/subcategory filter is active */}
+              {!isFiltered && totalPages > 1 && (
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <span>Show</span>

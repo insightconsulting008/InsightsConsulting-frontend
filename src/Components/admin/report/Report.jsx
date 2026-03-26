@@ -2,6 +2,7 @@ import axiosInstance from "@src/providers/axiosInstance";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertCircle } from "lucide-react";
+import PageHeader from '../page-header/PageHeader';
 
 const formatDate = (d) =>
   new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -66,26 +67,15 @@ export default function Report() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Nav */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
-          <span className="font-bold text-primary text-sm">AdminPanel</span>
-          <span className="text-sm text-gray-400">Application History</span>
-        </div>
-      </div>
+      <PageHeader
+        title="Application History"
+        subtitle={`${pagination.total} total application${pagination.total !== 1 ? "s" : ""}`}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        {/* Page header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Application History</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {pagination.total} total application{pagination.total !== 1 ? "s" : ""}
-            </p>
-          </div>
-
-          {/* Search */}
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">
           <form className="flex items-center gap-2" onSubmit={handleSearch}>
             <div className={`flex items-center gap-2 h-9 px-3 rounded-lg border bg-white text-sm transition-all ${
               searchInput ? "border-primary ring-2 ring-primary/20" : "border-gray-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
@@ -147,80 +137,142 @@ export default function Report() {
             )}
           </div>
 
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-primary-50 border-b border-primary-100">
-                {["Application ID", "Applicant", "Service", "Assigned To", "Submitted", ""].map((h, i) => (
-                  <th
-                    key={i}
-                    className="px-4 py-3 text-left text-[11px] font-semibold text-primary-700 uppercase tracking-wider whitespace-nowrap first:pl-6 last:pr-6"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
-              ) : !data.length ? (
-                <tr>
-                  <td colSpan={6}>
-                    <div className="py-16 text-center">
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300">
-                        <Search className="w-5 h-5" />
-                      </div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        {search ? `No results for "${search}"` : "No applications yet."}
-                      </p>
-                      {search && (
-                        <button
-                          type="button"
-                          onClick={handleClear}
-                          className="mt-2 text-xs text-primary hover:text-primary-hover font-medium underline"
-                        >
-                          Clear search
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          {/* ── Desktop table (md+) ── */}
+          <div className="hidden md:block">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-primary-50 border-b border-primary-100">
+                  {["Application ID", "Applicant", "Service", "Assigned To", "Submitted", ""].map((h, i) => (
+                    <th
+                      key={i}
+                      className="px-4 py-3 text-left text-[11px] font-semibold text-primary-700 uppercase tracking-wider whitespace-nowrap first:pl-6 last:pr-6"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ) : (
-                data.map(app => (
-                  <tr
-                    key={app.applicationId}
-                    onClick={() => navigate(`/reports/${app.applicationId}`)}
-                    className="hover:bg-primary-50 cursor-pointer transition-colors"
-                  >
-                    <td className="px-4 py-3.5 pl-6">
-                      <span className="font-mono text-xs text-gray-500">{app.applicationId?.slice(0, 14)}…</span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <p className="font-medium text-gray-900">{app.user?.name || "—"}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{app.user?.email}</p>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <p className="font-medium text-gray-900 mb-1">{app.service?.name || "—"}</p>
-                      {app.service?.serviceType && (
-                        <span className={`inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${getServiceTypeClass(app.service.serviceType)}`}>
-                          {app.service.serviceType}
-                        </span>
-                      )}
-                    </td>
-                    <td className={`px-4 py-3.5 text-sm font-medium ${app.employee?.name ? "text-primary" : "text-gray-400"}`}>
-                      {app.employee?.name || "Unassigned"}
-                    </td>
-                    <td className="px-4 py-3.5 text-sm text-gray-500">
-                      {formatDate(app.createdAt)}
-                    </td>
-                    <td className="px-4 py-3.5 pr-6 text-right">
-                      <span className="text-gray-300 text-base group-hover:text-primary transition-colors">→</span>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {loading ? (
+                  Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
+                ) : !data.length ? (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="py-16 text-center">
+                        <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300">
+                          <Search className="w-5 h-5" />
+                        </div>
+                        <p className="text-sm text-gray-500 font-medium">
+                          {search ? `No results for "${search}"` : "No applications yet."}
+                        </p>
+                        {search && (
+                          <button type="button" onClick={handleClear} className="mt-2 text-xs text-primary hover:text-primary-hover font-medium underline">
+                            Clear search
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  data.map(app => (
+                    <tr
+                      key={app.applicationId}
+                      onClick={() => navigate(`/reports/${app.applicationId}`)}
+                      className="hover:bg-primary-50 cursor-pointer transition-colors"
+                    >
+                      <td className="px-4 py-3.5 pl-6">
+                        <span className="font-mono text-xs text-gray-500">{app.applicationId?.slice(0, 14)}…</span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <p className="font-medium text-gray-900">{app.user?.name || "—"}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{app.user?.email}</p>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <p className="font-medium text-gray-900 mb-1">{app.service?.name || "—"}</p>
+                        {app.service?.serviceType && (
+                          <span className={`inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${getServiceTypeClass(app.service.serviceType)}`}>
+                            {app.service.serviceType}
+                          </span>
+                        )}
+                      </td>
+                      <td className={`px-4 py-3.5 text-sm font-medium ${app.employee?.name ? "text-primary" : "text-gray-400"}`}>
+                        {app.employee?.name || "Unassigned"}
+                      </td>
+                      <td className="px-4 py-3.5 text-sm text-gray-500">
+                        {formatDate(app.createdAt)}
+                      </td>
+                      <td className="px-4 py-3.5 pr-6 text-right">
+                        <span className="text-gray-300 text-base">→</span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── Mobile cards (< md) ── */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="p-4 animate-pulse space-y-2">
+                  <div className="h-3.5 bg-primary-50 rounded w-1/2" />
+                  <div className="h-3 bg-primary-50 rounded w-3/4" />
+                  <div className="h-3 bg-primary-50 rounded w-2/5" />
+                </div>
+              ))
+            ) : !data.length ? (
+              <div className="py-14 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300">
+                  <Search className="w-5 h-5" />
+                </div>
+                <p className="text-sm text-gray-500 font-medium">
+                  {search ? `No results for "${search}"` : "No applications yet."}
+                </p>
+                {search && (
+                  <button type="button" onClick={handleClear} className="mt-2 text-xs text-primary font-medium underline block mx-auto">
+                    Clear search
+                  </button>
+                )}
+              </div>
+            ) : (
+              data.map(app => (
+                <div
+                  key={app.applicationId}
+                  onClick={() => navigate(`/reports/${app.applicationId}`)}
+                  className="p-4 hover:bg-primary-50/40 active:bg-primary-50 cursor-pointer transition-colors"
+                >
+                  {/* Header row */}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 text-sm truncate">{app.user?.name || "—"}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{app.user?.email}</p>
+                    </div>
+                    <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 mt-0.5">{formatDate(app.createdAt)}</span>
+                  </div>
+                  {/* Service row */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-sm text-gray-700 font-medium truncate flex-1">{app.service?.name || "—"}</p>
+                    {app.service?.serviceType && (
+                      <span className={`inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full shrink-0 ${getServiceTypeClass(app.service.serviceType)}`}>
+                        {app.service.serviceType}
+                      </span>
+                    )}
+                  </div>
+                  {/* Footer row */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-gray-400">Assigned to:</span>
+                      <span className={`text-xs font-medium ${app.employee?.name ? "text-primary" : "text-gray-400"}`}>
+                        {app.employee?.name || "Unassigned"}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-gray-300">{app.applicationId?.slice(0, 10)}…</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
 
           {/* Pagination */}
           {!loading && pagination.totalPages > 1 && (

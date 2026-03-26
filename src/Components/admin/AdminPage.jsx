@@ -4,6 +4,9 @@
 //  /admin-dashboard              → ADMIN_EXACT ✓
 //  /employees                    → ADMIN_EXACT ✓
 //  /services                     → ADMIN_EXACT ✓
+//  /add-blog                     → ADMIN_EXACT ✓
+//  /manage-blog                  → ADMIN_EXACT ✓
+//  /manage-blog/:slug            → ADMIN_PREFIX /manage-blog/ ✓
 //  /services/add                 → ADMIN_PREFIX /services/ ✓
 //  /services/bundle/add          → ADMIN_PREFIX /services/ ✓
 //  /services/:serviceId          → ADMIN_PREFIX /services/ ✓
@@ -21,13 +24,14 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminNav from "./Navbar/AdminNav";
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./admin-dashboard/AdminDashboard";
 import Employe from "./employee_repo/Employe";
 import Service from "./service/Service";
 import AddService from "./service/add-service/AddService";
 import AddBundleService from "./service/add-service/AddBundleService";
 import ViewService from "./service/get-service/ViewService";
 import EditService from "./service/get-service/EditService";
+import EditBundle from "./service/get-service/EditBundle";
 import OrderManagement from "./order-management/OrderManagement";
 import ViewOrder from "./order-management/ViewOrder";
 import PaymentSettings from "./payments/PaymentSettings";
@@ -39,6 +43,9 @@ import Profile from "./profile/Profile";
 import Users from "./users/Users";
 import PaymentHistory from "./payments/PaymentHistory";
 import EmailDashboard from "./sms/EmailDashboard";
+import CreateBlog from "./blog/CreateBlog";
+import BlogList from "./blog/BlogList";
+import ViewEditBlog from "./blog/ViewEditBlog";
 
 const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
   <>
@@ -61,6 +68,7 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
         <Route path="/services/add" element={<AddService />} />
         <Route path="/services/bundle/add" element={<AddBundleService />} />
         <Route path="/services/edit/:serviceId" element={<EditService />} />
+        <Route path="/bundle/edit/:bundleId" element={<EditBundle />} />
         <Route path="/services/:serviceId" element={<ViewService />} />
         <Route path="/amendment" element={<CreateAmendmentLink />} />
         <Route path="/users" element={<Users />} />
@@ -76,6 +84,11 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
         <Route path="/settings" element={<PaymentSettings />} />
         <Route path="/email-config" element={<EmailDashboard />} />
         <Route path="/Profile" element={<Profile/>} />
+
+        {/* ── Blog Management ── */}
+        <Route path="/add-blog"             element={<CreateBlog />} />
+        <Route path="/manage-blog"          element={<BlogList />} />
+        <Route path="/manage-blog/:slug"    element={<ViewEditBlog />} />
       </Routes>
     </div>
   </>

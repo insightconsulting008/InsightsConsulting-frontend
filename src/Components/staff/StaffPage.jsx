@@ -12,7 +12,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import StaffNav         from "./staff-navbar/StaffNav";
-import StaffDashboard   from "./StaffDashboard";
+import StaffDashboard   from "./staff-dashboard/StaffDashboard";
 import StaffMyService   from "./my-service/StaffMyService";
 import StaffViewDetails from "./my-service/StaffViewDetails";
 import "@src/App.css"

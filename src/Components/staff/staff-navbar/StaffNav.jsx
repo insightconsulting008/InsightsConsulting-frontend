@@ -76,6 +76,34 @@ const StaffNav = () => {
     { path: "/settings", icon: Settings, label: "Settings" },
   ];
 
+  // Function to check if a route is active (supports nested routes)
+  const isRouteActive = (routePath) => {
+    const currentPath = location.pathname;
+    
+    if (routePath === "/tasks") {
+      // Tasks active for /tasks and any /tasks/{id} paths
+      return currentPath === routePath || currentPath.startsWith('/tasks/');
+    }
+    
+    if (routePath === "/amendment") {
+      // Amendment active for /amendment and any /amendment/* paths
+      return currentPath === routePath || currentPath.startsWith('/amendment/');
+    }
+    
+    if (routePath === "/profile") {
+      // Profile active for /profile and any /profile/* paths
+      return currentPath === routePath || currentPath.startsWith('/profile/');
+    }
+    
+    if (routePath === "/settings") {
+      // Settings active for /settings and any /settings/* paths
+      return currentPath === routePath || currentPath.startsWith('/settings/');
+    }
+    
+    // For all other routes, check exact match
+    return currentPath === routePath;
+  };
+
   const handleNavClick = (path) => {
     setActiveRoute(path);
     navigate(path);
@@ -85,7 +113,13 @@ const StaffNav = () => {
   };
 
   useEffect(() => {
-    setActiveRoute(location.pathname);
+    // Update active route based on current path
+    const activeNavItem = navItems.find(item => isRouteActive(item.path));
+    if (activeNavItem) {
+      setActiveRoute(activeNavItem.path);
+    } else {
+      setActiveRoute(location.pathname);
+    }
   }, [location.pathname]);
 
   // Determine sidebar width based on open state and hover
@@ -137,7 +171,7 @@ const StaffNav = () => {
       {/* Navigation Items */}
       <nav className="py-6 overflow-y-auto flex-1 px-3">
         {navItems.map(({ path, icon: Icon, label }) => {
-          const isActive = activeRoute === path;
+          const isActive = isRouteActive(path);
           return (
             <button
               key={path}
@@ -230,7 +264,7 @@ const StaffNav = () => {
 
   // Mobile Top Navigation
   const MobileTopNav = () => (
-    <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-neutral-200 z-30 px-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-3">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -241,13 +275,13 @@ const StaffNav = () => {
         <span className="font-bold text-lg text-primary">Staff Portal</span>
       </div>
       <div className="flex items-center gap-2">
-        <div 
+        <div
           className="w-8 h-8 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center cursor-pointer hover:bg-primary-200 transition-colors"
           onClick={() => handleNavClick('/profile')}
         >
           {profile?.photoUrl ? (
-            <img 
-              src={profile.photoUrl} 
+            <img
+              src={profile.photoUrl}
               alt={profile.name}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -261,27 +295,28 @@ const StaffNav = () => {
             </span>
           )}
         </div>
+        <LogoutButton variant="icon" />
       </div>
     </div>
   );
 
   // Mobile Bottom Navigation
   const MobileBottomNav = () => (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-30 px-2 py-2 flex justify-around shadow-lg">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-neutral-200 z-30 px-2 flex items-center justify-around shadow-lg">
       {navItems.slice(0, 5).map(({ path, icon: Icon, label }) => {
-        const isActive = activeRoute === path;
+        const isActive = isRouteActive(path);
         return (
           <button
             key={path}
             onClick={() => handleNavClick(path)}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors cursor-pointer ${
               isActive
                 ? "text-primary"
                 : "text-neutral-500 hover:text-primary hover:bg-primary-50"
             }`}
           >
             <Icon size={20} />
-            <span className="text-[10px] mt-1 font-medium">{label}</span>
+            <span className="text-[10px] font-medium leading-tight">{label}</span>
           </button>
         );
       })}
@@ -324,7 +359,7 @@ const StaffNav = () => {
           {/* Menu Items */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
             {navItems.map(({ path, icon: Icon, label }) => {
-              const isActive = activeRoute === path;
+              const isActive = isRouteActive(path);
               return (
                 <button
                   key={path}
@@ -399,8 +434,8 @@ const StaffNav = () => {
         className={`hidden md:block transition-all duration-300 ${isOpen || isHovered ? "ml-64" : "ml-20"}`}
       />
 
-      {/* Main Content Spacer for Mobile */}
-      <div className="md:hidden pt-20 lg:pt-0" />
+      {/* Main Content Spacer for Mobile — matches MobileTopNav height (h-16 = 64px) */}
+      <div className="md:hidden h-16" />
     </>
   );
 };
