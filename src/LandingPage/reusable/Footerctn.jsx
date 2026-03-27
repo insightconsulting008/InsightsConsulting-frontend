@@ -7,7 +7,7 @@ const Footerctn = () => {
     <div>
       <section className="w-full pt-[64px] pb-[48px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-8">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
 
             {/* Text */}
             <div className="flex flex-col gap-[16px] text-center lg:text-left max-w-xl">

@@ -203,7 +203,7 @@ const ServiceContent = () => {
             {/* Box 1 — Insight Advantage */}
             {service.insightAdvantage && (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
-                <p className="text-[11px] font-bold tracking-widest uppercase text-red mb-5">
+                <p className="text-white text-sm font-semibold mb-5">
                   {service.insightAdvantage.intro}
                 </p>
                 <ul className="space-y-3">
@@ -220,7 +220,7 @@ const ServiceContent = () => {
             {/* Box 2 — Post Support (title varies per service) */}
             {service.postSupport?.length > 0 && (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
-                <p className="text-[11px] font-bold tracking-widest uppercase text-red mb-6">
+                <p className="text-white text-sm font-semibold mb-6">
                   {service.postSupportTitle || "Post-Filing Support"}
                 </p>
                 <ul className="space-y-4">
@@ -239,7 +239,7 @@ const ServiceContent = () => {
             {/* Box 3 — Common Mistakes We Help You Avoid */}
             {service.commonMistakes?.length > 0 && (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
-                <p className="text-[11px] font-bold tracking-widest uppercase text-red mb-6">
+                <p className="text-white text-sm font-semibold mb-6">
                   Common Mistakes We Help You Avoid
                 </p>
                 <ul className="space-y-4">
@@ -256,7 +256,7 @@ const ServiceContent = () => {
             {/* Box 4 — Strategic Insight */}
             {service.growthInsight && (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
-                <p className="text-[11px] font-bold tracking-widest uppercase text-red mb-4">
+                <p className="text-white text-sm font-semibold mb-4">
                   {service.growthInsight.heading}
                 </p>
                 <p className="text-white text-base lg:text-[17px] leading-relaxed">
@@ -309,7 +309,7 @@ const ServiceContent = () => {
             </div>
             <button
               onClick={() => setPopupOpen(true)}
-              className="flex-shrink-0 bg-red hover:bg-[#b01712] text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-colors"
+              className="flex-shrink-0 bg-red hover:bg-[#b01712] text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition-all duration-300"
             >
               Get Started Today
             </button>
@@ -412,7 +412,7 @@ const ServiceContent = () => {
             {/* CTA button */}
             <button
               onClick={() => setPopupOpen(true)}
-              className="inline-flex items-center gap-2.5 bg-red hover:bg-[#b01712] text-white font-bold text-base px-9 py-3.5 rounded-xl transition-all shadow-xl"
+              className="inline-flex items-center gap-2.5 bg-red hover:bg-[#b01712] text-white font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 shadow-xl"
             >
               {service.cta.buttonText}
             </button>

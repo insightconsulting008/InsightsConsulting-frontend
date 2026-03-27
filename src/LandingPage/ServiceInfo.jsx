@@ -156,7 +156,7 @@ const ServiceInfoSection = () => {
               </p>
               <button
                 onClick={() => setPopupOpen(true)}
-                className="flex-shrink-0 bg-white text-red text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="flex-shrink-0 bg-white text-[#D11C16] text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-[#e8e8e8] hover:text-[#D11C16] transition-all duration-300 whitespace-nowrap"
               >
                 Get Started
               </button>

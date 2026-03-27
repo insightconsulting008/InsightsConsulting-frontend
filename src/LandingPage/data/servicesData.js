@@ -631,9 +631,9 @@ export const servicesData = [
             name: "NGO Darpan Registration",
             tagline: "Get Your NGO Listed with NITI Aayog — Access Government Grants & CSR Funding",
             whyChoose: {
-              heading: "Why NGO Darpan Registration Matters",
+              heading: "Why NGO Darpan Registration is Important",
               paragraphs: [
-                "NGO Darpan is an online portal managed by NITI Aayog that assigns a unique ID to NGOs. It acts as the official gateway for NGOs to connect with government departments, apply for central funding, and participate in government schemes.",
+                "NGO Darpan is an online portal managed by NITI Aayog that creates a unique ID for NGOs. It acts as a gateway for NGOs to connect with Government departments and schemes.",
                 "At Insight Consulting, we handle end-to-end NGO Darpan registration — from documentation to submission — ensuring your NGO is correctly listed and ready to access government opportunities.",
               ],
             },
@@ -728,9 +728,9 @@ export const servicesData = [
             name: "Digital Signature Certificate (DSC)",
             tagline: "Secure, Legal & Mandatory — Get Your DSC Issued Quickly",
             whyChoose: {
-              heading: "Why DSC Is Essential",
+              heading: "Why DSC is Important for NGOs & Businesses",
               paragraphs: [
-                "A Digital Signature Certificate (DSC) is the electronic equivalent of a handwritten signature — legally recognized under the Information Technology Act, 2000. It is mandatory for filing documents with MCA, Income Tax, GST, NGO registrations, and government tenders.",
+                "A Digital Signature Certificate (DSC) is an electronic form of signature used to sign documents digitally and authenticate identity online. It is issued by government-authorized agencies under the framework of the Information Technology Act, 2000.",
                 "At Insight Consulting, we assist in quick and error-free DSC procurement — handling documentation, verification, and token issuance with minimal hassle.",
               ],
             },
@@ -825,18 +825,18 @@ export const servicesData = [
             name: "Udyam Registration (MSME)",
             tagline: "Unlock Government Benefits, Subsidies & Financial Support for Your Business",
             whyChoose: {
-              heading: "Why Udyam Registration Is a Business Advantage",
+              heading: "Why Udyam Registration Is Required",
               paragraphs: [
-                "Udyam Registration is not just a certificate — it is your gateway to credibility, funding, and government-backed growth opportunities. Registered MSMEs get access to collateral-free loans, government subsidies, priority in tenders, and protection under the MSME Act.",
+                "Udyam Registration is not just a certificate — it is your gateway to credibility, funding, and government-backed growth opportunities.",
                 "At Insight Consulting, we don't just register your business — we ensure you are strategically positioned to leverage every MSME benefit available.",
               ],
             },
             idealForHeading: "Who Should Register?",
             idealFor: [
-              "Manufacturers & service providers",
-              "Small traders and growing enterprises",
-              "Proprietorships, Partnerships, LLPs & Pvt Ltd companies",
-              "Startups seeking MSME benefits",
+              "Manufacturers",
+              "Service providers",
+              "Traders",
+              "Startups & growing enterprises",
             ],
             keyAdvantages: [
               {
@@ -941,14 +941,14 @@ export const servicesData = [
             whyChoose: {
               heading: "Why GST Registration Matters",
               paragraphs: [
-                "GST registration is not just a legal requirement — it is a critical step in building a compliant, scalable, and credible business. A GSTIN enables you to collect tax, claim Input Tax Credit, and operate across India without restrictions.",
-                "At Insight Consulting, we ensure your GST setup is accurate, strategic, and aligned with your business model — from structure selection to post-registration compliance.",
+                "GST registration is not just a legal requirement — it is a critical step in building a compliant, scalable, and credible business.",
+                "At Insight Consulting, we ensure your GST setup is accurate, strategic, and aligned with your business model.",
               ],
             },
             idealForHeading: "Who Needs GST Registration?",
             idealFor: [
               "Businesses with turnover exceeding ₹40L (Goods) / ₹20L (Services)",
-              "E-commerce sellers on platforms like Amazon, Flipkart",
+              "E-commerce sellers",
               "Businesses making interstate supply of goods",
               "Input Service Distributors & reverse charge entities",
             ],
@@ -956,12 +956,12 @@ export const servicesData = [
               {
                 iconKey: "shield",
                 title: "Legal Compliance",
-                desc: "Operate your business without regulatory risk or penalties.",
+                desc: "Operate your business without regulatory risks.",
               },
               {
                 iconKey: "wallet",
                 title: "Input Tax Credit (ITC)",
-                desc: "Reduce your tax cost by claiming eligible credits on purchases.",
+                desc: "Reduce your tax cost by claiming eligible credits.",
               },
               {
                 iconKey: "building",
@@ -971,7 +971,7 @@ export const servicesData = [
               {
                 iconKey: "trending",
                 title: "Expansion Opportunities",
-                desc: "Sell across India and to international markets without restrictions.",
+                desc: "Sell across India without restrictions.",
               },
             ],
             importantNote: null,
@@ -1050,7 +1050,7 @@ export const servicesData = [
             whyChoose: {
               heading: "Expanding Into India? Start with GST Compliance",
               paragraphs: [
-                "If you are a foreign business or individual supplying goods or services in India, GST registration is mandatory before commencing operations — even without a physical presence.",
+                "If you are a foreign business or individual supplying goods or services in India, GST registration is mandatory before commencing operations.",
                 "At Insight Consulting, we simplify the process and ensure you are fully compliant, structured, and ready to operate in India without delays.",
               ],
             },
@@ -1146,7 +1146,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Enter the Indian Market with Confidence",
-              tagline: "Enter the Indian market with confidence — compliant from Day 1.",
+              tagline: "Avoid compliance risks and operational delays — get your GST registration done right from Day 1.",
               buttonText: "Get GST as a Foreign Entity",
             },
           },
@@ -1158,15 +1158,16 @@ export const servicesData = [
             whyChoose: {
               heading: "Expand Your Business Without Expanding Costs",
               paragraphs: [
-                "A Virtual Office allows you to legally use a premium business address for GST registration — without renting a full-fledged office. This is ideal for startups, remote businesses, and companies expanding to new cities.",
-                "At Insight Consulting, we provide compliant virtual office solutions combined with end-to-end GST registration, ensuring your business is legally structured and operational from Day 1.",
+                "A Virtual Office allows you to legally use a premium business address for GST registration — without renting a full-fledged office.",
+                "At Insight Consulting, we provide compliant virtual office solutions along with GST registration, ensuring your business is legally structured and operational from Day 1.",
               ],
             },
             idealFor: [
-              "Startups and new businesses needing a business address",
-              "Businesses expanding to new cities without physical presence",
-              "E-commerce sellers requiring multi-state GST registration",
+              "Startups and new businesses",
+              "Businesses expanding to new cities",
+              "E-commerce sellers",
               "Service providers working remotely",
+              "Companies needing multi-state GST registration",
             ],
             keyAdvantages: [
               {
@@ -1253,7 +1254,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Start Anywhere. Grow Everywhere.",
-              tagline: "Start anywhere. Grow everywhere — the smart, compliant way.",
+              tagline: "Set up your business presence without heavy overheads — the smart way.",
               buttonText: "Set Up Virtual Office + GST",
             },
           },
@@ -1353,7 +1354,7 @@ export const servicesData = [
             growthInsight: null,
             cta: {
               headline: "Keep Your GST Clean & Compliant",
-              tagline: "Changed your business details? Don't forget to update your GST — stay compliant, stay protected.",
+              tagline: "Outdated GST data can cost you — update it the right way, at the right time.",
               buttonText: "Amend GST Registration",
             },
           },
@@ -1365,8 +1366,8 @@ export const servicesData = [
             whyChoose: {
               heading: "GST Cancelled? Don't Panic — Act Fast",
               paragraphs: [
-                "GST registration may get cancelled due to non-compliance, non-filing of returns, or other procedural issues. Without GST, you cannot issue valid invoices, collect tax, or claim Input Tax Credit.",
-                "At Insight Consulting, we specialize in quick, compliant, and strategic revocation support — getting your business back on track.",
+                "GST registration may get cancelled due to non-compliance, non-filing of returns, or other procedural issues. The good news? You can restore your GST registration through revocation — if handled correctly and within timelines.",
+                "At Insight Consulting, we specialize in quick, compliant, and strategic revocation support to get your business back on track.",
               ],
             },
             idealForHeading: "Common Reasons for GST Cancellation",
@@ -1451,7 +1452,7 @@ export const servicesData = [
             growthInsight: null,
             cta: {
               headline: "Get Your GST Back — Quickly & Correctly",
-              tagline: "Every day matters when your GST is cancelled — act fast with expert support.",
+              tagline: "Every day matters when your GST is cancelled.",
               buttonText: "Apply for GST Revocation",
             },
           },
@@ -1463,7 +1464,7 @@ export const servicesData = [
             whyChoose: {
               heading: "Received a GST Notice? Stay Calm — Respond Smartly",
               paragraphs: [
-                "A GST notice does not always mean a penalty — but how you respond determines the outcome. Incorrect or delayed replies can lead to penalties, ITC disallowance, and even cancellation of GST registration.",
+                "A GST notice does not always mean a penalty — but how you respond determines the outcome.",
                 "At Insight Consulting, we ensure your response is accurate, well-drafted, and strategically positioned to protect your business.",
               ],
             },
@@ -1560,7 +1561,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Respond Right. Stay Protected.",
-              tagline: "Don't let a GST notice disrupt your business — respond right, stay protected.",
+              tagline: "Don't let a GST notice disrupt your business.",
               buttonText: "Get Expert GST Notice Help",
             },
           },
@@ -1572,7 +1573,7 @@ export const servicesData = [
             whyChoose: {
               heading: "GST Returns — More Than Just Filing",
               paragraphs: [
-                "GST return filing directly impacts your tax liability, Input Tax Credit (ITC), and working capital. Incorrect or late filing can trigger notices, penalties, and ITC reversals that hurt your business.",
+                "GST return filing is not just a routine task — it directly impacts your tax liability, input tax credit (ITC), and working capital.",
                 "At Insight Consulting, we ensure your GST returns are accurate, optimized, and strategically aligned with your business operations.",
               ],
             },
@@ -1680,7 +1681,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay Compliant. Stay Confident.",
-              tagline: "Stay compliant. Stay confident. Outsource GST filing to experts.",
+              tagline: "Avoid errors, save taxes, and keep your business running smoothly.",
               buttonText: "File GST Returns",
             },
           },
@@ -1692,7 +1693,7 @@ export const servicesData = [
             whyChoose: {
               heading: "What is LUT & Why It Matters",
               paragraphs: [
-                "A Letter of Undertaking (LUT) allows exporters to export goods or services without paying GST upfront — no blocking of working capital, no need to claim refunds later. It is mandatory for all businesses making zero-rated supplies.",
+                "If you are an exporter of goods or services, filing a Letter of Undertaking (LUT) allows you to export without paying GST upfront — no blocking of working capital, no need to claim refunds later.",
                 "At Insight Consulting, we ensure your LUT is filed correctly and on time — so your exports remain smooth and tax-efficient.",
               ],
             },
@@ -1880,7 +1881,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Close Your GST Year the Right Way",
-              tagline: "Avoid errors. Stay compliant. Close your GST year the right way.",
+              tagline: "Avoid errors. Stay compliant. Gain clarity.",
               buttonText: "File GST Annual Return",
             },
           },
@@ -1890,7 +1891,7 @@ export const servicesData = [
             name: "GSTR-10 Filing (Final Return)",
             tagline: "Close Your GST Registration Properly — Avoid Future Notices & Penalties",
             whyChoose: {
-              heading: "What is GSTR-10 & Why It Is Mandatory",
+              heading: "What is GSTR-10?",
               paragraphs: [
                 "GSTR-10 is the Final Return that must be filed when your GST registration is cancelled or surrendered. It ensures a complete and proper exit from GST compliance. Many businesses ignore this step — but failure to file GSTR-10 attracts heavy late fees of ₹100 per day under both CGST and SGST.",
                 "At Insight Consulting, we ensure your GST exit is clean, complete, and free from future notices or complications.",
@@ -2124,8 +2125,8 @@ export const servicesData = [
             whyChoose: {
               heading: "Partnership Tax Filing — More Than Just Return Submission",
               paragraphs: [
-                "Filing Income Tax Return (ITR) for a partnership firm is not just compliance — it directly impacts partner remuneration, profit sharing, and overall tax liability. Incorrect structuring can lead to disallowance of partner salary and higher taxes.",
-                "At Insight Consulting, we ensure your partnership tax filing is accurate, optimized, and aligned with your business structure and partnership deed.",
+                "Filing Income Tax Return (ITR) for a partnership firm is not just compliance — it directly impacts partner remuneration, profit sharing, and tax liability.",
+                "At Insight Consulting, we ensure your partnership tax filing is accurate, optimized, and aligned with your business structure.",
               ],
             },
             idealForHeading: "Who Needs This Service?",
@@ -2223,7 +2224,7 @@ export const servicesData = [
             },
             cta: {
               headline: "File Smart. Distribute Better.",
-              tagline: "Don't let tax inefficiencies reduce your profits — file smart.",
+              tagline: "Don't let tax inefficiencies reduce your profits.",
               buttonText: "File Partnership ITR",
             },
           },
@@ -2235,7 +2236,7 @@ export const servicesData = [
             whyChoose: {
               heading: "Company Tax Filing — More Than Compliance",
               paragraphs: [
-                "Filing Income Tax Return for a company is about accurate reporting of financial performance, strategic tax planning, and building credibility with stakeholders. It is mandatory for all companies — regardless of profit or loss.",
+                "Filing Income Tax Return for a company is not just about meeting statutory requirements — it is about accurate reporting of financial performance, strategic tax planning, and building credibility with stakeholders.",
                 "At Insight Consulting, we ensure your company's tax filing is accurate, optimized, and aligned with your growth strategy.",
               ],
             },
@@ -2345,8 +2346,8 @@ export const servicesData = [
             whyChoose: {
               heading: "NGO & Trust Tax Filing — Beyond Compliance",
               paragraphs: [
-                "For Trusts and NGOs, Income Tax filing is about maintaining tax exemption status, ensuring proper utilization of funds, and building credibility with donors and authorities. Incorrect filing may result in loss of exemption and taxation of the entire income.",
-                "At Insight Consulting, we ensure your filings are accurate, compliant, and aligned with regulatory requirements — protecting your exemption and mission.",
+                "For Trusts and NGOs, Income Tax filing is not just about submission — it is about maintaining tax exemption status, ensuring proper utilization of funds, and building credibility with donors and authorities.",
+                "At Insight Consulting, we ensure your filings are accurate, compliant, and aligned with regulatory requirements.",
               ],
             },
             idealForHeading: "Who Needs This Service?",
@@ -2457,8 +2458,8 @@ export const servicesData = [
             whyChoose: {
               heading: "Missed or Incorrect ITR? You Still Have a Chance",
               paragraphs: [
-                "The Updated Return (ITR-U) allows taxpayers to correct errors or report missed income — even after the original due date has passed. Filing proactively reduces the risk of penalties and departmental notices.",
-                "At Insight Consulting, we help you regularize past filings safely and strategically, ensuring complete and correct disclosure.",
+                "The Updated Return (ITR-U) allows taxpayers to correct errors or report missed income — even after the original due date has passed.",
+                "At Insight Consulting, we help you regularize past filings safely and strategically, reducing the risk of penalties and notices.",
               ],
             },
             idealForHeading: "Who Should File ITR-U?",
@@ -2551,7 +2552,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Fix It Before It Becomes a Problem",
-              tagline: "Fix it before it becomes a problem — correct your return proactively.",
+              tagline: "Don't wait for a notice — correct your return proactively.",
               buttonText: "File Updated Return (ITR-U)",
             },
           },
@@ -2563,8 +2564,8 @@ export const servicesData = [
             whyChoose: {
               heading: "Business Taxation — Beyond Filing",
               paragraphs: [
-                "Business taxation is not just about submitting returns — it directly impacts your profitability, cash flow, and growth potential. Whether you are a proprietorship, partnership, LLP, or company — tax strategy must be built into your operations.",
-                "At Insight Consulting, we offer end-to-end business taxation services combining compliance, planning, and strategic advisory.",
+                "Business taxation is not just about submitting returns — it directly impacts your profitability, cash flow, and growth potential.",
+                "At Insight Consulting, we offer end-to-end business taxation services that combine compliance, planning, and strategic advisory.",
               ],
             },
             idealForHeading: "Who Needs This Service?",
@@ -2678,8 +2679,8 @@ export const servicesData = [
             whyChoose: {
               heading: "What is TAN & Why It Matters",
               paragraphs: [
-                "TAN (Tax Deduction and Collection Account Number) is mandatory for businesses deducting or collecting tax at source (TDS/TCS). Without TAN, you cannot legally deduct TDS or file TDS returns.",
-                "At Insight Consulting, we ensure your TAN registration and TDS compliance are smooth, accurate, and fully compliant — from registration through ongoing quarterly filing.",
+                "TAN (Tax Deduction and Collection Account Number) is a mandatory requirement for businesses deducting or collecting tax at source (TDS/TCS). Without TAN: You cannot deduct TDS legally, you cannot file TDS returns, and you may face penalties.",
+                "At Insight Consulting, we ensure your TAN registration and compliance are smooth, accurate, and fully compliant.",
               ],
             },
             idealForHeading: "Who Needs TAN?",
@@ -2770,7 +2771,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay TDS Compliant — Stay Protected",
-              tagline: "Avoid TDS penalties and compliance risks — get expert TAN and TDS support.",
+              tagline: "Avoid penalties and compliance risks — get your TAN and TDS handled by experts.",
               buttonText: "Apply for TAN & TDS Setup",
             },
           },
@@ -2782,7 +2783,7 @@ export const servicesData = [
             whyChoose: {
               heading: "TDS Compliance — Critical for Every Business",
               paragraphs: [
-                "Tax Deducted at Source (TDS) is a key compliance requirement. Incorrect deduction or delayed filing can lead to penalties of ₹200 per day under Section 234E, disallowance of expenses, and notices.",
+                "Tax Deducted at Source (TDS) is a key compliance requirement that ensures timely tax collection by the government. But incorrect deduction or delayed filing can lead to penalties, interest, and disallowance of expenses.",
                 "At Insight Consulting, we ensure your TDS compliance is accurate, timely, and fully aligned with regulations.",
               ],
             },
@@ -2886,7 +2887,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay Compliant. Stay Penalty-Free.",
-              tagline: "Don't let TDS errors cost your business — file accurately, on time.",
+              tagline: "Don't let TDS errors cost your business.",
               buttonText: "File TDS Returns",
             },
           },
@@ -2904,7 +2905,7 @@ export const servicesData = [
             whyChoose: {
               heading: "Sending Money Abroad? Ensure Proper Compliance",
               paragraphs: [
-                "When making payments to non-residents, Form 15CA & 15CB are mandatory for most foreign remittances — ensuring correct TDS deduction and proper reporting to the Income Tax Department. Banks require these before processing international transfers.",
+                "When making payments to non-residents, compliance with Income Tax regulations is critical. Form 15CA & 15CB are mandatory for most foreign remittances to ensure correct tax deduction (TDS) and proper reporting to the Income Tax Department.",
                 "At Insight Consulting, we ensure your remittances are fully compliant, tax-efficient, and processed without delays.",
               ],
             },
@@ -3000,7 +3001,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Send Money Abroad — The Right Way",
-              tagline: "Send money abroad the right way — avoid delays, penalties, and errors.",
+              tagline: "Avoid delays, penalties, and errors.",
               buttonText: "File Form 15CA & 15CB",
             },
           },
@@ -3018,8 +3019,8 @@ export const servicesData = [
             whyChoose: {
               heading: "Received an Income Tax Notice? Stay Calm — Act Strategically",
               paragraphs: [
-                "An Income Tax notice does not always mean a penalty — but ignoring or mishandling it can create serious consequences including penalties, interest, and further scrutiny.",
-                "At Insight Consulting, we ensure your notice is analyzed correctly, responded to professionally, and resolved efficiently.",
+                "An Income Tax notice does not always mean a penalty — but ignoring or mishandling it can create serious consequences.",
+                "At Insight Consulting, we ensure your notice is analyzed correctly, responded professionally, and resolved efficiently.",
               ],
             },
             idealForHeading: "Received an Income Tax Notice?",
@@ -3114,7 +3115,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Respond Right. Stay Protected.",
-              tagline: "Don't let a notice escalate — respond right and stay protected.",
+              tagline: "Don't let a notice escalate into a problem.",
               buttonText: "Handle IT Notice",
             },
           },
@@ -3236,7 +3237,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay Compliant. Stay Credible.",
-              tagline: "Avoid penalties and build a strong corporate image — compliance done right.",
+              tagline: "Avoid penalties and build a strong corporate image.",
               buttonText: "Get MCA Compliance Support",
             },
           },
@@ -3343,7 +3344,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay Compliant. Stay Growth-Ready.",
-              tagline: "Focus on your business — we'll handle your OPC compliance.",
+              tagline: "Focus on your business — we'll handle your compliance.",
               buttonText: "Get OPC Compliance Support",
             },
           },
@@ -3355,7 +3356,7 @@ export const servicesData = [
             whyChoose: {
               heading: "LLP Compliance — Simple but Critical",
               paragraphs: [
-                "LLPs enjoy lower compliance compared to companies, but timely filings are mandatory. Failure to comply leads to heavy penalties of ₹100 per day with no upper limit, and the LLP may be marked inactive.",
+                "LLPs enjoy lower compliance compared to companies, but timely filings are mandatory. Failure to comply can lead to heavy penalties (₹100 per day with no upper limit), LLP being marked inactive, and difficulty in closure or restructuring.",
                 "At Insight Consulting, we ensure your LLP remains fully compliant, organized, and penalty-free.",
               ],
             },
@@ -3449,7 +3450,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Stay Compliant. Stay Stress-Free.",
-              tagline: "Avoid penalties and last-minute rush — let experts handle your LLP compliance.",
+              tagline: "Avoid penalties and last-minute rush.",
               buttonText: "Get LLP Compliance Support",
             },
           },
@@ -3467,21 +3468,22 @@ export const servicesData = [
             whyChoose: {
               heading: "Planning to Change Your Company Name?",
               paragraphs: [
-                "Your company name is your brand identity — and sometimes it needs to evolve with your business. Whether for rebranding, expansion, or strategic repositioning, changing your company name requires proper legal compliance under MCA.",
+                "Your company name is your brand identity — and sometimes, it needs to evolve with your business. Whether it's for rebranding, expansion, or strategic repositioning, changing your company name requires proper legal compliance under MCA.",
                 "At Insight Consulting, we ensure your name change is smooth, compliant, and strategically aligned with your business vision.",
               ],
             },
             idealFor: [
-              "Companies rebranding or repositioning",
-              "Businesses with change in activity or focus",
-              "Post-merger restructuring",
-              "Companies with trademark conflicts",
+              "Business rebranding or repositioning",
+              "Change in business activity",
+              "Mergers or restructuring",
+              "Trademark conflicts",
+              "Expanding into new markets",
             ],
             keyAdvantages: [
               {
                 iconKey: "award",
                 title: "Stronger Brand Identity",
-                desc: "Align your name with your current business vision and market positioning.",
+                desc: "Align your name with your current business vision.",
               },
               {
                 iconKey: "trending",
@@ -3492,11 +3494,6 @@ export const servicesData = [
                 iconKey: "building",
                 title: "Legal Recognition",
                 desc: "Official name change recognized across all regulatory platforms.",
-              },
-              {
-                iconKey: "shield",
-                title: "Complete Post-Change Support",
-                desc: "PAN, GST, bank, and all regulatory updates handled together.",
               },
             ],
             importantNote: null,
@@ -3516,12 +3513,12 @@ export const servicesData = [
                 "MOA & AOA",
                 "Board resolution",
                 "Shareholder resolution",
-                "Proposed names (at least 2 options)",
+                "Proposed names (options)",
               ],
             },
             process: [
-              "Name availability check & strategic selection",
-              "Drafting board and shareholder resolutions",
+              "Name availability check & strategy",
+              "Drafting resolutions",
               "Filing name approval application",
               "MCA filings (MGT-14, INC-24)",
               "Obtaining new Certificate of Incorporation",
@@ -3576,7 +3573,7 @@ export const servicesData = [
               heading: "Changing Your Business Address? Do It the Right Way",
               paragraphs: [
                 "Your registered office is your company's official legal address — used for all government communication and compliance. Any change must be updated with MCA and other authorities promptly to avoid penalties and disruptions.",
-                "At Insight Consulting, we ensure your address change is smooth, compliant, and hassle-free — from simple city-level changes to complex inter-state transitions.",
+                "At Insight Consulting, we ensure your address change is smooth, compliant, and hassle-free.",
               ],
             },
             idealFor: [
@@ -3774,7 +3771,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Ensure a Clean & Compliant Exit",
-              tagline: "Ensure a clean and compliant director exit — no loose ends.",
+              tagline: "Avoid complications — handle director removal professionally.",
               buttonText: "Manage Director Exit",
             },
           },
@@ -3887,7 +3884,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Don't Let Your DIN Get Deactivated",
-              tagline: "A simple filing can prevent major compliance issues. Complete your DIN eKYC with expert support today.",
+              tagline: "A simple filing can prevent major compliance issues.",
               buttonText: "File DIN eKYC",
             },
           },
@@ -3899,7 +3896,7 @@ export const servicesData = [
             whyChoose: {
               heading: "DIN Deactivated? Act Quickly",
               paragraphs: [
-                "If your DIN is marked as 'Deactivated due to non-filing of KYC', you cannot act as a director, sign MCA documents, or participate in company compliance. This can disrupt company filings, business decisions, and regulatory approvals.",
+                "If your DIN (Director Identification Number) is marked as 'Deactivated due to non-filing of KYC', you cannot act as a director, sign MCA documents, or participate in company compliance.",
                 "At Insight Consulting, we help you reactivate your DIN quickly and correctly — ensuring full compliance and minimal disruption.",
               ],
             },
@@ -3913,33 +3910,29 @@ export const servicesData = [
               {
                 iconKey: "cycle",
                 title: "Restore Legal Authority",
-                desc: "Regain your ability to act as a director and sign MCA documents.",
+                desc: "Regain your ability to act as a director and sign documents.",
               },
               {
                 iconKey: "shield",
                 title: "Avoid Compliance Disruption",
-                desc: "Inactive DIN can delay company filings and regulatory approvals.",
+                desc: "Inactive DIN can delay:",
+                bullets: ["Company filings", "Business decisions", "Regulatory approvals"],
               },
               {
                 iconKey: "building",
                 title: "Maintain Professional Credibility",
                 desc: "Active DIN is essential for maintaining your role in business entities.",
               },
-              {
-                iconKey: "bolt",
-                title: "Fast Reactivation",
-                desc: "We handle the process quickly — minimizing the period of inactivity.",
-              },
             ],
             importantNote:
-              "Government fee for DIN reactivation: ₹5,000 (applicable when KYC is not filed within the due date).",
+              "Government fee for reactivation: ₹5,000 (applicable when KYC is not filed within due date).",
             requirements: {
               eligibility: {
                 heading: "Common Reasons for Deactivation",
                 items: [
-                  "Non-filing of DIR-3 KYC by 30th September",
+                  "Non-filing of DIR-3 KYC",
                   "Missing annual DIN eKYC deadline",
-                  "Incorrect or incomplete KYC details previously submitted",
+                  "Incorrect or incomplete KYC details",
                 ],
               },
               documents: [
@@ -3954,7 +3947,7 @@ export const servicesData = [
               "Document collection & validation",
               "Preparation of DIR-3 KYC form",
               "DSC-based filing with MCA",
-              "Payment of government reactivation fee",
+              "Payment of government fee",
               "Reactivation confirmation",
             ],
             processSummary: "Fast. Accurate. Fully compliant.",
@@ -3993,7 +3986,7 @@ export const servicesData = [
             },
             cta: {
               headline: "Get Your DIN Back — Without Delay",
-              tagline: "Don't let a deactivated DIN disrupt your business — restore it today.",
+              tagline: "Don't let a deactivated DIN disrupt your business.",
               buttonText: "Reactivate DIN",
             },
           },
