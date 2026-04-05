@@ -1,64 +1,59 @@
 /**
- * PageHeader.jsx  —  THE single shared header for every STAFF page.
- *
- * Props
- *   title        {string}              Page title               (required)
- *   subtitle     {string}              Muted sub-line           (optional)
- *   breadcrumbs  [{label,href}]        Trail above title        (optional)
- *   onBack       {fn}                  Shows ← button           (optional)
- *   onRefresh    {fn}                  Shows ↺ button           (optional)
- *   refreshing   {boolean}             Spins the ↺ icon         (optional)
- *   actions      {ReactNode}           Right-side slot          (optional)
+ * PageHeader.jsx  —  Shared header for every STAFF page.
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Bell, ArrowLeft, RefreshCw, X, CheckCheck,
-  ChevronRight, ArrowRight, AlertCircle,
+  ChevronRight, ExternalLink, AlertCircle, CheckCircle,
+  FileText, UserPlus, CreditCard,
 } from 'lucide-react';
 import axiosInstance from '@src/providers/axiosInstance';
 
-/* ── design tokens ─────────────────────────────────────────────── */
-const T = {
-  H: 64,
-  panelW: 420,
-  border: '#ebebf3',
-  white: '#ffffff',
-  subtle: '#fafafa',
-  n900: '#1a1a2e', n700: '#424260', n500: '#7878a0',
-  n400: '#a8a8c0', n200: '#e4e4ec', n100: '#f1f1f5',
-  primary:    'var(--color-primary)',
-  primary50:  'var(--primary-50,  #fef2f2)',
-  primary100: 'var(--primary-100, #fee2e2)',
-  primary200: 'var(--primary-200, #fecaca)',
-  success: '#059669', error: '#be123c',
-  errorBg: '#fff1f2', errorBorder: '#ffe4e6',
+/* ─── design tokens ────────────────────────────────────────────── */
+const P = {
+  primary: 'var(--color-primary)',
+  p50:     'var(--primary-50,  #fef2f2)',
+  p100:    'var(--primary-100, #fee2e2)',
+  p200:    'var(--primary-200, #fecaca)',
 };
+const C = {
+  white:  '#ffffff',
+  border: '#e8e8f0',
+  n900:   '#1a1a2e',
+  n700:   '#424260',
+  n500:   '#7878a0',
+  n400:   '#a8a8c0',
+  n200:   '#e4e4ec',
+  n100:   '#f1f1f5',
+  n50:    '#f8f8fa',
+  ok:     '#059669',
+  errTxt: '#be123c',
+  errBg:  '#fff1f2',
+  errBdr: '#fecaca',
+};
+const H = 64;
 
-/* ── inject CSS keyframes once ─────────────────────────────────── */
-const STYLE_ID = '__sph__';
+/* ─── inject keyframes once ─────────────────────────────────────── */
+const STYLE_ID = '__sph3__';
 function injectStyles() {
   if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
   const s = document.createElement('style');
   s.id = STYLE_ID;
   s.textContent = `
-    @keyframes sph-down  {from{transform:translateY(-5px);opacity:0}to{transform:translateY(0);opacity:1}}
-    @keyframes sph-spin  {to{transform:rotate(360deg)}}
-    @keyframes sph-pulse {0%,100%{opacity:1}50%{opacity:.45}}
-    @keyframes sph-bell  {
-      0%,100%{transform:rotate(0)}   15%{transform:rotate(14deg)}
-      30%{transform:rotate(-10deg)}  45%{transform:rotate(8deg)}
-      60%{transform:rotate(-6deg)}   75%{transform:rotate(3deg)}
+    @keyframes sph-slide { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes sph-spin   { to{transform:rotate(360deg)} }
+    @keyframes sph-pulse  { 0%,100%{opacity:1} 50%{opacity:.35} }
+    @keyframes sph-pop    { 0%{transform:scale(0)} 65%{transform:scale(1.3)} 100%{transform:scale(1)} }
+    @keyframes sph-bell   {
+      0%,100%{transform:rotate(0)} 20%{transform:rotate(14deg)}
+      40%{transform:rotate(-10deg)} 60%{transform:rotate(6deg)} 80%{transform:rotate(-3deg)}
     }
-    @keyframes sph-pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
-    @media(max-width:480px){.sph-sub{display:none!important}}
-    @media(max-width:380px){.sph-crumbs{display:none!important}}
-    @media(max-width:767px){.sph-header{top:64px!important}}
   `;
   document.head.appendChild(s);
 }
 
-/* ── helpers ──────────────────────────────────────────────────── */
-function ago(d) {
+/* ─── helpers ───────────────────────────────────────────────────── */
+function timeAgo(d) {
   if (!d) return '';
   const m = Math.floor((Date.now() - new Date(d)) / 60000);
   if (m < 1)  return 'Just now';
@@ -68,69 +63,206 @@ function ago(d) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-/* ── notification type icon ───────────────────────────────────── */
-function NIcon({ title = '', read }) {
-  const c = read ? T.n400 : T.primary;
-  const t = title.toLowerCase();
-  if (t.includes('assign'))
-    return <svg width="14" height="14" fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>;
-  if (t.includes('updat') || t.includes('amend') || t.includes('edit'))
-    return <svg width="14" height="14" fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>;
-  if (t.includes('pay') || t.includes('amount'))
-    return <svg width="14" height="14" fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>;
-  return <svg width="14" height="14" fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>;
+function fmtClock(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleTimeString('en-IN', {
+    hour: '2-digit', minute: '2-digit', hour12: true,
+  });
 }
 
-/* ── icon button ──────────────────────────────────────────────── */
-function Btn({ children, label, onClick, disabled, active }) {
+function fmtDateLabel(d) {
+  if (!d) return '';
+  const dt    = new Date(d);
+  const today = new Date();
+  const yest  = new Date(today); yest.setDate(yest.getDate() - 1);
+  const same  = (a, b) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth()    === b.getMonth()    &&
+    a.getDate()     === b.getDate();
+  if (same(dt, today)) return 'Today';
+  if (same(dt, yest))  return 'Yesterday';
+  return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function groupByDate(items) {
+  const groups = [];
+  const seen   = {};
+  items.forEach(n => {
+    const label = fmtDateLabel(n.createdAt);
+    if (!seen[label]) { seen[label] = true; groups.push({ label, items: [] }); }
+    groups[groups.length - 1].items.push(n);
+  });
+  return groups;
+}
+
+/* ─── notification type → icon + colour ─────────────────────────── */
+function notifMeta(title = '') {
+  const t = title.toLowerCase();
+  if (t.includes('assign'))
+    return { Icon: UserPlus,  bg: '#eff6ff', iconColor: '#3b82f6' };
+  if (t.includes('pay') || t.includes('amount'))
+    return { Icon: CreditCard, bg: '#f0fdf4', iconColor: '#16a34a' };
+  if (t.includes('upload') || t.includes('document'))
+    return { Icon: FileText,   bg: P.p50,    iconColor: P.primary };
+  return { Icon: Bell, bg: C.n100, iconColor: C.n400 };
+}
+
+/* ─── header icon button ────────────────────────────────────────── */
+function IconBtn({ children, label, onClick, disabled, active }) {
   const [hov, setHov] = useState(false);
-  const on = active || hov;
+  const lit = active || hov;
   return (
-    <button aria-label={label} title={label} onClick={onClick} disabled={disabled}
-      onMouseEnter={() => { if (!disabled) setHov(true); }}
+    <button
+      aria-label={label} title={label} onClick={onClick} disabled={disabled}
+      onMouseEnter={() => !disabled && setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        width: 34, height: 34, borderRadius: 9, flexShrink: 0, padding: 0,
-        border: `1.5px solid ${on ? T.primary : T.n200}`,
-        background: on ? T.primary50 : 'transparent',
-        color: on ? T.primary : T.n500,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? .45 : 1,
-        transition: 'border-color 140ms,background 140ms,color 140ms',
-        fontFamily: 'inherit',
-      }}>
+        width: 34, height: 34, borderRadius: 9, padding: 0, flexShrink: 0,
+        border:      `1.5px solid ${lit ? P.primary : C.n200}`,
+        background:  lit ? P.p50 : 'transparent',
+        color:       lit ? P.primary : C.n500,
+        display:     'flex', alignItems: 'center', justifyContent: 'center',
+        cursor:      disabled ? 'not-allowed' : 'pointer',
+        opacity:     disabled ? 0.45 : 1,
+        transition:  'border-color 130ms, background 130ms, color 130ms',
+        fontFamily:  'inherit',
+      }}
+    >
       {children}
     </button>
   );
 }
 
-/* ── skeleton row ─────────────────────────────────────────────── */
-function SkRow({ i }) {
-  const d = i * 60;
+/* ─── skeleton ─────────────────────────────────────────────────── */
+function SkRow({ delay = 0 }) {
   return (
-    <div style={{ display: 'flex', gap: 12, padding: '14px 20px', borderBottom: '1px solid #f5f5fa' }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: T.n100, animation: `sph-pulse 1.5s ${d}ms ease-in-out infinite` }} />
+    <div style={{ display: 'flex', gap: 12, padding: '14px 16px', borderBottom: `1px solid ${C.border}` }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: C.n100, animation: `sph-pulse 1.4s ${delay}ms ease-in-out infinite` }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
-        <div style={{ height: 11, width: '52%', borderRadius: 6, background: T.n100, animation: `sph-pulse 1.5s ${d + 80}ms ease-in-out infinite` }} />
-        <div style={{ height: 10, width: '82%', borderRadius: 6, background: T.n100, animation: `sph-pulse 1.5s ${d + 160}ms ease-in-out infinite` }} />
-        <div style={{ height: 10, width: '32%', borderRadius: 6, background: T.n100, animation: `sph-pulse 1.5s ${d + 240}ms ease-in-out infinite` }} />
+        <div style={{ height: 11, width: '42%', borderRadius: 5, background: C.n100, animation: `sph-pulse 1.4s ${delay + 80}ms ease-in-out infinite` }} />
+        <div style={{ height: 10, width: '72%', borderRadius: 5, background: C.n100, animation: `sph-pulse 1.4s ${delay + 160}ms ease-in-out infinite` }} />
       </div>
     </div>
   );
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   NOTIFICATION PANEL  (staff — uses employeeId)
+   NOTIFICATION ITEM — isolated component so props are always fresh,
+   hover handlers never use stale closures.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function NotifItem({ notif, onMarkRead, isBusy, isLast }) {
+  const isUnread = !notif.isRead;
+  const { Icon, bg, iconColor } = notifMeta(notif.title);
+
+  return (
+    <div style={{
+      display: 'flex', gap: 12, padding: '13px 16px',
+      borderBottom: isLast ? 'none' : `1px solid ${C.border}`,
+      background: isUnread ? P.p50 : C.white,
+      position: 'relative',
+    }}>
+      {/* unread left accent */}
+      {isUnread && (
+        <div style={{
+          position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+          background: P.primary, borderRadius: '0 2px 2px 0',
+        }} />
+      )}
+
+      {/* icon bubble */}
+      <div style={{
+        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+        background: isUnread ? bg : C.n100,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Icon size={16} style={{ color: isUnread ? iconColor : C.n400 }} />
+      </div>
+
+      {/* body */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* title row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 0 }}>
+          <p style={{
+            margin: 0, fontSize: 13, lineHeight: 1.4,
+            fontWeight: isUnread ? 700 : 500,
+            color: isUnread ? C.n900 : C.n700,
+          }}>
+            {notif.title}
+          </p>
+          {/* time: relative + absolute clock */}
+          <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 48 }}>
+            <p style={{ margin: 0, fontSize: 10, color: C.n500, whiteSpace: 'nowrap' }}>
+              {timeAgo(notif.createdAt)}
+            </p>
+            <p style={{ margin: '1px 0 0', fontSize: 10, color: C.n400, whiteSpace: 'nowrap' }}>
+              {fmtClock(notif.createdAt)}
+            </p>
+          </div>
+        </div>
+
+        {/* description */}
+        {notif.description && (
+          <p style={{
+            margin: '2px 0 7px', fontSize: 12, color: C.n500, lineHeight: 1.55,
+          }}>
+            {notif.description}
+          </p>
+        )}
+
+        {/* actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {notif.redirectUrl && (
+            <a
+              href={notif.redirectUrl}
+              onClick={() => isUnread && onMarkRead(notif.notificationId)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 11, fontWeight: 700, color: P.primary, textDecoration: 'none',
+              }}
+            >
+              View <ExternalLink size={10} />
+            </a>
+          )}
+
+          {isUnread ? (
+            <button
+              onClick={() => onMarkRead(notif.notificationId)}
+              disabled={isBusy}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                background: 'none', border: 'none', padding: 0,
+                fontSize: 11, fontWeight: 600, color: C.n400,
+                cursor: isBusy ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              {isBusy
+                ? <RefreshCw size={10} style={{ animation: 'sph-spin .6s linear infinite' }} />
+                : <CheckCheck size={10} />}
+              {isBusy ? 'Marking…' : 'Mark read'}
+            </button>
+          ) : (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: C.ok, fontWeight: 600 }}>
+              <CheckCircle size={10} /> Read
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTIFICATION PANEL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 function NotifPanel({ open, onClose, onCountChange }) {
   const [items,      setItems]      = useState([]);
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState(null);
-  const [busy,       setBusy]       = useState(new Set());
+  const [busyIds,    setBusyIds]    = useState(new Set());
   const [markingAll, setMarkingAll] = useState(false);
-  const ref   = useRef(null);
-  const empId = localStorage.getItem('employeeId');
+  const [tab,        setTab]        = useState('all');
+  const panelRef = useRef(null);
+  const empId    = localStorage.getItem('employeeId');
 
   const load = useCallback(async () => {
     if (!empId) return;
@@ -143,176 +275,275 @@ function NotifPanel({ open, onClose, onCountChange }) {
         onCountChange?.(list.filter(n => !n.isRead).length);
       }
     } catch { setError('Could not load notifications.'); }
-    finally { setLoading(false); }
+    finally   { setLoading(false); }
   }, [empId, onCountChange]);
 
   useEffect(() => { if (open) load(); }, [open, load]);
 
   useEffect(() => {
     if (!open) return;
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
-    const t = setTimeout(() => document.addEventListener('mousedown', h), 15);
-    return () => { clearTimeout(t); document.removeEventListener('mousedown', h); };
+    const fn = (e) => { if (panelRef.current && !panelRef.current.contains(e.target)) onClose(); };
+    const t  = setTimeout(() => document.addEventListener('mousedown', fn), 20);
+    return () => { clearTimeout(t); document.removeEventListener('mousedown', fn); };
   }, [open, onClose]);
 
   useEffect(() => {
-    const h = e => { if (e.key === 'Escape' && open) onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
+    const fn = (e) => { if (e.key === 'Escape' && open) onClose(); };
+    document.addEventListener('keydown', fn);
+    return () => document.removeEventListener('keydown', fn);
   }, [open, onClose]);
 
-  const markOne = async id => {
-    if (busy.has(id)) return;
-    setBusy(p => new Set([...p, id]));
+  /* mark single — fresh state, no stale closure */
+  const markOne = useCallback(async (id) => {
+    if (busyIds.has(id)) return;
+    setBusyIds(prev => new Set([...prev, id]));
     try {
       await axiosInstance.put(`/notifications/read/${id}`);
-      setItems(p => {
-        const next = p.map(n => n.notificationId === id ? { ...n, isRead: true } : n);
+      setItems(prev => {
+        const next = prev.map(n => n.notificationId === id ? { ...n, isRead: true } : n);
         onCountChange?.(next.filter(n => !n.isRead).length);
         return next;
       });
     } catch { /* silent */ }
-    finally { setBusy(p => { const s = new Set(p); s.delete(id); return s; }); }
-  };
+    finally { setBusyIds(prev => { const s = new Set(prev); s.delete(id); return s; }); }
+  }, [busyIds, onCountChange]);
 
-  const markAll = async () => {
+  const markAll = useCallback(async () => {
     const unread = items.filter(n => !n.isRead);
     if (!unread.length || markingAll) return;
     setMarkingAll(true);
     try {
       await Promise.all(unread.map(n => axiosInstance.put(`/notifications/read/${n.notificationId}`)));
-      setItems(p => { const next = p.map(n => ({ ...n, isRead: true })); onCountChange?.(0); return next; });
-    } catch { /* silent */ }
+      setItems(prev => { const next = prev.map(n => ({ ...n, isRead: true })); onCountChange?.(0); return next; });
+    } catch { await load(); }
     finally { setMarkingAll(false); }
-  };
+  }, [items, markingAll, onCountChange, load]);
 
-  const unread = items.filter(n => !n.isRead).length;
+  const unreadCount = items.filter(n => !n.isRead).length;
+  const visible     = tab === 'unread' ? items.filter(n => !n.isRead) : items;
+  const groups      = groupByDate(visible);
 
   return (
     <>
-      <div aria-hidden="true" onClick={onClose}
+      {/* backdrop */}
+      <div
+        aria-hidden="true" onClick={onClose}
         style={{
           position: 'fixed', inset: 0, zIndex: 49,
-          background: 'rgba(10,10,30,.30)',
-          backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
+          background: 'rgba(0,0,0,.22)',
+          backdropFilter: 'blur(2px)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity 260ms ease',
+          transition: 'opacity 240ms ease',
         }}
       />
-      <div ref={ref} role="dialog" aria-label="Notifications" aria-modal="true"
-        style={{
-          position: 'fixed', top: 0, right: 0, bottom: 0,
-          width: `min(${T.panelW}px,100vw)`, zIndex: 50,
-          display: 'flex', flexDirection: 'column',
-          background: T.white,
-          boxShadow: '-6px 0 48px rgba(0,0,0,.13)',
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 300ms cubic-bezier(.32,.72,0,1)',
-          willChange: 'transform',
-        }}>
 
-        {/* panel header */}
+      {/* ── panel
+          SCROLL FIX: height is 100dvh, overflow-y auto is ONLY on the
+          scrollable body div, NOT on the panel itself. Panel uses
+          display:flex + flexDirection:column so header/tabs/footer are
+          fixed and only the middle section scrolls.
+      ── */}
+      <div
+        ref={panelRef}
+        role="dialog" aria-label="Notifications" aria-modal="true"
+        style={{
+          position:        'fixed',
+          top:             0,
+          right:           0,
+          height:          '100dvh',        /* exact viewport height */
+          width:           'min(400px, 100vw)',
+          zIndex:          50,
+          display:         'flex',
+          flexDirection:   'column',        /* stack: header | tabs | body | footer */
+          overflow:        'hidden',        /* panel itself does NOT scroll */
+          background:      C.white,
+          boxShadow:       '-4px 0 32px rgba(0,0,0,.12)',
+          transform:       open ? 'translateX(0)' : 'translateX(100%)',
+          transition:      'transform 280ms cubic-bezier(.32,.72,0,1)',
+          willChange:      'transform',
+        }}
+      >
+        {/* ── 1. HEADER ── */}
         <div style={{
-          height: T.H, flexShrink: 0,
+          flexShrink: 0, height: H,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          paddingInline: 20, borderBottom: `1px solid ${T.border}`,
-          background: `linear-gradient(to right,${T.primary50},${T.white})`,
+          paddingInline: 16, gap: 8,
+          borderBottom: `1px solid ${C.border}`,
+          background: `linear-gradient(135deg, ${P.p50} 0%, ${C.white} 70%)`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: T.primary100, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bell size={16} />
+            <div style={{
+              width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+              background: P.p100, color: P.primary,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Bell size={15} />
             </div>
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: T.n900, lineHeight: 1.2 }}>Notifications</p>
-              <p style={{ margin: 0, fontSize: 11, color: T.n400, marginTop: 1 }}>
-                {loading ? 'Refreshing…' : unread > 0 ? `${unread} unread` : 'All caught up'}
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.n900, lineHeight: 1.2 }}>
+                Notifications
+              </p>
+              <p style={{ margin: 0, fontSize: 11, color: C.n500, marginTop: 1 }}>
+                {loading ? 'Loading…' : unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
               </p>
             </div>
           </div>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Btn label="Refresh" onClick={load} disabled={loading}>
+            <IconBtn label="Refresh" onClick={load} disabled={loading}>
               <RefreshCw size={13} style={loading ? { animation: 'sph-spin .7s linear infinite' } : {}} />
-            </Btn>
-            {unread > 0 && (
-              <button onClick={markAll} disabled={markingAll}
-                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 8, cursor: 'pointer', border: `1.5px solid ${T.primary200}`, background: T.primary50, color: T.primary, fontSize: 11, fontWeight: 700, fontFamily: 'inherit', opacity: markingAll ? .5 : 1, transition: 'opacity 140ms' }}>
-                <CheckCheck size={11} /> Mark all read
+            </IconBtn>
+            {unreadCount > 0 && (
+              <button onClick={markAll} disabled={markingAll} style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '5px 10px', borderRadius: 8,
+                border: `1.5px solid ${P.p200}`, background: P.p50, color: P.primary,
+                fontSize: 11, fontWeight: 700,
+                cursor: markingAll ? 'not-allowed' : 'pointer',
+                opacity: markingAll ? 0.5 : 1,
+                fontFamily: 'inherit', whiteSpace: 'nowrap',
+              }}>
+                {markingAll
+                  ? <RefreshCw size={10} style={{ animation: 'sph-spin .7s linear infinite' }} />
+                  : <CheckCheck size={10} />}
+                Mark all
               </button>
             )}
-            <Btn label="Close" onClick={onClose}><X size={14} /></Btn>
+            <IconBtn label="Close" onClick={onClose}><X size={14} /></IconBtn>
           </div>
         </div>
 
-        {/* panel body */}
-        <div style={{ flex: 1, overflowY: 'auto', overscrollBehavior: 'contain' }}>
-          {error && (
-            <div style={{ margin: 16, padding: '12px 14px', borderRadius: 10, background: T.errorBg, border: `1px solid ${T.errorBorder}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AlertCircle size={14} style={{ color: T.error, flexShrink: 0 }} />
-              <p style={{ margin: 0, fontSize: 12, color: T.error, flex: 1 }}>{error}</p>
-              <button onClick={load} style={{ background: 'none', border: 'none', color: T.error, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Retry</button>
-            </div>
-          )}
-          {loading && items.length === 0 && [...Array(6)].map((_, i) => <SkRow key={i} i={i} />)}
-          {!loading && !error && items.length === 0 && (
-            <div style={{ minHeight: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 40, textAlign: 'center' }}>
-              <div style={{ width: 64, height: 64, borderRadius: 20, background: T.primary50, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bell size={28} />
-              </div>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.n700 }}>All caught up!</p>
-              <p style={{ margin: 0, fontSize: 13, color: T.n400, lineHeight: 1.55 }}>No notifications right now.</p>
-            </div>
-          )}
-          {!loading && items.map((n, i) => {
-            const isBusy = busy.has(n.notificationId);
-            return (
-              <div key={n.notificationId}
-                style={{ display: 'flex', gap: 12, padding: '14px 20px', borderBottom: i < items.length - 1 ? '1px solid #f5f5fa' : 'none', background: n.isRead ? T.white : T.primary50, position: 'relative', transition: 'background 140ms' }}
-                onMouseEnter={e => { if (n.isRead) e.currentTarget.style.background = T.subtle; }}
-                onMouseLeave={e => { e.currentTarget.style.background = n.isRead ? T.white : T.primary50; }}>
-                {!n.isRead && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, borderRadius: '0 2px 2px 0', background: T.primary }} />}
-                <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: n.isRead ? T.n100 : T.primary100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <NIcon title={n.title} read={n.isRead} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 3 }}>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.4, fontWeight: n.isRead ? 400 : 700, color: T.n900 }}>{n.title}</p>
-                    <span style={{ fontSize: 10, color: T.n400, flexShrink: 0, marginTop: 2, whiteSpace: 'nowrap' }}>{ago(n.createdAt)}</span>
-                  </div>
-                  {n.description && <p style={{ margin: 0, fontSize: 12, color: T.n500, lineHeight: 1.55 }}>{n.description}</p>}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-                    {n.redirectUrl && (
-                      <a href={n.redirectUrl} onClick={() => !n.isRead && markOne(n.notificationId)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: T.primary, textDecoration: 'none' }}>
-                        View details <ArrowRight size={10} />
-                      </a>
-                    )}
-                    {!n.isRead && (
-                      <button onClick={() => markOne(n.notificationId)} disabled={isBusy}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', padding: 0, fontSize: 11, color: T.n400, fontFamily: 'inherit', cursor: isBusy ? 'not-allowed' : 'pointer', opacity: isBusy ? .5 : 1, transition: 'color 140ms' }}
-                        onMouseEnter={e => { if (!isBusy) e.currentTarget.style.color = T.primary; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = T.n400; }}>
-                        {isBusy ? <RefreshCw size={10} style={{ animation: 'sph-spin .7s linear infinite' }} /> : <CheckCheck size={10} />}
-                        Mark as read
-                      </button>
-                    )}
-                    {n.isRead && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: T.success }}>
-                        <CheckCheck size={10} /> Read
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        {/* ── 2. TABS ── */}
+        <div style={{
+          flexShrink: 0,
+          display: 'flex', gap: 2,
+          paddingInline: 12, paddingTop: 6,
+          borderBottom: `1px solid ${C.border}`,
+          background: C.white,
+        }}>
+          {[
+            { key: 'all',    label: 'All',    count: items.length },
+            { key: 'unread', label: 'Unread', count: unreadCount  },
+          ].map(({ key, label, count }) => (
+            <button key={key} onClick={() => setTab(key)} style={{
+              padding: '6px 14px', border: 'none', background: 'none',
+              fontSize: 12, fontWeight: tab === key ? 700 : 500,
+              color: tab === key ? P.primary : C.n500,
+              borderBottom: tab === key ? `2px solid ${P.primary}` : '2px solid transparent',
+              cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'color 130ms, border-color 130ms',
+            }}>
+              {label}{' '}
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 20,
+                background: tab === key ? P.p100 : C.n100,
+                color: tab === key ? P.primary : C.n500,
+              }}>
+                {count}
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* panel footer */}
+        {/* ── 3. SCROLLABLE BODY — flex:1 + overflow-y:auto ── */}
+        <div style={{
+          flex:                     1,          /* takes remaining height */
+          overflowY:                'auto',     /* THIS is the scroll container */
+          overflowX:                'hidden',
+          WebkitOverflowScrolling:  'touch',    /* smooth scroll on iOS */
+          overscrollBehavior:       'contain',
+        }}>
+          {/* error */}
+          {error && (
+            <div style={{
+              margin: 12, padding: '11px 14px', borderRadius: 10,
+              background: C.errBg, border: `1px solid ${C.errBdr}`,
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <AlertCircle size={14} style={{ color: C.errTxt, flexShrink: 0 }} />
+              <p style={{ margin: 0, fontSize: 12, color: C.errTxt, flex: 1 }}>{error}</p>
+              <button onClick={load} style={{
+                background: 'none', border: 'none', color: C.errTxt,
+                fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              }}>Retry</button>
+            </div>
+          )}
+
+          {/* skeleton */}
+          {loading && items.length === 0 &&
+            [...Array(5)].map((_, i) => <SkRow key={i} delay={i * 60} />)}
+
+          {/* empty */}
+          {!loading && !error && visible.length === 0 && (
+            <div style={{
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              padding: '60px 24px', gap: 12, textAlign: 'center',
+            }}>
+              <div style={{
+                width: 52, height: 52, borderRadius: 16,
+                background: P.p50, color: P.primary,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Bell size={22} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.n700 }}>
+                  {tab === 'unread' ? 'No unread notifications' : 'All caught up!'}
+                </p>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: C.n400, lineHeight: 1.5 }}>
+                  {tab === 'unread' ? 'Switch to All to see past notifications.' : 'Nothing here yet.'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* grouped list */}
+          {!loading && !error && groups.map((group, gi) => (
+            <div key={group.label}>
+              {/* sticky date label — add top gap for every group after the first */}
+              <div style={{
+                position: 'sticky', top: 0, zIndex: 1,
+                padding: '6px 16px',
+                marginTop: gi === 0 ? 0 : 10,
+                background: C.n50,
+                borderTop:    gi === 0 ? 'none' : `1px solid ${C.border}`,
+                borderBottom: `1px solid ${C.border}`,
+              }}>
+                <p style={{
+                  margin: 0, fontSize: 10, fontWeight: 700,
+                  color: C.n500, textTransform: 'uppercase', letterSpacing: '0.06em',
+                }}>
+                  {group.label}
+                </p>
+              </div>
+
+              {group.items.map((n, i) => (
+                <NotifItem
+                  key={n.notificationId}
+                  notif={n}
+                  onMarkRead={markOne}
+                  isBusy={busyIds.has(n.notificationId)}
+                  isLast={i === group.items.length - 1}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* ── 4. FOOTER ── */}
         {items.length > 0 && (
-          <div style={{ borderTop: `1px solid ${T.border}`, flexShrink: 0, padding: '10px 20px', background: T.subtle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ margin: 0, fontSize: 11, color: T.n400 }}>
-              {items.length} notification{items.length !== 1 ? 's' : ''}{unread > 0 ? ` · ${unread} unread` : ' · all read'}
+          <div style={{
+            flexShrink: 0,
+            borderTop: `1px solid ${C.border}`,
+            padding: '9px 16px',
+            background: C.n50,
+            textAlign: 'center',
+          }}>
+            <p style={{ margin: 0, fontSize: 11, color: C.n400 }}>
+              {items.length} notification{items.length !== 1 ? 's' : ''}
+              {unreadCount > 0 ? ` · ${unreadCount} unread` : ' · all read'}
             </p>
           </div>
         )}
@@ -322,11 +553,12 @@ function NotifPanel({ open, onClose, onCountChange }) {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   STAFF PAGE HEADER  ← the only export
+   PAGE HEADER — only export
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-export default function PageHeader({ title, subtitle, breadcrumbs, onBack, onRefresh, refreshing = false, actions }) {
+export default function PageHeader({
+  title, subtitle, breadcrumbs, onBack, onRefresh, refreshing = false, actions,
+}) {
   useEffect(injectStyles, []);
-
   const [notifOpen, setNotifOpen] = useState(false);
   const [unread,    setUnread]    = useState(0);
   const [bellAnim,  setBellAnim]  = useState(false);
@@ -340,74 +572,93 @@ export default function PageHeader({ title, subtitle, breadcrumbs, onBack, onRef
   }, []);
 
   useEffect(() => {
-    if (unread > 0) { setBellAnim(true); const t = setTimeout(() => setBellAnim(false), 850); return () => clearTimeout(t); }
+    if (unread > 0) {
+      setBellAnim(true);
+      const t = setTimeout(() => setBellAnim(false), 900);
+      return () => clearTimeout(t);
+    }
   }, [unread]);
 
   const hasCrumbs = Array.isArray(breadcrumbs) && breadcrumbs.length > 0;
 
   return (
     <>
-      <header role="banner" className="sph-header"
-        style={{
-          height: T.H, background: T.white,
-          borderBottom: `1px solid ${T.border}`,
-          boxShadow: '0 1px 0 rgba(0,0,0,.03),0 2px 14px -2px rgba(0,0,0,.07)',
-          position: 'sticky', top: 0, zIndex: 29,
-          animation: 'sph-down .28s ease both',
+      <header role="banner" style={{
+        height: H, background: C.white,
+        borderBottom: `1px solid ${C.border}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,.03), 0 2px 12px -2px rgba(0,0,0,.07)',
+        position: 'sticky', top: 0, zIndex: 29,
+        animation: 'sph-slide .25s ease both',
+      }}>
+        <div style={{
+          maxWidth: 1280, margin: '0 auto', width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center',
+          paddingInline: 'clamp(12px, 3vw, 24px)', gap: 8, boxSizing: 'border-box',
         }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', height: '100%', display: 'flex', alignItems: 'center', paddingInline: 20, gap: 10 }}>
 
-        {onBack && <Btn label="Go back" onClick={onBack}><ArrowLeft size={15} /></Btn>}
+          {onBack && <IconBtn label="Go back" onClick={onBack}><ArrowLeft size={15} /></IconBtn>}
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {hasCrumbs && (
-            <nav aria-label="Breadcrumb" className="sph-crumbs"
-              style={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 1, overflow: 'hidden' }}>
-              {breadcrumbs.map((c, i) => (
-                <React.Fragment key={i}>
-                  <a href={c.href}
-                    style={{ fontSize: 10, fontWeight: 600, color: T.n400, textDecoration: 'none', whiteSpace: 'nowrap', letterSpacing: '0.02em', transition: 'color 140ms' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = T.primary; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = T.n400; }}>
-                    {c.label}
-                  </a>
-                  <ChevronRight size={9} style={{ color: '#d1d1de', flexShrink: 0 }} />
-                </React.Fragment>
-              ))}
-            </nav>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {hasCrumbs && (
+              <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 1, overflow: 'hidden' }}>
+                {breadcrumbs.map((c, i) => (
+                  <React.Fragment key={i}>
+                    <a href={c.href} style={{ fontSize: 10, fontWeight: 600, color: C.n400, textDecoration: 'none', whiteSpace: 'nowrap', letterSpacing: '0.03em' }}>
+                      {c.label}
+                    </a>
+                    {i < breadcrumbs.length - 1 && <ChevronRight size={9} style={{ color: C.n200, flexShrink: 0 }} />}
+                  </React.Fragment>
+                ))}
+              </nav>
+            )}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, overflow: 'hidden' }}>
+              <h1 style={{
+                margin: 0, fontSize: subtitle || hasCrumbs ? 15 : 17,
+                fontWeight: 700, color: C.n900, letterSpacing: '-0.02em', lineHeight: 1.25,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {title}
+              </h1>
+              {subtitle && (
+                <span style={{ fontSize: 12, color: C.n400, fontWeight: 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1 }}>
+                  {subtitle}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {actions && <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>{actions}</div>}
+
+          {onRefresh && (
+            <IconBtn label={refreshing ? 'Refreshing…' : 'Refresh'} onClick={onRefresh} disabled={refreshing}>
+              <RefreshCw size={14} style={refreshing ? { animation: 'sph-spin .7s linear infinite' } : {}} />
+            </IconBtn>
           )}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, overflow: 'hidden' }}>
-            <h1 style={{ margin: 0, fontSize: (subtitle || hasCrumbs) ? 15 : 17, fontWeight: 700, color: T.n900, letterSpacing: '-0.022em', lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1 }}>
-              {title}
-            </h1>
-            {subtitle && (
-              <span className="sph-sub"
-                style={{ fontSize: 12, color: T.n400, fontWeight: 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1 }}>
-                {subtitle}
+
+          {/* bell */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <IconBtn
+              label={`Notifications${unread > 0 ? ` (${unread})` : ''}`}
+              onClick={() => setNotifOpen(v => !v)}
+              active={notifOpen}
+            >
+              <Bell size={15} style={bellAnim ? { animation: 'sph-bell .85s ease' } : {}} />
+            </IconBtn>
+            {unread > 0 && (
+              <span aria-label={`${unread} unread`} style={{
+                position: 'absolute', top: -3, right: -3,
+                minWidth: 16, height: 16, borderRadius: 999,
+                background: P.primary, color: '#fff',
+                fontSize: unread > 9 ? 8 : 9, fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                paddingInline: 3, border: '2px solid #fff',
+                boxShadow: '0 1px 4px rgba(0,0,0,.20)', pointerEvents: 'none',
+                animation: 'sph-pop .3s cubic-bezier(.34,1.56,.64,1) forwards',
+              }}>
+                {unread > 99 ? '99+' : unread}
               </span>
             )}
           </div>
-        </div>
-
-        {actions && <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>{actions}</div>}
-
-        {onRefresh && (
-          <Btn label={refreshing ? 'Refreshing…' : 'Refresh'} onClick={onRefresh} disabled={refreshing}>
-            <RefreshCw size={14} style={refreshing ? { animation: 'sph-spin .7s linear infinite' } : {}} />
-          </Btn>
-        )}
-
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <Btn label={`Notifications${unread > 0 ? ` (${unread} unread)` : ''}`} onClick={() => setNotifOpen(v => !v)} active={notifOpen}>
-            <Bell size={15} style={bellAnim ? { animation: 'sph-bell .82s ease' } : {}} />
-          </Btn>
-          {unread > 0 && (
-            <span aria-label={`${unread} unread notifications`}
-              style={{ position: 'absolute', top: -3, right: -3, minWidth: 16, height: 16, borderRadius: 999, background: T.primary, color: '#fff', fontSize: unread > 9 ? 8 : 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingInline: 3, border: '2px solid #fff', boxShadow: '0 1px 4px rgba(0,0,0,.20)', pointerEvents: 'none', animation: 'sph-pop .3s cubic-bezier(.34,1.56,.64,1) forwards' }}>
-              {unread > 99 ? '99+' : unread}
-            </span>
-          )}
-        </div>
         </div>
       </header>
 

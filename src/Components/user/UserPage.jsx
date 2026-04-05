@@ -10,6 +10,7 @@ import "@src/App.css"
 import Documents from './documents/Documents';
 import Profile from './profile/Profile';
 import ServiceDetailPage from './my-service/ServiceDetailPage';
+import PaymentTransaction from './payment-transaction/PaymentTransaction';
 
 // Route audit — every path here must have a matching entry in App.jsx USER_EXACT
 //
@@ -73,6 +74,7 @@ const UserPage = () => {
           <Route path="/documents" element={<Documents />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/my-service/view/:id" element={<ServiceDetailPage/>} />
+          <Route path="/transactions" element={<PaymentTransaction/>} />
         </Routes>
       </div>
     </>

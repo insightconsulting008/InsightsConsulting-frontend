@@ -281,7 +281,7 @@ export default function GetService() {
               setSelectedBundle(null);
               setShowSuccessPopup(false);
               navigate("/my-services");
-            }, 3000);
+            }, 1500);
           }
         },
         prefill: {

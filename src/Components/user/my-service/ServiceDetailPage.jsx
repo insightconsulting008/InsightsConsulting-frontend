@@ -13,7 +13,8 @@ import {
   Timer, Repeat2, LayoutGrid, BadgeCheck, XCircle, Search,
   SendHorizonal, MessageSquareWarning, Inbox, BarChart3,
   Star, ArrowRight, CheckCheck, ShieldAlert, Hourglass,
-  FolderOpen, ArrowUpCircle, ThumbsUp, ScanSearch,
+  FolderOpen, ArrowUpCircle, ThumbsUp, ScanSearch, Download,
+  ArrowDownToLine,
 } from 'lucide-react';
 
 // ─── CONFIGS ──────────────────────────────────────────────────────────────────
@@ -26,6 +27,15 @@ const DOC_STATUS = {
     iconBg: 'bg-amber-100', iconColor: 'text-amber-600',
     border: 'border-amber-300', headerBg: 'bg-amber-50',
     pillBg: 'bg-amber-100', pillText: 'text-amber-700',
+  },
+  FOR_REVIEW: {
+    label: 'Being checked',
+    sublabel: 'Our team is reviewing this now',
+    StatusIcon: ScanSearch,
+    FileIcon: FileUp,
+    iconBg: 'bg-blue-100', iconColor: 'text-blue-600',
+    border: 'border-blue-200', headerBg: 'bg-blue-50',
+    pillBg: 'bg-blue-100', pillText: 'text-blue-700',
   },
   UPLOADED: {
     label: 'Being checked',
@@ -54,6 +64,17 @@ const DOC_STATUS = {
     border: 'border-rose-300', headerBg: 'bg-rose-50',
     pillBg: 'bg-rose-100', pillText: 'text-rose-700',
   },
+};
+
+// Config for ISSUED (staff → user) documents
+const ISSUED_DOC_CFG = {
+  label:    'Sent to you',
+  sublabel: 'Our team shared this with you',
+  StatusIcon: ArrowDownToLine,
+  FileIcon:   FileCheck,
+  iconBg: 'bg-purple-100', iconColor: 'text-purple-600',
+  border: 'border-purple-200', headerBg: 'bg-purple-50',
+  pillBg: 'bg-purple-100', pillText: 'text-purple-700',
 };
 
 const SVC_STATUS = {
@@ -167,7 +188,12 @@ const UploadModal = ({ doc, onClose, onSuccess }) => {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err,  setErr]  = useState('');
-  const isText = doc.inputType === 'TEXT';
+  const isText = doc.inputType?.toUpperCase() === 'TEXT';
+
+  // pre-fill text for re-upload
+  useEffect(() => {
+    if (isText && doc.textValue) setText(doc.textValue);
+  }, [isText, doc.textValue]);
 
   const submit = async () => {
     if (!isText && !file)        { setErr('Please pick a file first'); return; }
@@ -191,6 +217,9 @@ const UploadModal = ({ doc, onClose, onSuccess }) => {
       setErr(e.response?.data?.message || 'Something went wrong. Please try again.');
     } finally { setBusy(false); }
   };
+
+  // The staff remark — API returns it as `remark` field
+  const staffNote = doc.remark || doc.staffRemark;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -217,6 +246,9 @@ const UploadModal = ({ doc, onClose, onSuccess }) => {
               {isText
                 ? <><Type size={11} className="text-gray-400" /><span className="text-xs text-gray-400">Type your answer below</span></>
                 : <><Paperclip size={11} className="text-gray-400" /><span className="text-xs text-gray-400">Choose a file from your device</span></>}
+              {doc.version > 0 && (
+                <span className="text-[10px] text-gray-400 ml-1">· Currently v{doc.version}</span>
+              )}
             </div>
           </div>
           <button onClick={onClose}
@@ -225,13 +257,13 @@ const UploadModal = ({ doc, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Rejection note */}
-        {doc.status === 'REJECTED' && doc.staffRemark && (
+        {/* Staff note / instruction — shown for both PENDING and REJECTED */}
+        {staffNote && (
           <div className="mx-4 mt-4">
-            <TeamBlock label="Why it was sent back">
+            <TeamBlock label={doc.status === 'REJECTED' ? 'Why it was sent back' : 'Instructions from our team'}>
               <div className="flex items-start gap-2">
                 <MessageSquareWarning size={14} className="text-purple-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-purple-900 leading-relaxed font-medium">{doc.staffRemark}</p>
+                <p className="text-sm text-purple-900 leading-relaxed font-medium">{staffNote}</p>
               </div>
             </TeamBlock>
           </div>
@@ -314,14 +346,28 @@ const UploadModal = ({ doc, onClose, onSuccess }) => {
 
 // ─── DOCUMENT CARD ────────────────────────────────────────────────────────────
 const DocCard = ({ doc, onUpload }) => {
-  const cfg  = DOC_STATUS[doc.status] || DOC_STATUS.PENDING;
+  const isIssued = doc.flow === 'ISSUED';
+
+  // Use ISSUED config for staff-sent docs; otherwise use status config
+  const cfg  = isIssued ? ISSUED_DOC_CFG : (DOC_STATUS[doc.status] || DOC_STATUS.PENDING);
   const DIcon = cfg.FileIcon;
   const SIcon = cfg.StatusIcon;
-  const canAct = doc.status === 'PENDING' || doc.status === 'REJECTED';
+
+  // Users can only act on REQUESTED docs that need a response
+  const canAct  = !isIssued && (doc.status === 'PENDING' || doc.status === 'REJECTED');
   const hasFile = !!doc.fileUrl;
   const hasText = !!doc.textValue;
-  const hasRejectionNote = doc.status === 'REJECTED' && doc.staffRemark;
-  const hasInstruction   = doc.remark && doc.status !== 'REJECTED';
+
+  // ── Remark logic ──
+  // The API returns the staff note in the `remark` field (also check staffRemark for safety)
+  const staffNote = doc.remark || doc.staffRemark;
+
+  // Show instruction (non-rejection note) when there's a remark and it's not a rejection
+  const showInstruction  = !isIssued && !!staffNote && doc.status !== 'REJECTED';
+  // Show rejection note only when rejected
+  const showRejectedNote = !isIssued && !!staffNote && doc.status === 'REJECTED';
+  // Show historical note on verified docs (e.g. "hey this not proper" — previous rejection now resolved)
+  const showVerifiedNote = !isIssued && !!staffNote && doc.status === 'VERIFIED';
 
   return (
     <div className={`rounded-2xl border-2 ${cfg.border} overflow-hidden bg-white`}>
@@ -333,7 +379,9 @@ const DocCard = ({ doc, onUpload }) => {
         <div className="flex-1 min-w-0">
           <p className="font-bold text-sm text-gray-900 leading-snug line-clamp-1">{doc.documentType}</p>
           <div className="flex items-center gap-1 mt-0.5 text-[11px] text-gray-400 font-medium">
-            {doc.inputType === 'FILE' || doc.inputType === 'file'
+            {isIssued ? (
+              <><UserCheck size={9} className="text-purple-400" /><span>From our team</span></>
+            ) : doc.inputType?.toUpperCase() === 'FILE' || doc.inputType === 'file'
               ? <><Paperclip size={9} /><span>File upload</span></>
               : <><Type size={9} /><span>Written answer</span></>}
             {doc.version > 0 && <span className="ml-1 opacity-70">· v{doc.version}</span>}
@@ -354,20 +402,42 @@ const DocCard = ({ doc, onUpload }) => {
 
       {/* Body */}
       <div className="px-4 py-3 space-y-2.5">
-        {hasInstruction && (
+
+        {/* Instruction from team (non-rejection) */}
+        {showInstruction && (
           <TeamBlock label="What we need from you">
-            <p className="text-sm text-purple-900 leading-relaxed">{doc.remark}</p>
-          </TeamBlock>
-        )}
-        {hasRejectionNote && (
-          <TeamBlock label="Why it was sent back">
             <div className="flex items-start gap-2">
-              <MessageSquareWarning size={14} className="text-purple-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-purple-900 leading-relaxed font-medium">{doc.staffRemark}</p>
+              <Info size={14} className="text-purple-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-purple-900 leading-relaxed">{staffNote}</p>
             </div>
           </TeamBlock>
         )}
-        {hasFile && (
+
+        {/* Rejection note */}
+        {showRejectedNote && (
+          <TeamBlock label="Why it was sent back">
+            <div className="flex items-start gap-2">
+              <MessageSquareWarning size={14} className="text-purple-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-purple-900 leading-relaxed font-medium">{staffNote}</p>
+            </div>
+          </TeamBlock>
+        )}
+
+        {/* Historical note on verified — shown collapsed as "previous note" */}
+        {showVerifiedNote && (
+          <div className="flex items-start gap-2 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl">
+            <Info size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-0.5">
+                Previous note
+              </p>
+              <p className="text-xs text-gray-600 leading-relaxed italic">"{staffNote}"</p>
+            </div>
+          </div>
+        )}
+
+        {/* File the user uploaded */}
+        {hasFile && !isIssued && (
           <YouBlock label="File you uploaded">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -384,11 +454,51 @@ const DocCard = ({ doc, onUpload }) => {
             </div>
           </YouBlock>
         )}
-        {hasText && (
+
+        {/* Text the user submitted */}
+        {hasText && !isIssued && (
           <YouBlock label="Answer you wrote">
             <p className="text-sm text-sky-900 leading-relaxed">{doc.textValue}</p>
           </YouBlock>
         )}
+
+        {/* File issued by staff — purple "from team" treatment */}
+        {isIssued && hasFile && (
+          <TeamBlock label="Document from our team">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileTypeIcon url={doc.fileUrl} size={15} />
+                <span className="text-sm text-purple-900 font-semibold truncate">
+                  {decodeURIComponent(doc.fileUrl.split('/').pop())}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <button onClick={() => window.open(doc.fileUrl, '_blank')}
+                  className="flex items-center gap-1 px-2.5 py-1.5 bg-purple-200 hover:bg-purple-300
+                    text-purple-800 rounded-lg text-xs font-bold transition-colors">
+                  <Eye size={12} /> View
+                </button>
+              </div>
+            </div>
+          </TeamBlock>
+        )}
+
+        {/* Text issued by staff */}
+        {isIssued && doc.textValue && (
+          <TeamBlock label="Message from our team">
+            <p className="text-sm text-purple-900 leading-relaxed">{doc.textValue}</p>
+          </TeamBlock>
+        )}
+
+        {/* Staff note on issued doc (if any) */}
+        {isIssued && staffNote && (
+          <div className="flex items-start gap-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded-xl">
+            <Info size={13} className="text-purple-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-purple-700 leading-relaxed">{staffNote}</p>
+          </div>
+        )}
+
+        {/* Upload / re-upload button */}
         {canAct && (
           <button onClick={() => onUpload(doc)}
             className={`w-full py-3 text-sm font-extrabold rounded-xl flex items-center justify-center gap-2
@@ -458,8 +568,8 @@ const StepItem = ({ step, isLast, onUpload, num }) => {
           </div>
         </div>
 
-        {/* Error note from staff */}
-        {isError && step.remarks && (
+        {/* Error / remarks note from staff */}
+        {(isError || step.remarks) && step.remarks && (
           <div className="mt-2 mb-3">
             <TeamBlock label="Our team flagged this">
               <div className="flex items-start gap-2">
@@ -539,12 +649,9 @@ const PeriodRow = ({ period, isFirst, onUpload }) => {
     <div className={`rounded-2xl border-2 ${borderCls} overflow-hidden ${period.isLocked ? 'opacity-60' : ''}`}>
       <button onClick={() => setOpen(v => !v)}
         className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${headBg}`}>
-        {/* Period icon */}
         <div className={`w-10 h-10 rounded-2xl ${PIconBg} flex items-center justify-center flex-shrink-0`}>
           <PIcon size={16} className={PIconColor} />
         </div>
-
-        {/* Label + pills */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center flex-wrap gap-1.5">
             <span className="font-extrabold text-sm text-gray-900">{period.periodLabel}</span>
@@ -576,8 +683,6 @@ const PeriodRow = ({ period, isFirst, onUpload }) => {
             </p>
           )}
         </div>
-
-        {/* Progress mini bar (hidden on tiny screens) + chevron */}
         <div className="flex items-center gap-3 flex-shrink-0">
           {!period.isLocked && (
             <div className="hidden sm:flex flex-col items-end gap-1">
@@ -663,7 +768,6 @@ export default function ServiceDetailPage() {
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
-  // ── loading ──
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4"
       style={{ background: 'var(--neutral-50)' }}>
@@ -672,7 +776,6 @@ export default function ServiceDetailPage() {
     </div>
   );
 
-  // ── error ──
   if (!data) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6"
       style={{ background: 'var(--neutral-50)' }}>
@@ -688,7 +791,6 @@ export default function ServiceDetailPage() {
     </div>
   );
 
-  // ── derived state ──
   const svc     = data.service;
   const app     = data.application;
   const isRec   = svc.serviceType === 'RECURRING';
@@ -703,9 +805,13 @@ export default function ServiceDetailPage() {
     (p.serviceDocument || []).forEach(d => allDocs.push(d));
     (p.periodStep || []).forEach(s => (s.serviceDocument || []).forEach(d => allDocs.push(d)));
   });
-  const byStatus    = { PENDING: 0, UPLOADED: 0, VERIFIED: 0, REJECTED: 0 };
-  allDocs.forEach(d => { byStatus[d.status] = (byStatus[d.status] || 0) + 1; });
+
+  // Only count REQUESTED docs for user action needed
+  const requestedDocs = allDocs.filter(d => d.flow !== 'ISSUED');
+  const byStatus    = { PENDING: 0, FOR_REVIEW: 0, UPLOADED: 0, VERIFIED: 0, REJECTED: 0 };
+  requestedDocs.forEach(d => { byStatus[d.status] = (byStatus[d.status] || 0) + 1; });
   const needAction  = byStatus.PENDING + byStatus.REJECTED;
+  const issuedCount = allDocs.filter(d => d.flow === 'ISSUED').length;
   const hasErrors   = appSteps.some(s => s.status === 'ERROR') ||
     periods.some(p => p.periodStep?.some(s => s.status === 'ERROR'));
   const totalAlerts = needAction + (hasErrors ? 1 : 0);
@@ -714,7 +820,6 @@ export default function ServiceDetailPage() {
     ? Math.round((periodsDone / periods.length) * 100)
     : appSteps.length ? Math.round((stepsDone / appSteps.length) * 100) : 0;
 
-  // ── render ──
   return (
     <>
       {uploadDoc && (
@@ -736,21 +841,17 @@ export default function ServiceDetailPage() {
           }
         />
 
-        {/* ══ PAGE BODY ══ */}
         <div className="max-w-7xl mx-auto px-3 sm:px-5 py-4 sm:py-6">
           <div className="flex flex-col xl:flex-row gap-4 sm:gap-5 items-start">
 
-            {/* ════════════════════════════════════
-                LEFT — main tracking flow
-            ════════════════════════════════════ */}
+            {/* ════ LEFT ════ */}
             <div className="w-full xl:flex-1 xl:min-w-0 space-y-4">
 
-              {/* ① SERVICE CARD */}
+              {/* SERVICE CARD */}
               <Card>
                 <div className="p-4 sm:p-5">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    {/* Thumbnail */}
-                    <div className="w-20 h-full  rounded-2xl overflow-hidden flex-shrink-0
+                    <div className="w-20 h-full rounded-2xl overflow-hidden flex-shrink-0
                       border-2 border-gray-100" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.10)' }}>
                       <img
                         src={svc.photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(svc.name || 'S')}&background=6869AC&color=fff&size=200`}
@@ -823,7 +924,7 @@ export default function ServiceDetailPage() {
                 </div>
               </Card>
 
-              {/* ② NOT STARTED */}
+              {/* NOT STARTED */}
               {!app && (
                 <Card>
                   <div className="flex flex-col items-center justify-center py-14 text-center px-6">
@@ -839,7 +940,7 @@ export default function ServiceDetailPage() {
                 </Card>
               )}
 
-              {/* ③ APPLICATION STEPS */}
+              {/* APPLICATION STEPS */}
               {appSteps.length > 0 && (
                 <Card>
                   <CardHeader
@@ -856,7 +957,7 @@ export default function ServiceDetailPage() {
                 </Card>
               )}
 
-              {/* ④ MONTHLY PERIODS */}
+              {/* MONTHLY PERIODS */}
               {periods.length > 0 && (
                 <Card>
                   <CardHeader
@@ -881,7 +982,7 @@ export default function ServiceDetailPage() {
                 </Card>
               )}
 
-              {/* ⑤ FORM ANSWERS */}
+              {/* FORM ANSWERS */}
               {app?.formData && Object.keys(app.formData).length > 0 && (
                 <Card>
                   <CardHeader
@@ -918,10 +1019,7 @@ export default function ServiceDetailPage() {
               )}
             </div>
 
-            {/* ════════════════════════════════════
-                RIGHT — sticky summary panel (xl)
-                On mobile collapses to full-width cards
-            ════════════════════════════════════ */}
+            {/* ════ RIGHT ════ */}
             <div className="w-full xl:w-[300px] 2xl:w-[340px] flex-shrink-0 space-y-3 sm:space-y-4 xl:sticky xl:top-[60px]">
 
               {/* PROGRESS */}
@@ -1007,13 +1105,13 @@ export default function ServiceDetailPage() {
               {allDocs.length > 0 && (
                 <Card>
                   <CardHeader icon={FileText} title="Your documents"
-                    subtitle={`${allDocs.length} total`} />
+                    subtitle={`${requestedDocs.length} requested${issuedCount > 0 ? ` · ${issuedCount} from team` : ''}`} />
                   <div className="grid grid-cols-2 divide-x divide-y divide-gray-100">
                     {[
-                      { key: 'PENDING',  label: 'Upload needed', Icon: Inbox,      color: 'text-amber-600',   iconBg: 'bg-amber-50',   bg: 'bg-amber-50/40' },
-                      { key: 'UPLOADED', label: 'Being checked', Icon: ScanSearch, color: 'text-blue-600',    iconBg: 'bg-blue-50',    bg: 'bg-blue-50/40' },
-                      { key: 'VERIFIED', label: 'Approved',      Icon: BadgeCheck, color: 'text-emerald-600', iconBg: 'bg-emerald-50', bg: 'bg-emerald-50/40' },
-                      { key: 'REJECTED', label: 'Needs fixing',  Icon: XCircle,    color: 'text-rose-600',    iconBg: 'bg-rose-50',    bg: 'bg-rose-50/40' },
+                      { key: 'PENDING',    label: 'Upload needed', Icon: Inbox,          color: 'text-amber-600',   iconBg: 'bg-amber-50',   bg: 'bg-amber-50/40' },
+                      { key: 'FOR_REVIEW', label: 'Being checked', Icon: ScanSearch,     color: 'text-blue-600',    iconBg: 'bg-blue-50',    bg: 'bg-blue-50/40' },
+                      { key: 'VERIFIED',   label: 'Approved',      Icon: BadgeCheck,     color: 'text-emerald-600', iconBg: 'bg-emerald-50', bg: 'bg-emerald-50/40' },
+                      { key: 'REJECTED',   label: 'Needs fixing',  Icon: XCircle,        color: 'text-rose-600',    iconBg: 'bg-rose-50',    bg: 'bg-rose-50/40' },
                     ].map(({ key, label, Icon: DIcon, color, iconBg, bg }) => (
                       <div key={key} className={`${bg} flex flex-col items-center justify-center py-4 px-2 gap-1`}>
                         <div className={`w-8 h-8 ${iconBg} rounded-xl flex items-center justify-center mb-1`}>
@@ -1024,6 +1122,14 @@ export default function ServiceDetailPage() {
                       </div>
                     ))}
                   </div>
+                  {issuedCount > 0 && (
+                    <div className="flex items-center gap-2 px-4 py-2.5 bg-purple-50 border-t border-purple-100">
+                      <ArrowDownToLine size={13} className="text-purple-500 flex-shrink-0" />
+                      <p className="text-xs text-purple-800 font-bold">
+                        {issuedCount} document{issuedCount > 1 ? 's' : ''} sent to you by our team
+                      </p>
+                    </div>
+                  )}
                   {needAction > 0 && (
                     <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border-t-2 border-amber-200">
                       <BellRing size={13} className="text-amber-600 flex-shrink-0" />
@@ -1100,7 +1206,7 @@ export default function ServiceDetailPage() {
                 </Card>
               )}
 
-            </div>{/* end right */}
+            </div>
           </div>
           <div className="h-8" />
         </div>

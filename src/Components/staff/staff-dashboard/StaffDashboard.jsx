@@ -175,16 +175,15 @@ const StepProgressRow = ({ task }) => {
 export default function StaffDashboard() {
   const navigate = useNavigate();
 
+  // ✅ Move staffId INSIDE the component
+  const staffId = localStorage.getItem("employeeId");
+
   const [profile,    setProfile]    = useState(null);
   const [tasks,      setTasks]      = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const now      = new Date();
-  const greeting = now.getHours() < 12 ? "Good morning"
-                 : now.getHours() < 17 ? "Good afternoon"
-                 : "Good evening";
-  const dateStr  = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  // ... greeting / dateStr unchanged ...
 
   const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -192,21 +191,22 @@ export default function StaffDashboard() {
 
     const [profileRes, tasksRes] = await Promise.allSettled([
       axiosInstance.get("/staff/profile"),
-      axiosInstance.get(`/staff/tasks/${staffId}`),
+      axiosInstance.get(`/staff/${staffId}/applications`), // ✅ fixed endpoint
     ]);
 
     if (profileRes.status === "fulfilled") {
       setProfile(profileRes.value.data?.data ?? null);
     }
     if (tasksRes.status === "fulfilled" && tasksRes.value.data?.success) {
-      setTasks(tasksRes.value.data.data ?? []);
+      setTasks(tasksRes.value.data.applications ?? []); // ✅ fixed response key
     }
 
     setLoading(false);
     setRefreshing(false);
-  }, []);
+  }, [staffId]); // ✅ add staffId to dependency array
 
   useEffect(() => { load(); }, [load]);
+  // rest of component unchanged...
 
   /* derived */
   const inProgress    = tasks.filter((t) => (t.status ?? t.applicationStatus) === "IN_PROGRESS").length;

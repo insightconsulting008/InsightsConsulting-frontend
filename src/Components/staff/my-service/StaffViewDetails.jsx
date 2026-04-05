@@ -136,7 +136,6 @@ const getFileIcon = (url) => {
 
 const downloadFile = async (url, filename) => {
   try {
-    // Try fetch with CORS — S3 presigned URLs support this
     const response = await fetch(url, { mode: 'cors' });
     if (!response.ok) throw new Error('fetch failed');
     const blob = await response.blob();
@@ -154,7 +153,6 @@ const downloadFile = async (url, filename) => {
     document.body.removeChild(link);
     setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
   } catch {
-    // Fallback: open in new tab which triggers browser download for most file types
     const link = document.createElement('a');
     link.href = url;
     link.download = filename || 'download';
@@ -164,6 +162,234 @@ const downloadFile = async (url, filename) => {
     link.click();
     document.body.removeChild(link);
   }
+};
+
+// ─── FORM DATA FIELD HELPERS ───────────────────────────────────────────────────
+const detectFieldType = (v) => {
+  if (typeof v === 'object' && v !== null) return v.url && v.sizeInMb ? 'file' : 'object';
+  if (typeof v === 'string') {
+    if (v.includes('@') && v.includes('.')) return 'email';
+    if (v.match(/^\d{10}$/)) return 'phone';
+    if (v.match(/^\d{12}$/)) return 'aadhar';
+    if (v.match(/^[A-Z]{5}\d{4}[A-Z]$/)) return 'pan';
+    if (v.match(/^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z\d][Z][A-Z\d]$/)) return 'gst';
+    // JSON array (multi-select)
+    if (v.startsWith('[') && v.endsWith(']')) {
+      try { JSON.parse(v); return 'array'; } catch {}
+    }
+    if (!isNaN(v) && v.trim() !== '') return 'number';
+    return 'text';
+  }
+  if (typeof v === 'boolean') return 'boolean';
+  return 'text';
+};
+
+const fieldTypeIcon = (type) => {
+  switch (type) {
+    case 'file':   return <FileText size={13} className="text-purple-500" />;
+    case 'email':  return <Mail     size={13} className="text-blue-500" />;
+    case 'phone':  return <Phone    size={13} className="text-teal-500" />;
+    case 'number': return <Hash     size={13} className="text-orange-500" />;
+    case 'array':  return <List     size={13} className="text-indigo-500" />;
+    default:       return <Type     size={13} className="text-gray-400" />;
+  }
+};
+
+// Renders the value portion of a form field
+function FormFieldValue({ value }) {
+  const type = detectFieldType(value);
+
+  if (type === 'file') return (
+    <div className="flex items-center gap-2.5 mt-1.5">
+      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+        {getFileIcon(value.url)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <a
+          href={value.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-blue-600 font-medium flex items-center gap-1 hover:underline"
+        >
+          View File <ExternalLink size={11} />
+        </a>
+        <p className="text-[10px] text-gray-400 mt-0.5">{(parseFloat(value.sizeInMb) || 0).toFixed(2)} MB</p>
+      </div>
+      <button
+        onClick={() => downloadFile(value.url, 'document')}
+        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+        title="Download"
+      >
+        <Download size={13} className="text-gray-400" />
+      </button>
+    </div>
+  );
+
+  if (type === 'email') return (
+    <a href={`mailto:${value}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-1">
+      <Mail size={12} className="text-gray-400 flex-shrink-0" />{value}
+    </a>
+  );
+
+  if (type === 'phone') return (
+    <a href={`tel:${value}`} className="flex items-center gap-1.5 text-sm text-gray-700 mt-1">
+      <Phone size={12} className="text-gray-400 flex-shrink-0" />{value}
+    </a>
+  );
+
+  if (type === 'aadhar' || type === 'pan' || type === 'gst') return (
+    <span className="inline-block font-mono text-sm bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg mt-1">
+      {value}
+    </span>
+  );
+
+  if (type === 'array') {
+    let items = [];
+    try { items = JSON.parse(value); } catch {}
+    return (
+      <div className="flex flex-wrap gap-1.5 mt-1">
+        {items.map((item, i) => (
+          <span key={i} className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full font-medium">
+            {item}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  if (type === 'boolean') return (
+    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full mt-1 ${
+      value ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+    }`}>
+      {value ? <CheckCircle size={10} /> : <XCircle size={10} />}
+      {value ? 'Yes' : 'No'}
+    </span>
+  );
+
+  // Plain text / number — also handle date strings
+  const isDateLike = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value);
+  const displayVal = isDateLike
+    ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    : value;
+
+  return <p className="text-sm text-gray-800 mt-1 break-words leading-relaxed">{displayVal}</p>;
+}
+
+// ─── COLLAPSIBLE PANEL WRAPPER ────────────────────────────────────────────────
+const CollapsiblePanel = ({ icon: Icon, iconBg, iconColor, gradientFrom, title, subtitle, defaultOpen = false, children, badge }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r ${gradientFrom} to-white transition-colors hover:brightness-[0.98]`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 ${iconBg} rounded-xl flex items-center justify-center shrink-0`}>
+            <Icon className={`w-4 h-4 ${iconColor}`} />
+          </div>
+          <div className="text-left">
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              {title}
+              {badge && (
+                <span className="text-[10px] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                  {badge}
+                </span>
+              )}
+            </h3>
+            <p className="text-xs text-gray-500">{subtitle}</p>
+          </div>
+        </div>
+        <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${open ? 'bg-gray-100' : 'bg-gray-50'}`}>
+          {open
+            ? <ChevronUp   size={15} className="text-gray-500" />
+            : <ChevronDown size={15} className="text-gray-500" />}
+        </div>
+      </button>
+      {open && <div>{children}</div>}
+    </div>
+  );
+};
+
+// ─── FORM DATA SECTION ────────────────────────────────────────────────────────
+const FormDataSection = ({ formData }) => {
+  const [expandedFields, setExpandedFields] = useState({});
+
+  const entries = Object.entries(formData || {});
+  if (!entries.length) return null;
+
+  const toggleField = (key) => setExpandedFields(p => ({ ...p, [key]: !p[key] }));
+
+  const fileEntries  = entries.filter(([, v]) => detectFieldType(v) === 'file');
+  const otherEntries = entries.filter(([, v]) => detectFieldType(v) !== 'file');
+
+  return (
+    <CollapsiblePanel
+      icon={FileText}
+      iconBg="bg-indigo-100"
+      iconColor="text-indigo-600"
+      gradientFrom="from-indigo-50"
+      title="Submitted Form Data"
+      subtitle={`${entries.length} field${entries.length !== 1 ? 's' : ''} submitted by applicant`}
+      badge={entries.length}
+      defaultOpen={true}
+    >
+      <div className="p-4 space-y-4">
+
+        {/* Plain fields: 2-col grid */}
+        {otherEntries.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {otherEntries.map(([key, value]) => {
+              const type    = detectFieldType(value);
+              const isLong  = typeof value === 'string' && value.length > 60;
+              const isOpen  = expandedFields[key];
+              return (
+                <div key={key} className="bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-3 flex flex-col">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    {fieldTypeIcon(type)}
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate">{key}</p>
+                  </div>
+                  {isLong ? (
+                    <>
+                      <p className={`text-sm text-gray-800 mt-1 break-words leading-relaxed ${!isOpen ? 'line-clamp-2' : ''}`}>
+                        {value}
+                      </p>
+                      <button
+                        onClick={() => toggleField(key)}
+                        className="mt-1 text-[10px] text-blue-500 font-medium self-start hover:underline"
+                      >
+                        {isOpen ? 'Show less' : 'Show more'}
+                      </button>
+                    </>
+                  ) : (
+                    <FormFieldValue value={value} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* File fields */}
+        {fileEntries.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-0.5">
+              Uploaded Documents
+            </p>
+            <div className="space-y-2">
+              {fileEntries.map(([key, value]) => (
+                <div key={key} className="bg-purple-50 border border-purple-100 rounded-xl px-3.5 py-3">
+                  <p className="text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-1">{key}</p>
+                  <FormFieldValue value={value} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </CollapsiblePanel>
+  );
 };
 
 // ─── REQUEST / ISSUE DOCUMENT MODAL ───────────────────────────────────────────
@@ -188,10 +414,10 @@ const RequestDocumentModal = ({
   const fileInputRef                = useRef(null);
 
   const commonDocTypes = [
-    'PAN Card', 'Aadhaar Card', 'Passport', 'Driving Licence',
-    'Bank Statement', 'Salary Slip', 'ITR', 'GST Certificate',
-    'Company Registration', 'Address Proof', 'Photo ID', 'Staff Note',
-    'Approval Letter', 'Other',
+    'Aadhaar Card', 'Passport',
+    'Bank Statement', 'Salary Slip',
+    'Address Proof', 'Photo ID', 'Staff Note',
+    'Approval Letter',
   ];
 
   useEffect(() => {
@@ -411,7 +637,7 @@ const RequestDocumentModal = ({
 
           {/* Common Doc Types */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Common Document Types</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Example Document Types</label>
             <div className="flex flex-wrap gap-1.5">
               {commonDocTypes.map(t => (
                 <button
@@ -737,13 +963,11 @@ const DocumentReviewModal = ({ document: doc, onClose, onSuccess, defaultStatus 
             )}
           </div>
 
-          {/* ── Decision buttons — only enabled when status is FOR_REVIEW ── */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Decision <span className="text-red-500">*</span>
             </label>
 
-            {/* If document is PENDING (user hasn't uploaded yet), show a notice instead */}
             {doc.status === 'PENDING' ? (
               <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
@@ -842,16 +1066,16 @@ const DocumentReviewModal = ({ document: doc, onClose, onSuccess, defaultStatus 
 
 // ─── DOCUMENT MANAGEMENT SECTION ──────────────────────────────────────────────
 const DocumentManagementSection = ({ applicationId, onCountChange }) => {
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [documents,           setDocuments]           = useState([]);
+  const [loading,             setLoading]             = useState(true);
+  const [showRequestModal,    setShowRequestModal]    = useState(false);
   const [selectedStepForRequest, setSelectedStepForRequest] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('recent');
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedDocForReview, setSelectedDocForReview] = useState(null);
+  const [activeFilter,        setActiveFilter]        = useState('recent');
+  const [showReviewModal,     setShowReviewModal]     = useState(false);
+  const [selectedDocForReview,setSelectedDocForReview]= useState(null);
   const [reviewDefaultStatus, setReviewDefaultStatus] = useState('');
-  const [quickActionLoading, setQuickActionLoading] = useState(null);
-  const [actionMessage, setActionMessage] = useState({ type: '', text: '' });
+  const [quickActionLoading,  setQuickActionLoading]  = useState(null);
+  const [actionMessage,       setActionMessage]       = useState({ type: '', text: '' });
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -874,10 +1098,7 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
       }
     } catch (e) {
       console.error('Error fetching documents:', e);
-      setActionMessage({
-        type: 'error',
-        text: e.response?.data?.message || 'Failed to load documents',
-      });
+      setActionMessage({ type: 'error', text: e.response?.data?.message || 'Failed to load documents' });
     } finally {
       setLoading(false);
     }
@@ -892,7 +1113,9 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
       const res = await axiosInstance.put(`/staff/review-document/${doc.documentId}`, { status: 'VERIFIED' });
       if (res.data.success) {
         setActionMessage({ type: 'success', text: 'Document verified successfully!' });
-        setDocuments(prev => prev.map(d => d.documentId === doc.documentId ? { ...d, status: 'VERIFIED', staffRemark: null } : d));
+        setDocuments(prev => prev.map(d =>
+          d.documentId === doc.documentId ? { ...d, status: 'VERIFIED', staffRemark: null } : d
+        ));
         fetchDocuments();
         setTimeout(() => setActionMessage({ type: '', text: '' }), 3000);
       } else {
@@ -911,34 +1134,126 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
     setShowReviewModal(true);
   };
 
-  const openRequestModal = (stepInfo = null) => {
-    setSelectedStepForRequest(stepInfo);
-    setShowRequestModal(true);
-  };
-
-  // Sort all docs by createdAt descending (newest first)
-  const sortedDocs = [...documents].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  const filteredDocs = activeFilter === 'recent'
-    ? sortedDocs.slice(0, 4)
-    : sortedDocs.filter(d => d.flow === 'REQUESTED' && d.status === activeFilter);
-
-  // Counts are only for REQUESTED docs (Issued docs are tracked separately)
   const requestedOnly = documents.filter(d => d.flow === 'REQUESTED');
+  const issuedDocs    = documents.filter(d => d.flow === 'ISSUED');
+
   const counts = {
     PENDING:    requestedOnly.filter(d => d.status === 'PENDING').length,
     FOR_REVIEW: requestedOnly.filter(d => d.status === 'FOR_REVIEW').length,
     VERIFIED:   requestedOnly.filter(d => d.status === 'VERIFIED').length,
     REJECTED:   requestedOnly.filter(d => d.status === 'REJECTED').length,
   };
-  const issuedDocs = documents.filter(d => d.flow === 'ISSUED');
 
   const filters = [
-    { key: 'PENDING',    label: 'Awaiting',  color: 'bg-amber-50 text-amber-700',     activeColor: 'bg-amber-500 text-white' },
-    { key: 'FOR_REVIEW', label: 'To Review', color: 'bg-blue-50 text-blue-700',       activeColor: 'bg-blue-600 text-white' },
-    { key: 'VERIFIED',   label: 'Verified',  color: 'bg-emerald-50 text-emerald-700', activeColor: 'bg-emerald-600 text-white' },
-    { key: 'REJECTED',   label: 'Rejected',  color: 'bg-rose-50 text-rose-700',       activeColor: 'bg-rose-600 text-white' },
+    { key: 'recent',     label: 'Recent',    color: 'bg-gray-100 text-gray-600',        activeColor: 'bg-gray-700 text-white' },
+    { key: 'PENDING',    label: 'Awaiting',  color: 'bg-amber-50 text-amber-700',       activeColor: 'bg-amber-500 text-white' },
+    { key: 'FOR_REVIEW', label: 'To Review', color: 'bg-blue-50 text-blue-700',         activeColor: 'bg-blue-600 text-white' },
+    { key: 'VERIFIED',   label: 'Verified',  color: 'bg-emerald-50 text-emerald-700',   activeColor: 'bg-emerald-600 text-white' },
+    { key: 'REJECTED',   label: 'Rejected',  color: 'bg-rose-50 text-rose-700',         activeColor: 'bg-rose-600 text-white' },
   ];
+
+  // ── shared sub-components ──
+  const FileActions = ({ url, docType }) => (
+    <button onClick={() => downloadFile(url, docType)} title="Download"
+      className="p-1.5 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0">
+      <Download className="w-3.5 h-3.5 text-gray-400" />
+    </button>
+  );
+
+  const DocCard = ({ doc, showReviewButtons = false }) => {
+    const cfg = DOC_STATUS_CONFIG[doc.status] || DOC_STATUS_CONFIG.PENDING;
+    const DocIcon = cfg.icon;
+    const isQuickLoading = quickActionLoading === doc.documentId;
+    return (
+      <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
+        <div className="px-4 py-3">
+          {/* Top row */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <DocIcon size={15} className={cfg.iconColor} />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-800 truncate">{doc.documentType}</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(doc.createdAt)}</p>
+              </div>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap flex-shrink-0 border ${cfg.badge}`}>
+              {cfg.label}
+            </span>
+          </div>
+
+          {doc.remark && (
+            <p className="text-[11px] text-gray-400 mt-1.5 italic pl-[26px]">"{doc.remark}"</p>
+          )}
+          {doc.applicationTrackStep && (
+            <div className="flex items-center gap-1 mt-1 pl-[26px]">
+              <Layers size={10} className="text-gray-300" />
+              <span className="text-[11px] text-gray-400">{doc.applicationTrackStep.title}</span>
+            </div>
+          )}
+
+          {/* File / text content */}
+          {(doc.fileUrl || doc.textValue) && (
+            <div className="mt-2.5 pl-[26px]">
+              {doc.fileUrl ? (
+                <div className="flex items-center justify-between gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {getFileIcon(doc.fileUrl)}
+                    <span className="text-xs text-gray-600 truncate">
+                      {decodeURIComponent(doc.fileUrl.split('/').pop().split('?')[0]) || 'Uploaded File'}
+                    </span>
+                  </div>
+                  <FileActions url={doc.fileUrl} docType={doc.documentType} />
+                </div>
+              ) : (
+                <div className="px-3 py-2 bg-white rounded-lg border border-gray-200">
+                  <p className="text-[10px] text-gray-400 mb-0.5">Response</p>
+                  <p className="text-xs text-gray-700">{doc.textValue}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {doc.status === 'REJECTED' && doc.staffRemark && (
+            <p className="text-[10px] text-rose-500 font-medium mt-2 pl-[26px]">
+              Rejected: <span className="font-normal italic">{doc.staffRemark}</span>
+            </p>
+          )}
+          {doc.status === 'PENDING' && (
+            <p className="text-[11px] text-amber-500 mt-1.5 pl-[26px]">Waiting for client to upload.</p>
+          )}
+
+          {/* Review buttons */}
+          {showReviewButtons && doc.status === 'FOR_REVIEW' && (
+            <div className="mt-3 flex gap-2 pl-[26px]">
+              <button onClick={() => handleQuickVerify(doc)} disabled={isQuickLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors">
+                {isQuickLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
+                Verify
+              </button>
+              <button onClick={() => openReviewModal(doc, 'REJECTED')} disabled={isQuickLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors">
+                <XCircle className="w-3 h-3" /> Reject
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Filtered requested docs
+  const displayRequested = activeFilter === 'recent'
+    ? [...requestedOnly].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
+    : requestedOnly.filter(d => d.status === activeFilter).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const displayIssued = [...issuedDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const loadingState = (
+    <div className="flex items-center justify-center py-10 gap-3">
+      <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+      <p className="text-gray-400 text-sm">Loading…</p>
+    </div>
+  );
 
   return (
     <>
@@ -952,7 +1267,6 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
           stepTitle={selectedStepForRequest?.title}
         />
       )}
-
       {showReviewModal && selectedDocForReview && (
         <DocumentReviewModal
           document={selectedDocForReview}
@@ -962,288 +1276,83 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
         />
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center shrink-0">
-              <FileText className="w-4 h-4 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-gray-900">Document Requests</h3>
-              <p className="text-xs text-gray-500">{documents.length} total · Requested &amp; Issued</p>
-            </div>
-          </div>
-        </div>
-
+      {/* ── Requested from Client panel ── */}
+      <CollapsiblePanel
+        icon={Send}
+        iconBg="bg-blue-100"
+        iconColor="text-blue-600"
+        gradientFrom="from-blue-50"
+        title="Document Requests"
+        subtitle="Documents requested from client"
+        badge={requestedOnly.length}
+        defaultOpen={false}
+      >
         {actionMessage.text && (
-          <div className={`mx-6 mt-2 px-3 py-2 rounded-lg text-xs ${
+          <div className={`mx-4 mt-3 px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 ${
             actionMessage.type === 'success'
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
               : 'bg-rose-50 text-rose-700 border border-rose-200'
           }`}>
             {actionMessage.type === 'success'
-              ? <CheckCircle className="inline mr-1 w-3 h-3" />
-              : <AlertCircle className="inline mr-1 w-3 h-3" />}
+              ? <CheckCircle className="w-3 h-3 flex-shrink-0" />
+              : <AlertCircle className="w-3 h-3 flex-shrink-0" />}
             {actionMessage.text}
           </div>
         )}
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2 px-6 py-3 border-b border-gray-100 overflow-x-auto">
-          <button
-            onClick={() => setActiveFilter('recent')}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              activeFilter === 'recent' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-600 hover:opacity-80'
-            }`}
-          >
-            Recent
-          </button>
+        {/* Filter pills */}
+        <div className="flex items-center gap-1.5 px-4 pt-3 pb-2 overflow-x-auto">
           {filters.map(f => (
-            <button
-              key={f.key}
-              onClick={() => setActiveFilter(f.key)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            <button key={f.key} onClick={() => setActiveFilter(f.key)}
+              className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                 activeFilter === f.key ? f.activeColor : f.color + ' hover:opacity-80'
-              }`}
-            >
+              }`}>
               {f.label}
-              {counts[f.key] > 0 && <span className="ml-1 opacity-75">({counts[f.key]})</span>}
+              {f.key !== 'recent' && counts[f.key] > 0 && (
+                <span className="ml-1 opacity-75">({counts[f.key]})</span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* Document List */}
-        <div className="p-5">
-          {loading ? (
-            <div className="flex items-center justify-center py-10 gap-3">
-              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-gray-400 text-sm">Loading documents…</p>
+        <div className="px-4 pb-4">
+          {loading ? loadingState : displayRequested.length === 0 ? (
+            <div className="text-center py-8 border border-dashed border-gray-200 rounded-xl">
+              <p className="text-xs text-gray-400">
+                {activeFilter === 'recent' ? 'No document requests yet.' : `No ${activeFilter.replace('_', ' ').toLowerCase()} requests.`}
+              </p>
             </div>
-          ) : (() => {
-            // For "Recent" tab: show last 4 across both flows
-            // For status tabs: show only REQUESTED docs with that status
-            const displayRequested = activeFilter === 'recent'
-              ? [...documents].filter(d => d.flow === 'REQUESTED').sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt)).slice(0, 4)
-              : requestedOnly.filter(d => d.status === activeFilter).sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
-
-            // Issued docs always shown in full (not filtered by status tab)
-            const displayIssued = [...issuedDocs].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
-
-            // ── File action row: Download only
-            const FileActions = ({ url, docType }) => (
-              <div className="flex items-center flex-shrink-0">
-                <button
-                  onClick={() => downloadFile(url, docType)}
-                  title="Download"
-                  className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5 text-gray-400" />
-                </button>
-              </div>
-            );
-
-            // ── Minimal doc card ──
-            const renderRequestedCard = (doc) => {
-              const cfg = DOC_STATUS_CONFIG[doc.status] || DOC_STATUS_CONFIG.PENDING;
-              const DocIcon = cfg.icon;
-              const needsReview = doc.status === 'FOR_REVIEW';
-              const isQuickLoading = quickActionLoading === doc.documentId;
-
-              return (
-                <div key={doc.documentId}
-                  className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="px-4 py-3">
-                    {/* Top row: icon + name + badge */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <DocIcon size={15} className={cfg.iconColor} />
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-800 truncate">{doc.documentType}</p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(doc.createdAt)}</p>
-                        </div>
-                      </div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap flex-shrink-0 ${cfg.badge}`}>
-                        {cfg.label}
-                      </span>
-                    </div>
-
-                    {/* Instruction remark */}
-                    {doc.remark && (
-                      <p className="text-[11px] text-gray-400 mt-1.5 italic pl-6">"{doc.remark}"</p>
-                    )}
-
-                    {/* Step label */}
-                    {doc.applicationTrackStep && (
-                      <div className="flex items-center gap-1 mt-1.5 pl-6">
-                        <Layers size={10} className="text-gray-300" />
-                        <span className="text-[11px] text-gray-400">{doc.applicationTrackStep.title}</span>
-                      </div>
-                    )}
-
-                    {/* Uploaded file / text */}
-                    {(doc.fileUrl || doc.textValue) && (
-                      <div className="mt-2.5 pl-6">
-                        {doc.fileUrl ? (
-                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                            <div className="flex items-center gap-2 min-w-0">
-                              {getFileIcon(doc.fileUrl)}
-                              <span className="text-xs text-gray-600 truncate">
-                                {decodeURIComponent(doc.fileUrl.split('/').pop().split('?')[0]) || 'Uploaded File'}
-                              </span>
-                            </div>
-                            <FileActions url={doc.fileUrl} docType={doc.documentType} />
-                          </div>
-                        ) : (
-                          <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="text-[10px] text-gray-400 mb-0.5">Response</p>
-                            <p className="text-xs text-gray-700">{doc.textValue}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Rejection reason */}
-                    {doc.status === 'REJECTED' && doc.staffRemark && (
-                      <div className="mt-2 pl-6">
-                        <p className="text-[10px] text-rose-500 font-medium">Rejected: <span className="font-normal italic">{doc.staffRemark}</span></p>
-                      </div>
-                    )}
-
-                    {/* Awaiting notice */}
-                    {doc.status === 'PENDING' && (
-                      <p className="text-[11px] text-amber-500 mt-1.5 pl-6">Waiting for client to upload.</p>
-                    )}
-
-                    {/* Review action buttons */}
-                    {needsReview && (
-                      <div className="mt-3 flex gap-2 pl-6">
-                        <button
-                          onClick={() => handleQuickVerify(doc)}
-                          disabled={isQuickLoading}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors"
-                        >
-                          {isQuickLoading
-                            ? <RefreshCw className="w-3 h-3 animate-spin" />
-                            : <CheckCircle className="w-3 h-3" />}
-                          Verify
-                        </button>
-                        <button
-                          onClick={() => openReviewModal(doc, 'REJECTED')}
-                          disabled={isQuickLoading}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors"
-                        >
-                          <XCircle className="w-3 h-3" /> Reject
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            };
-
-            const renderIssuedCard = (doc) => {
-              const cfg = DOC_STATUS_CONFIG[doc.status] || DOC_STATUS_CONFIG.VERIFIED;
-              const DocIcon = cfg.icon;
-
-              return (
-                <div key={doc.documentId}
-                  className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="px-4 py-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <DocIcon size={15} className={cfg.iconColor} />
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-800 truncate">{doc.documentType}</p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(doc.createdAt)}</p>
-                        </div>
-                      </div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap flex-shrink-0 ${cfg.badge}`}>
-                        {cfg.label}
-                      </span>
-                    </div>
-
-                    {doc.remark && (
-                      <p className="text-[11px] text-gray-400 mt-1.5 italic pl-6">"{doc.remark}"</p>
-                    )}
-
-                    {(doc.fileUrl || doc.textValue) && (
-                      <div className="mt-2.5 pl-6">
-                        {doc.fileUrl ? (
-                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                            <div className="flex items-center gap-2 min-w-0">
-                              {getFileIcon(doc.fileUrl)}
-                              <span className="text-xs text-gray-600 truncate">
-                                {decodeURIComponent(doc.fileUrl.split('/').pop().split('?')[0]) || 'Issued File'}
-                              </span>
-                            </div>
-                            <FileActions url={doc.fileUrl} docType={doc.documentType} />
-                          </div>
-                        ) : (
-                          <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="text-[10px] text-gray-400 mb-0.5">Content</p>
-                            <p className="text-xs text-gray-700">{doc.textValue}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            };
-
-            const noRequested = displayRequested.length === 0;
-            const noIssued    = displayIssued.length === 0;
-
-            return (
-              <div className="space-y-6">
-
-                {/* ── Requested from Client ── */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Requested from Client</span>
-                    <span className="ml-auto text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                      {requestedOnly.length} total
-                    </span>
-                  </div>
-                  {noRequested ? (
-                    <div className="text-center py-6 border border-dashed border-gray-200 rounded-lg">
-                      <p className="text-xs text-gray-400">
-                        {activeFilter === 'recent' ? 'No document requests yet.' : `No ${activeFilter.replace('_',' ').toLowerCase()} requests.`}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {displayRequested.map(doc => renderRequestedCard(doc))}
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Issued by Staff ── */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Issued by Staff</span>
-                    <span className="ml-auto text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                      {issuedDocs.length} total
-                    </span>
-                  </div>
-                  {noIssued ? (
-                    <div className="text-center py-6 border border-dashed border-gray-200 rounded-lg">
-                      <p className="text-xs text-gray-400">No documents issued yet.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {displayIssued.map(doc => renderIssuedCard(doc))}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            );
-          })()}
+          ) : (
+            <div className="space-y-2">
+              {displayRequested.map(doc => <DocCard key={doc.documentId} doc={doc} showReviewButtons />)}
+            </div>
+          )}
         </div>
-      </div>
+      </CollapsiblePanel>
+
+      {/* ── Issued by Staff panel ── */}
+      <CollapsiblePanel
+        icon={Upload}
+        iconBg="bg-emerald-100"
+        iconColor="text-emerald-600"
+        gradientFrom="from-emerald-50"
+        title="Issued by Staff"
+        subtitle="Documents provided by the team"
+        badge={issuedDocs.length}
+        defaultOpen={false}
+      >
+        <div className="px-4 pb-4 pt-3">
+          {loading ? loadingState : displayIssued.length === 0 ? (
+            <div className="text-center py-8 border border-dashed border-gray-200 rounded-xl">
+              <p className="text-xs text-gray-400">No documents issued yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {displayIssued.map(doc => <DocCard key={doc.documentId} doc={doc} />)}
+            </div>
+          )}
+        </div>
+      </CollapsiblePanel>
     </>
   );
 };
@@ -1271,10 +1380,12 @@ const TrackStepItem = ({ step, isLast, applicationId, isPeriodStep = false, onOp
           : step.status === 'PROCESSING' ? 'bg-blue-500 border-blue-200'
           : 'bg-gray-100 border-gray-200'
         }`}>
-          {isDone   ? <Check   size={14} className="text-white" />
-          : isError  ? <XCircle size={14} className="text-white" />
-          : step.status === 'PROCESSING' ? <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-          : <span className="text-xs font-bold text-gray-400">{step.order}</span>}
+          {/* Always show the step number — colour conveys status */}
+          <span className={`text-xs font-bold leading-none ${
+            isDone || isError || step.status === 'PROCESSING' ? 'text-white' : 'text-gray-400'
+          }`}>
+            {step.order}
+          </span>
         </div>
         {!isLast && (
           <div className={`w-0.5 flex-1 mt-1 ${isDone ? 'bg-emerald-300' : 'bg-gray-200'}`} style={{ minHeight: 16 }} />
@@ -1300,18 +1411,18 @@ const TrackStepItem = ({ step, isLast, applicationId, isPeriodStep = false, onOp
               </div>
             )}
 
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={handleRequestDoc}
-                className="text-[10px] text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold rounded-lg transition-colors"
               >
-                <FileText size={10} /> Request Doc
+                <FileText size={12} /> Request Doc
               </button>
               <button
                 onClick={() => onOpenStepUpdate(step, isPeriodStep)}
-                className="text-[10px] text-gray-600 hover:text-gray-800 font-medium flex items-center gap-1"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors"
               >
-                <Edit size={10} /> Update Status
+                <Edit size={12} /> Update Status
               </button>
             </div>
           </div>
@@ -1333,14 +1444,6 @@ const ServicePeriodCard = ({ period, isFirst, applicationId, onOpenDocRequest, o
     ERROR:      { bg: 'bg-rose-50',   border: 'border-rose-200',    text: 'text-rose-700',    badge: 'bg-rose-100 text-rose-700' },
   };
   const pCfg = periodStatusMap[period.status] || periodStatusMap.PENDING;
-
-  const handleRequestDocumentForPeriod = () => {
-    onOpenDocRequest({
-      title: period.periodLabel,
-      periodStepId: period.servicePeriodId,
-      periodLabel: period.periodLabel,
-    }, true);
-  };
 
   return (
     <div className={`border rounded-xl overflow-hidden transition-all ${pCfg.border} ${period.isLocked ? 'opacity-70' : ''}`}>
@@ -1705,6 +1808,8 @@ export default function ViewDetails() {
     );
   }
 
+  const hasFormData = Object.keys(application.formData || {}).length > 0;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastContainer />
@@ -1740,7 +1845,6 @@ export default function ViewDetails() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-5">
 
         {/* ── Service Info Banner ── */}
-        {/* FIX: Use flat fields from API — serviceName, servicePhoto, serviceDescription, serviceType */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-5">
             <div className="shrink-0">
@@ -1793,7 +1897,7 @@ export default function ViewDetails() {
           </div>
         </div>
 
-        {/* ── Two-column layout ── */}
+        {/* ── Two-column layout: Progress + (Form + Documents) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
 
           {/* LEFT: Application Progress */}
@@ -1828,12 +1932,20 @@ export default function ViewDetails() {
             </div>
           </div>
 
-          {/* RIGHT: Document Requests */}
-          <div>
+          {/* RIGHT: Form Data + Document Requests stacked */}
+          <div className="space-y-5">
+
+            {/* Form Data */}
+            {hasFormData && (
+              <FormDataSection formData={application.formData} />
+            )}
+
+            {/* Document Requests */}
             <DocumentManagementSection
               applicationId={application.applicationId}
               onCountChange={setDocCounts}
             />
+
           </div>
 
         </div>

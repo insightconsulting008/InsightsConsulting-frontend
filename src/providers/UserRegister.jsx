@@ -112,6 +112,7 @@ function Alert({ type, message }) {
 /* ══════════════════════════════════════════════════════════════════════ */
 export default function UserRegister() {
   const navigate = useNavigate();
+   
 
   // Form state
   const [formData, setFormData] = useState({
@@ -179,11 +180,17 @@ export default function UserRegister() {
     setApiError("");
 
     try {
-      const response = await axiosInstance.post("/user/register", formData, {
-        withCredentials: true,
-      });
+      const utmData = JSON.parse(localStorage.getItem('utmData')) || {};
+      const payload = {
+      ...formData,
+      ...utmData,
+    };
+      const response = await axiosInstance.post("/user/register", payload, {
+      withCredentials: true,
+    });
 
       if (response.data.success) {
+        localStorage.removeItem('utmData');
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("userId", response.data.userId);
@@ -214,33 +221,40 @@ export default function UserRegister() {
     }
   };
 
-  // ─── Google Auth Handlers ──────────────────────────────────────────
   const handleGoogleSuccess = async (credentialResponse) => {
-    setApiError("");
-    setGoogleLoading(true);
-    try {
-      const res = await axiosInstance.post(
-        "/user/google-auth",
-        { token: credentialResponse.credential }
-      );
+  setApiError("");
+  setGoogleLoading(true);
+  try {
+    // Read UTM data directly from localStorage
+    const utmData = JSON.parse(localStorage.getItem('utmData')) || {};
 
-      const { accessToken, role, userId } = res.data;
+    const payload = {
+      token: credentialResponse.credential,
+      ...utmData,
+    };
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("role", role);
-      if (userId) localStorage.setItem("userId", userId);
+    const res = await axiosInstance.post("/user/google-auth", payload);
 
-      window.location.href = "/user-dashboard";
-    } catch (err) {
-      console.error("Google Login Error", err);
-      setApiError(
-        err?.response?.data?.message ||
-        "Google sign-up failed. Please try again."
-      );
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
+    // Clear after successful Google registration
+    localStorage.removeItem('utmData');
+
+    const { accessToken, role, userId } = res.data;
+
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("role", role);
+    if (userId) localStorage.setItem("userId", userId);
+
+    window.location.href = "/user-dashboard";
+  } catch (err) {
+    console.error("Google Login Error", err);
+    setApiError(
+      err?.response?.data?.message ||
+      "Google sign-up failed. Please try again."
+    );
+  } finally {
+    setGoogleLoading(false);
+  }
+};
 
   const handleGoogleError = () => {
     setApiError("Google sign-up was unsuccessful. Please try again.");

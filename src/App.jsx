@@ -28,6 +28,7 @@ import UserRegister from './providers/UserRegister';
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import EmployeeResetPassword from './providers/EmployeeResetPassword';
 import UserResetPassword from './providers/UserResetPassword';
+import UTMTracker from './providers/UTMTracker';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KNOWN ROUTE REGISTRY — audit every Route in every shell page here
@@ -89,6 +90,7 @@ const USER_EXACT = [
   '/my-services',
   '/profile',
   '/documents',
+  '/transactions'
 ];
 
 const USER_PREFIX = [
@@ -173,6 +175,7 @@ const App = () => (
   
   <BrowserRouter>
     <ScrollToTop />
+    <UTMTracker />
     <Routes>
       {/* Standalone auth pages — no shell, no role required */}
       <Route path="/admin/login" element={<AdminLogin />} />

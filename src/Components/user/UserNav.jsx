@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { path: '/my-services', icon: Package, label: 'My Services' },
   { path: '/services', icon: Briefcase, label: 'Browse Services' },
   { path: '/documents', icon: FileText, label: 'Documents' },
+  { path: '/transactions', icon: FileText, label: 'Payment Transactions' },
   { path: '/profile', icon: UserCircle, label: 'Profile' },
 ];
 

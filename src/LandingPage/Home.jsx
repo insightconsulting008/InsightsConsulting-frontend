@@ -74,7 +74,6 @@ export default function Home() {
     "GST Filing",
     "MSME",
     "FSSAI",
-    "Trademark Registration",
     "ISO Certification",
     "NGO Registration",
   ];
@@ -259,7 +258,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                     "GST Registration",
                     "GST Filing",
                     "Company Incorporation",
-                    "Trademark Registration",
                     "Compliance Support",
                   ]}
                   loop={0}
@@ -911,9 +909,8 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         </style>
       </section>
 
-      <section className="bg-[#F4EBFF33] py-10 lg:py-16 ">
+      {/* <section className="bg-[#F4EBFF33] py-10 lg:py-16 ">
         <div className="lg:px-12 px-4 container mx-auto">
-          {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="w-14 h-10 rounded-full bg-blue-50 flex items-center justify-center border border-[#3E72F9] text-blue-600">
               <FaUsers />
@@ -931,14 +928,14 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             Authentic experiences from people who trusted LoanWalle when life moved faster than money — and got the support they needed.
           </p>
 
-          {/* Cards */}
+     
           <div className="grid md:grid-cols-3 gap-6 mt-10">
             {testimonials.map((item, i) => (
               <div
                 key={i}
                 className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-sm transition"
               >
-                {/* Profile */}
+            
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <img
@@ -959,12 +956,12 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   </div>
                 </div>
 
-                {/* Title */}
+                
                 <h4 className="font-semibold mt-5 text-gray-900">
                   “{item.title}”
                 </h4>
 
-                {/* Description */}
+      
                 <p className="text-gray-600 text-sm mt-3 leading-relaxed whitespace-pre-line">
                   {item.desc}
                 </p>
@@ -972,10 +969,10 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             ))}
           </div>
 
-          {/* Bottom CTA */}
+          
           <div className="flex flex-col md:flex-row items-center justify-between bg-white border border-gray-200 rounded-xl px-6 py-4 mt-10 gap-4">
             <div className="flex flex-col md:flex-row items-center gap-4">
-              {/* Avatars */}
+          
               <div className="flex -space-x-3">
                 <img
                   src="https://i.pravatar.cc/40?img=1"
@@ -1005,7 +1002,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section className="bg-[#F5F8FA] py-10 lg:py-20">
         <div className="px-4 lg:px-12 container mx-auto py-5 ">
