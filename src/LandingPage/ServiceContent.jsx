@@ -36,9 +36,9 @@ const SectionLabel = ({ label }) => (
    CARD SECTION HEADING  (primary title inside cards)
 ───────────────────────────────────────────────────────── */
 const CardHeading = ({ text }) => (
-  <div className="flex items-start gap-3 mb-6">
+  <div className="flex items-start gap-3 mb-4 lg:mb-6">
     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-    <h3 className="text-[18px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+    <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
       {stripLeadingEmoji(text)}
     </h3>
   </div>
@@ -89,16 +89,18 @@ const NoteBox = ({ text, dark = false }) => {
   const clean = stripLeadingEmoji(text);
   if (dark) {
     return (
-      <div className="flex items-start gap-3 border-l-[3px] border-red/40 bg-white/5 rounded-r-lg px-4 py-3 mt-4">
-        <Info size={13} className="text-red/60 flex-shrink-0 mt-[2px]" />
-        <p className="text-gray-400 text-[13px] lg:text-sm leading-relaxed">{clean}</p>
+      <div className="relative flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 mt-4 overflow-hidden">
+        <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-red/50" />
+        <Info size={14} className="text-gray-400 flex-shrink-0 mt-[2px] ml-1" />
+        <p className="text-gray-400 text-[13px] lg:text-[14px] leading-relaxed">{clean}</p>
       </div>
     );
   }
   return (
-    <div className="flex items-start gap-3 border-l-[3px] border-amber-400 bg-amber-50/70 rounded-r-lg px-4 py-3 mt-4">
-      <Info size={13} className="text-amber-500 flex-shrink-0 mt-[2px]" />
-      <p className="text-gray-700 text-[13px] lg:text-sm leading-relaxed">{clean}</p>
+    <div className="relative flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5 mt-4 mb-2 overflow-hidden">
+      <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-400" />
+      <Info size={14} className="text-amber-500 flex-shrink-0 mt-[2px] ml-1" />
+      <p className="text-gray-700 text-[13px] lg:text-[14px] leading-relaxed">{clean}</p>
     </div>
   );
 };
@@ -107,7 +109,7 @@ const NoteBox = ({ text, dark = false }) => {
    LIGHT ITEM CARD
 ───────────────────────────────────────────────────────── */
 const ItemCard = ({ group }) => (
-  <div className="bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm flex flex-col gap-2.5">
+  <div className="h-full bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm flex flex-col gap-2.5">
     {group.header && (
       <p className="text-[15px] font-bold text-gray-900 leading-snug mb-1">
         {stripLeadingEmoji(group.header)}
@@ -141,7 +143,7 @@ const ItemCard = ({ group }) => (
    DARK ITEM CARD
 ───────────────────────────────────────────────────────── */
 const DarkItemCard = ({ group }) => (
-  <div className="bg-gray-800/80 border border-gray-700/60 rounded-xl p-5 lg:p-6 flex flex-col gap-2.5">
+  <div className="h-full bg-gray-800/80 border border-gray-700/60 rounded-xl p-5 lg:p-6 flex flex-col gap-2.5">
     {group.header && (
       <p className="text-[15px] font-bold text-white leading-snug mb-1">
         {stripLeadingEmoji(group.header)}
@@ -180,7 +182,7 @@ const GenericSectionCard = ({ section }) => {
   const groups = parseGroups(items);
 
   return (
-    <div className="bg-secondary rounded-2xl p-7 lg:p-10">
+    <div className="bg-secondary rounded-2xl p-5 lg:p-10">
 
       {heading && <CardHeading text={heading} />}
 
@@ -242,16 +244,28 @@ const GenericSectionCard = ({ section }) => {
         </>
       ) : items?.length > 0 && (
         <ul className="space-y-3 mb-4">
-          {items.map((item, i) =>
-            item.startsWith('👉') ? (
-              <NoteBox key={i} text={item} />
-            ) : (
+          {items.map((item, i) => {
+            if (item.startsWith('👉')) {
+              const clean = stripLeadingEmoji(item);
+              /* ends with ':' → sub-label/intro title, not a callout note */
+              if (clean.endsWith(':')) {
+                return (
+                  <li key={i} className="list-none">
+                    <p className="text-[13px] font-bold tracking-wider uppercase text-gray-500 mt-1 mb-0.5">
+                      {clean.slice(0, -1)}
+                    </p>
+                  </li>
+                );
+              }
+              return <NoteBox key={i} text={item} />;
+            }
+            return (
               <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] lg:text-base leading-relaxed">
                 <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-red flex-shrink-0" />
                 {stripLeadingEmoji(item)}
               </li>
-            )
-          )}
+            );
+          })}
         </ul>
       )}
 
@@ -281,17 +295,6 @@ const GenericSectionCard = ({ section }) => {
             )
           )}
         </div>
-      )}
-
-      {/* inline note — appears right after items when extraItems also exist */}
-      {note && (
-        note.startsWith('✔') ? (
-          <div className="mt-3 inline-flex items-center gap-2 bg-red/10 border border-red/20 text-red text-sm font-semibold rounded-full px-4 py-2">
-            {note}
-          </div>
-        ) : (
-          <NoteBox text={note} />
-        )
       )}
 
       {/* closing paragraphs — shown after items, before extraItems */}
@@ -324,7 +327,7 @@ const GenericSectionCard = ({ section }) => {
       {subSections?.length > 0 && (
         <div className={`grid ${colClass(subSections.length)} gap-4 mb-4`}>
           {subSections.map((sub, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm">
+            <div key={i} className="h-full bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm">
               <p className="text-[15px] font-bold text-gray-900 leading-snug mb-3">
                 {stripLeadingEmoji(sub.heading)}
               </p>
@@ -402,7 +405,7 @@ const GenericSectionCard = ({ section }) => {
       {serviceItems?.length > 0 && (
         <div className={`grid ${colClass(serviceItems.length)} gap-4 mb-4`}>
           {serviceItems.map((item, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm">
+            <div key={i} className="h-full bg-white border border-gray-100 rounded-xl p-5 lg:p-6 shadow-sm">
               <p className="text-[15px] font-bold text-gray-900 leading-snug mb-2.5">
                 {stripLeadingEmoji(item.name)}
               </p>
@@ -421,7 +424,7 @@ const GenericSectionCard = ({ section }) => {
         <div className="mb-4">
           <ol className={`grid ${colClass(processSteps.length)} gap-4`}>
             {processSteps.map((step, i) => (
-              <li key={i} className="bg-white border border-gray-200 rounded-xl p-5 lg:p-6 shadow-sm flex items-start gap-3">
+              <li key={i} className="h-full bg-white border border-gray-200 rounded-xl p-5 lg:p-6 shadow-sm flex items-start gap-3">
                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -503,9 +506,20 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
+      {/* note — always rendered at the bottom, after all content */}
+      {note && (
+        note.startsWith('✔') ? (
+          <div className="mt-5 inline-flex items-center gap-2 bg-red/8 border border-red/25 text-red text-[13px] font-semibold rounded-xl px-4 py-2.5 shadow-sm">
+            {note}
+          </div>
+        ) : (
+          <NoteBox text={note} />
+        )
+      )}
+
       {footerNote && (
         footerNote.startsWith('✔') ? (
-          <div className="mt-3 inline-flex items-center gap-2 bg-red/10 border border-red/20 text-red text-sm font-semibold rounded-full px-4 py-2">
+          <div className="mt-3 inline-flex items-center gap-2 bg-red/8 border border-red/25 text-red text-[13px] font-semibold rounded-xl px-4 py-2.5 shadow-sm">
             {footerNote}
           </div>
         ) : (
@@ -525,12 +539,12 @@ const GenericDarkCard = ({ section }) => {
   const groups = parseGroups(items);
 
   return (
-    <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-7 lg:p-9">
+    <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-5 lg:p-9">
 
       {heading && (
-        <div className="flex items-start gap-3 mb-6">
+        <div className="flex items-start gap-3 mb-4 lg:mb-6">
           <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-          <h3 className="text-[18px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
+          <h3 className="text-[16px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
             {stripLeadingEmoji(heading)}
           </h3>
         </div>
@@ -592,12 +606,9 @@ const GenericDarkCard = ({ section }) => {
         <div className={`grid ${colClass(subSections.length)} gap-3 mt-4`}>
           {subSections.map((sub, i) => (
             <div key={i} className="bg-gray-800/70 border border-gray-700/50 rounded-xl p-4 lg:p-5">
-              <div className="flex items-start gap-2 mb-2.5 pb-2 border-b border-gray-700/60">
-                
-                <p className="text-[14px] font-bold text-white leading-snug">
-                  {stripLeadingEmoji(sub.heading)}
-                </p>
-              </div>
+              <p className="text-[14px] font-bold text-white leading-snug mb-2.5">
+                {stripLeadingEmoji(sub.heading)}
+              </p>
               {sub.description && (
                 <p className="text-gray-300 text-sm leading-relaxed mb-2">
                   {sub.description}
@@ -618,11 +629,7 @@ const GenericDarkCard = ({ section }) => {
         </div>
       )}
 
-      {note && (
-        <p className="text-red/80 text-sm font-medium mt-4 leading-relaxed">
-          {note}
-        </p>
-      )}
+      {note && <NoteBox text={note} dark />}
 
     </div>
   );
@@ -635,12 +642,12 @@ const AdvantagesSection = ({ advantages }) => {
   if (!advantages) return null;
   return (
     <section className="py-8 lg:py-12">
-      <h2 className="text-2xl lg:text-[32px] font-bold text-gray-900 mb-10 leading-tight">
+      <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
         {stripLeadingEmoji(advantages.heading)}
       </h2>
       <div className="grid sm:grid-cols-2 gap-5">
         {advantages.items.map((item, i) => (
-          <div key={i} className="bg-secondary rounded-2xl p-7 lg:p-8">
+          <div key={i} className="h-full bg-secondary rounded-2xl p-5 lg:p-8">
             <p className="text-[17px] font-bold text-red leading-snug mb-3">
               {stripLeadingEmoji(item.title)}
             </p>
@@ -671,7 +678,7 @@ const ImportantNoteSection = ({ importantNote }) => {
   if (!importantNote) return null;
   const { title, points, description, highlight } = importantNote;
   return (
-    <div className="bg-secondary rounded-2xl p-7 lg:p-10">
+    <div className="w-full h-full bg-secondary rounded-2xl p-5 lg:p-10">
       {title && <CardHeading text={title} />}
       {description && (
         <p className="text-gray-700 text-[15px] lg:text-base leading-relaxed mb-3">
@@ -680,12 +687,27 @@ const ImportantNoteSection = ({ importantNote }) => {
       )}
       {points?.length > 0 && (
         <ul className="space-y-2.5">
-          {points.map((pt, i) => (
-            <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] lg:text-base">
-              <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-red flex-shrink-0" />
-              {stripLeadingEmoji(pt)}
-            </li>
-          ))}
+          {points.map((pt, i) => {
+            if (pt.startsWith('👉')) {
+              const clean = stripLeadingEmoji(pt);
+              if (clean.endsWith(':')) {
+                return (
+                  <li key={i} className="list-none">
+                    <p className="text-[13px] font-bold tracking-wider uppercase text-gray-500 mt-1 mb-0.5">
+                      {clean.slice(0, -1)}
+                    </p>
+                  </li>
+                );
+              }
+              return <li key={i} className="list-none"><NoteBox text={pt} /></li>;
+            }
+            return (
+              <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] lg:text-base">
+                <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-red flex-shrink-0" />
+                {stripLeadingEmoji(pt)}
+              </li>
+            );
+          })}
         </ul>
       )}
       {highlight && <NoteBox text={highlight} />}
@@ -699,10 +721,10 @@ const ImportantNoteSection = ({ importantNote }) => {
 const ProcessList = ({ steps, note }) => {
   if (!steps?.length) return null;
   return (
-    <div className="bg-secondary rounded-2xl p-7 lg:p-10">
-      <div className="flex items-start gap-3 mb-6">
+    <div className="bg-secondary rounded-2xl p-5 lg:p-10">
+      <div className="flex items-start gap-3 mb-4 lg:mb-6">
         <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-        <h3 className="text-[18px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">Our End-to-End Process</h3>
+        <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">Our End-to-End Process</h3>
       </div>
       <ol className="space-y-3.5">
         {steps.map((step, i) => (
@@ -745,6 +767,32 @@ const ServiceContent = ({ hideCta = false }) => {
   const mainContentSections = service.contentSections?.filter((s) => !isDocSection(s)) || [];
   const docContentSections  = service.contentSections?.filter(isDocSection) || [];
 
+  /* ── Overview grid: compute which cards are visible, span last if alone ── */
+  const overviewKeys = [
+    service.idealFor?.length > 0        && 'idealFor',
+    service.formsHandled                 && 'formsHandled',
+    service.importantNote                && 'importantNote',
+    service.establishment                && 'establishment',
+  ].filter(Boolean);
+  const overviewLast  = overviewKeys[overviewKeys.length - 1];
+  const overviewAlone = (key) => overviewKeys.length % 2 !== 0 && overviewLast === key ? 'lg:col-span-2' : '';
+
+  /* ── Insight grid: simulate 2-col flow to detect lone last card ── */
+  const insightFlow = [
+    service.insightAdvantage            && { key: 'insightAdvantage', full: false },
+    service.postSupport?.length > 0     && { key: 'postSupport',      full: false },
+    service.commonMistakes?.length > 0  && { key: 'commonMistakes',   full: false },
+    service.growthInsight               && { key: 'growthInsight',    full: false },
+    ...(service.darkSections?.map((s, i) => ({ key: `dark_${i}`, full: !!s.fullWidth })) || []),
+  ].filter(Boolean);
+  let _rowPos = 0, _loneKey = null;
+  insightFlow.forEach(({ key, full }) => {
+    if (full) { _rowPos = 0; }
+    else { if (_rowPos === 0) _loneKey = key; _rowPos = (_rowPos + 1) % 2; }
+  });
+  const insightAlone = _rowPos === 1 ? _loneKey : null;
+  const insightSpan  = (key) => insightAlone === key ? 'sm:col-span-2' : '';
+
   /* Registration documents (from requirements) */
   const regDocs = isRegistration ? service.requirements?.documents : null;
 
@@ -757,11 +805,11 @@ const ServiceContent = ({ hideCta = false }) => {
             OVERVIEW — Ideal For + Important Note (registration)
         ──────────────────────────────────────────────── */}
         {(service.idealFor?.length > 0 || service.formsHandled || service.importantNote || service.establishment) && (
-          <section id="overview" className="py-8 lg:py-14">
-            <div className="grid lg:grid-cols-2 gap-5">
+          <section id="overview" className="py-5 lg:py-14">
+            <div className={`grid gap-5 ${overviewKeys.length > 1 ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
 
               {service.idealFor?.length > 0 && (
-                <div className="bg-secondary rounded-2xl p-7 lg:p-10">
+                <div className={`h-full bg-secondary rounded-2xl p-5 lg:p-10 ${overviewAlone('idealFor')}`}>
                   <CardHeading text={service.idealForHeading || "Ideal For"} />
                   <ul className="space-y-3">
                     {service.idealFor.map((item, i) => (
@@ -775,7 +823,7 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.formsHandled && (
-                <div className="bg-secondary rounded-2xl p-7 lg:p-10">
+                <div className={`h-full bg-secondary rounded-2xl p-5 lg:p-10 ${overviewAlone('formsHandled')}`}>
                   <CardHeading text={service.formsHandled.heading} />
                   <ul className="space-y-3">
                     {service.formsHandled.items.map((item, i) => (
@@ -792,11 +840,15 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.importantNote && (
-                <ImportantNoteSection importantNote={service.importantNote} />
+                <div className={`h-full ${overviewAlone('importantNote')}`}>
+                  <ImportantNoteSection importantNote={service.importantNote} />
+                </div>
               )}
 
               {service.establishment && (
-                <ImportantNoteSection importantNote={service.establishment} />
+                <div className={`h-full ${overviewAlone('establishment')}`}>
+                  <ImportantNoteSection importantNote={service.establishment} />
+                </div>
               )}
 
             </div>
@@ -813,9 +865,9 @@ const ServiceContent = ({ hideCta = false }) => {
             Both boxes side-by-side on desktop under one heading
         ──────────────────────────────────────────────── */}
         {isRegistration && (service.requirements?.eligibility || regDocs?.length > 0) && (
-          <section id="requirements" className="py-8 lg:py-14">
+          <section id="requirements" className="py-5 lg:py-14">
             <SectionLabel label="Requirements" />
-            <h2 className="text-2xl lg:text-[32px] font-bold text-gray-900 mb-10 leading-tight">
+            <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
               What You Need to Get Started
             </h2>
 
@@ -823,7 +875,7 @@ const ServiceContent = ({ hideCta = false }) => {
 
               {/* Eligibility */}
               {service.requirements?.eligibility && (
-                <div className="bg-secondary rounded-2xl p-7 lg:p-9">
+                <div className="h-full bg-secondary rounded-2xl p-5 lg:p-9">
                   <CardHeading text={service.requirements.eligibility.heading} />
                   <ul className="space-y-3">
                     {service.requirements.eligibility.items.map((item, i) => (
@@ -838,7 +890,7 @@ const ServiceContent = ({ hideCta = false }) => {
 
               {/* Documents Required */}
               {regDocs?.length > 0 && (
-                <div className="bg-secondary rounded-2xl p-7 lg:p-9">
+                <div className="h-full bg-secondary rounded-2xl p-5 lg:p-9">
                   <CardHeading text="Documents Required" />
                   <ul className="space-y-3">
                     {regDocs.map((doc, i) => (
@@ -863,7 +915,7 @@ const ServiceContent = ({ hideCta = false }) => {
         {mainContentSections.length > 0 && (
           <>
             {mainContentSections.map((section, i) => (
-              <section key={i} className="py-6 lg:py-10">
+              <section key={i} className="py-4 lg:py-10">
                 <GenericSectionCard section={section} />
               </section>
             ))}
@@ -879,9 +931,9 @@ const ServiceContent = ({ hideCta = false }) => {
             ? stripLeadingEmoji(docContentSections[0].heading)
             : 'Documents Required';
           return (
-          <section id="documents" className="py-8 lg:py-14">
+          <section id="documents" className="py-5 lg:py-14">
             {docTitle !== 'Documents Required' && <SectionLabel label="Documents" />}
-            <h2 className="text-2xl lg:text-[32px] font-bold text-gray-900 mb-10 leading-tight">
+            <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
               {docTitle}
             </h2>
             <div className={`grid gap-5 ${docContentSections.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
@@ -899,10 +951,10 @@ const ServiceContent = ({ hideCta = false }) => {
           INSIGHT CONSULTING ADVANTAGE — dark
       ═══════════════════════════════════════════════════ */}
       {(service.insightAdvantage || service.postSupport?.length > 0 || service.commonMistakes?.length > 0 || service.growthInsight || service.darkSections?.length > 0) && (
-        <section id="insight" className="bg-secondary py-12 lg:py-16">
+        <section id="insight" className="bg-secondary py-8 lg:py-16">
           <div className="container mx-auto px-4 lg:px-12">
             {!service.hideInsightTitle && (
-              <h2 className="text-2xl lg:text-[32px] font-bold text-black mb-12 leading-tight">
+              <h2 className="text-xl lg:text-[32px] font-bold text-black mb-8 lg:mb-12 leading-tight">
                 The Insight Consulting Advantage
               </h2>
             )}
@@ -910,10 +962,10 @@ const ServiceContent = ({ hideCta = false }) => {
             <div className="grid sm:grid-cols-2 gap-5">
 
               {service.insightAdvantage && (
-                <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-7 lg:p-9">
-                  <div className="flex items-start gap-3 mb-6">
+                <div className={`h-full bg-gray-900 border border-gray-800 rounded-2xl p-5 lg:p-9 ${insightSpan('insightAdvantage')}`}>
+                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
                     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[18px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
+                    <h3 className="text-[16px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
                       {stripLeadingEmoji(service.insightAdvantage.intro)}
                     </h3>
                   </div>
@@ -929,10 +981,10 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.postSupport?.length > 0 && (
-                <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-7 lg:p-9">
-                  <div className="flex items-start gap-3 mb-6">
+                <div className={`h-full bg-gray-900 border border-gray-800 rounded-2xl p-5 lg:p-9 ${insightSpan('postSupport')}`}>
+                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
                     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[18px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
+                    <h3 className="text-[16px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
                       {stripLeadingEmoji(service.postSupportTitle) || "Post-Filing Support"}
                     </h3>
                   </div>
@@ -952,10 +1004,10 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.commonMistakes?.length > 0 && (
-                <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-7 lg:p-9">
-                  <div className="flex items-start gap-3 mb-6">
+                <div className={`h-full bg-gray-900 border border-gray-800 rounded-2xl p-5 lg:p-9 ${insightSpan('commonMistakes')}`}>
+                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
                     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[18px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
+                    <h3 className="text-[16px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
                       Common Mistakes We Help You Avoid
                     </h3>
                   </div>
@@ -973,10 +1025,10 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.growthInsight && (
-                <div className="h-full bg-gray-900 border border-gray-800 rounded-2xl p-7 lg:p-9">
-                  <div className="flex items-start gap-3 mb-6">
+                <div className={`h-full bg-gray-900 border border-gray-800 rounded-2xl p-5 lg:p-9 ${insightSpan('growthInsight')}`}>
+                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
                     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[18px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
+                    <h3 className="text-[16px] lg:text-[20px] font-bold text-white leading-snug tracking-tight">
                       {stripLeadingEmoji(service.growthInsight.heading)}
                     </h3>
                   </div>
@@ -1004,7 +1056,7 @@ const ServiceContent = ({ hideCta = false }) => {
               )}
 
               {service.darkSections?.map((section, i) => (
-                <div key={i} className={`h-full${section.fullWidth ? ' sm:col-span-2' : ''}`}>
+                <div key={i} className={`h-full${section.fullWidth ? ' sm:col-span-2' : insightAlone === `dark_${i}` ? ' sm:col-span-2' : ''}`}>
                   <GenericDarkCard section={section} />
                 </div>
               ))}
@@ -1012,7 +1064,7 @@ const ServiceContent = ({ hideCta = false }) => {
             </div>
 
             {service.serviceNote && (
-              <div className="mt-6 w-full">
+              <div className="mt-8 w-full">
                 <NoteBox text={service.serviceNote} />
               </div>
             )}
@@ -1027,7 +1079,7 @@ const ServiceContent = ({ hideCta = false }) => {
       {service.tailSections?.length > 0 && (
         <div className="container mx-auto px-4 lg:px-12">
           {service.tailSections.map((section, i) => (
-            <section key={i} className="py-6 lg:py-10">
+            <section key={i} className="py-4 lg:py-10">
               <GenericSectionCard section={section} />
             </section>
           ))}

@@ -150,24 +150,24 @@ const ServiceInfoSection = () => {
       >
         <div className="absolute inset-0 bg-white/92" />
 
-        <div className="relative container mx-auto px-4 lg:px-12 pt-12 lg:pt-20 pb-10">
+        <div className="relative container mx-auto px-4 lg:px-12 pt-8 lg:pt-20 pb-8 lg:pb-10">
 
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-400 mb-10">
             Home
             {categoryName    && <span> / {categoryName}</span>}
-            {subCategoryName && <span> / {subCategoryName}</span>}
+            {/* {subCategoryName && <span> / {subCategoryName}</span>} */}
             {selectedService && (
               <span className="text-gray-700 font-medium"> / {selectedService.name}</span>
             )}
           </nav>
 
           {/* ── Two-column: content + form ── */}
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
 
             {/* LEFT */}
             <div>
-              <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-2xl lg:text-5xl font-bold text-gray-900 leading-tight mb-3 lg:mb-4">
                 {selectedService?.name || subCategoryName}
               </h1>
 
@@ -180,45 +180,45 @@ const ServiceInfoSection = () => {
 
 
               {selectedService?.whyChoose && (
-                <div className="mb-8 mt-8">
+                <div className="mb-5 mt-5 lg:mb-8 lg:mt-8">
                   {stripLeadingEmoji(selectedService.whyChoose.heading) && (
-                    <div className="flex items-start gap-3 mb-5">
+                    <div className="flex items-start gap-3 mb-3 lg:mb-5">
                       <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                      <h2 className="text-xl lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
+                      <h2 className="text-[17px] lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
                         {stripLeadingEmoji(selectedService.whyChoose.heading)}
                       </h2>
                     </div>
                   )}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5 lg:space-y-3">
                     {selectedService.whyChoose.paragraphs?.map((para, i) => (
-                      <p key={i} className="text-gray-600 text-base leading-relaxed">
+                      <p key={i} className="text-gray-600 text-[15px] lg:text-base leading-relaxed">
                         {stripLeadingEmoji(para)}
                       </p>
                     ))}
                     {selectedService.whyChoose.items?.length > 0 && (
                       <ul className="space-y-2 pl-1">
                         {selectedService.whyChoose.items.map((item, i) => (
-                          <li key={i} className="flex items-start gap-3 text-gray-600 text-base leading-relaxed">
-                            <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-red flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-3 text-gray-600 text-[15px] lg:text-base leading-relaxed">
+                            <span className="mt-[8px] w-1.5 h-1.5 rounded-full bg-red flex-shrink-0" />
                             {item}
                           </li>
                         ))}
                       </ul>
                     )}
                     {selectedService.whyChoose.note && (
-                      <p className="text-gray-500 text-sm leading-relaxed italic">
+                      <p className="text-gray-500 text-[13px] lg:text-sm leading-relaxed italic">
                         {stripLeadingEmoji(selectedService.whyChoose.note)}
                       </p>
                     )}
                     {selectedService.whyChoose.closingParagraphs?.map((p, i) => (
-                      <p key={i} className="text-gray-600 text-base leading-relaxed">
+                      <p key={i} className="text-gray-600 text-[15px] lg:text-base leading-relaxed">
                         {p}
                       </p>
                     ))}
                     {selectedService.whyChoose.extraItems?.length > 0 && (
                       <ul className="space-y-2">
                         {selectedService.whyChoose.extraItems.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600 text-base leading-relaxed">
+                          <li key={i} className="flex items-start gap-2 text-gray-600 text-[15px] lg:text-base leading-relaxed">
                             <span className="flex-shrink-0 text-base leading-snug mt-[1px]">❌</span>
                             {item}
                           </li>
@@ -226,7 +226,7 @@ const ServiceInfoSection = () => {
                       </ul>
                     )}
                     {selectedService.whyChoose.closingText && (
-                      <p className="text-gray-600 text-base leading-relaxed">
+                      <p className="text-gray-600 text-[15px] lg:text-base leading-relaxed">
                         {selectedService.whyChoose.closingText}
                       </p>
                     )}
@@ -257,10 +257,10 @@ const ServiceInfoSection = () => {
                 }
                 /* ── Normal hero section ── */
                 return (
-                  <div key={i} className="mb-8">
-                    <div className="flex items-start gap-3 mb-4">
+                  <div key={i} className="mb-5 lg:mb-8">
+                    <div className="flex items-start gap-3 mb-3 lg:mb-4">
                       <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                      <h2 className="text-xl lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
+                      <h2 className="text-[17px] lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
                         {stripLeadingEmoji(sec.heading)}
                       </h2>
                     </div>
@@ -268,11 +268,11 @@ const ServiceInfoSection = () => {
                       <div className="space-y-3 mb-4">
                         {sec.paragraphs.map((p, j) =>
                           p.endsWith('?') ? (
-                            <div key={j} className="bg-red/5 border-l-4 border-red/40 rounded-r-xl px-5 py-3 my-1">
-                              <p className="text-gray-800 text-base font-semibold leading-relaxed">{p}</p>
+                            <div key={j} className="bg-red/5 border-l-4 border-red/40 rounded-r-xl px-4 py-2.5 my-1">
+                              <p className="text-gray-800 text-[15px] lg:text-base font-semibold leading-relaxed">{p}</p>
                             </div>
                           ) : (
-                            <p key={j} className="text-gray-600 text-base leading-relaxed">{p}</p>
+                            <p key={j} className="text-gray-600 text-[15px] lg:text-base leading-relaxed">{p}</p>
                           )
                         )}
                       </div>
@@ -300,16 +300,16 @@ const ServiceInfoSection = () => {
 
               {/* Our End-to-End Process */}
               {process.length > 0 && (
-                <div className="mb-10">
-                  <div className="flex items-start gap-3 mb-5">
+                <div className="mb-6 lg:mb-10">
+                  <div className="flex items-start gap-3 mb-3 lg:mb-5">
                     <span className="w-[3px] h-6 bg-red rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-xl font-bold text-gray-900 leading-snug tracking-tight">
+                    <h3 className="text-[17px] lg:text-xl font-bold text-gray-900 leading-snug tracking-tight">
                       Our End-to-End Process
                     </h3>
                   </div>
                   <ol className="space-y-3">
                     {process.map((step, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-700 text-base">
+                      <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] lg:text-base">
                         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
                           {String(i + 1).padStart(2, "0")}
                         </span>
