@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { servicesData } from "../data/servicesData";
+import { Headphones } from "lucide-react";
 
 /* 
   Safely build flat list of all services – skip any missing subcategories, 
@@ -127,17 +128,13 @@ const Enquiryform = ({ initialService = "" }) => {
         className="bg-white relative rounded-2xl shadow-xl w-full max-w-md"
       >
         {/* Header */}
-        <div className="bg-blue-100 px-6 rounded-t-2xl py-4 flex items-center gap-3">
-          <img
-            src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/call.png"
-            className="w-12"
-            alt=""
-          />
+        <div className="bg-primary px-6 rounded-t-2xl py-4 flex items-center gap-3">
+         <Headphones className="w-8 h-8 text-white" />
           <div>
-            <h3 className="font-semibold text-gray-800">
+            <h3 className="font-semibold text-white">
               Get Your Compliance Support
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-200">
               We’re here to assist you quickly ⚡
             </p>
           </div>
@@ -155,7 +152,7 @@ const Enquiryform = ({ initialService = "" }) => {
               value={formData.fullName}
               onChange={handleChange}
               placeholder="Enter Your Full Name"
-              className="mt-1 w-full bg-gray-100 text-gray-600 border border-gray-200 placeholder:text-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="mt-1 w-full bg-gray-100 text-gray-600 border border-gray-200 placeholder:text-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -170,7 +167,7 @@ const Enquiryform = ({ initialService = "" }) => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter Your Email"
-                className="mt-1 w-full bg-gray-100 text-gray-600 border placeholder:text-gray-700 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="mt-1 w-full bg-gray-100 text-gray-600 border placeholder:text-gray-700 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -184,7 +181,7 @@ const Enquiryform = ({ initialService = "" }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter Your Phone No"
-                className="mt-1 w-full bg-gray-100 text-gray-600 border placeholder:text-gray-700 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="mt-1 w-full bg-gray-100 text-gray-600 border placeholder:text-gray-700 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -258,7 +255,7 @@ const Enquiryform = ({ initialService = "" }) => {
               value={formData.comments}
               onChange={handleChange}
               placeholder="Enter Your Comments Here"
-              className="mt-1 w-full border text-gray-600 border-gray-200 bg-gray-100 placeholder:text-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="mt-1 w-full border text-gray-600 border-gray-200 bg-gray-100 placeholder:text-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -272,7 +269,7 @@ const Enquiryform = ({ initialService = "" }) => {
                 ? "bg-gray-400"
                 : success
                 ? "bg-green-600"
-                : "bg-red hover:bg-red-700"
+                : "bg-primary hover:bg-primary/90"
             } text-white`}
           >
             {loading
@@ -289,7 +286,7 @@ const Enquiryform = ({ initialService = "" }) => {
             </p>
           )}
           {errorMsg && (
-            <p className="text-red-600 text-sm text-center">{errorMsg}</p>
+            <p className="text-primary text-sm text-center">{errorMsg}</p>
           )}
         </div>
       </form>

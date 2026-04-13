@@ -54,10 +54,11 @@ const ADMIN_EXACT = [
   '/email-config',
   '/add-blog',           // create blog
   '/manage-blog',        // blog list
+  '/utm',
+  '/requests'
 ];
 const ADMIN_PREFIX = [
   '/services/',   // /services/add  /services/bundle/add
-                  // /services/:serviceId  /services/edit/:serviceId
   '/orders/',     // /orders/:applicationId
   '/settings/',   // /settings/general
   '/services/edit/',

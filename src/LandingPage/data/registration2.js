@@ -40,11 +40,11 @@ const data2={
             ["NGO tax exemption", "✅", "❌"],
             ["Donor tax benefit", "❌", "✅"],
             ["Credibility", "✅", "✅"],
-            ["Easier fundraising", "⚠️", "✅"]
+            ["Easier fundraising", "❌", "✅"]
           ]
         },
         "points": [
-          "👉 Together they:",
+          "👉 Having both 12A + 80G gives a complete advantage:",
           "Improve credibility",
           "Increase fund inflow",
           "Ensure tax efficiency",
@@ -127,7 +127,7 @@ const data2={
           "headers": ["Criteria", "12A", "80G"],
           "rows": [
             ["Purpose", "Tax exemption for NGO", "Tax benefit for donors"],
-            ["Mandatory for NGO survival", "✅", "⚠️ (but highly important)"],
+            ["Mandatory for NGO survival", "✅", "Important"],
             ["Focus", "Nature of NGO", "Transparency + donor benefit"]
           ]
         }
@@ -185,7 +185,7 @@ const data2={
           "Be a Society",
           "Be a Section 8 Company",
           "Have:",
-          "PAN card",
+          "PAN card of NGO",
           "Registration certificate",
           "Details of governing members",
           "DSC"

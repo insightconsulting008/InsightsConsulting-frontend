@@ -1,30 +1,183 @@
+/* ── Premium font imports — MUST be first ─────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&display=swap');
+
 @import "tailwindcss";
 
 html {
   scroll-behavior: smooth;
 }
 
+/* ════════════════════════════════════════════════════════
+   LANDING PAGE — Midnight Blue Premium Theme
+════════════════════════════════════════════════════════ */
 
-@layer components {
-  .btn-primary {
-    @apply bg-[#6869AC] text-white px-4 py-2;
-  }
-  .btn-secondary {
-    @apply border-[#6869AC] bg-[#F0F0F7] border text-[#4C4C4C] px-4 py-2;
-  }
-  .border{
-    @apply border-2 border-[#E5EFFF]
-  }
+/* ── 1. FORCE FONTS ───────────────────────────────────── */
+.landing-page,
+.landing-page * {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-page h4,
+.landing-page h5,
+.landing-page h6,
+.landing-page .font-bold,
+.landing-page .font-extrabold,
+.landing-page .font-semibold,
+.landing-page .font-medium {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  letter-spacing: -0.025em !important;
+}
+
+.landing-page h1 { font-weight: 700 !important; line-height: 1.1 !important; }
+.landing-page h2 { font-weight: 700 !important; line-height: 1.15 !important; }
+.landing-page h3 { font-weight: 600 !important; line-height: 1.2 !important; }
+.landing-page h4 { font-weight: 600 !important; }
+
+/* ── 2. TEXT COLOR SYSTEM ─────────────────────────────── */
+.landing-page .text-gray-950 { color: #020617 !important; }
+.landing-page .text-gray-900 { color: #0F172A !important; }
+.landing-page .text-gray-800 { color: #1E293B !important; }
+.landing-page .text-gray-700 { color: #334155 !important; }
+.landing-page .text-gray-600 { color: #475569 !important; }
+.landing-page .text-gray-500 { color: #64748B !important; }
+.landing-page .text-gray-400 { color: #94A3B8 !important; }
+.landing-page .text-gray-300 { color: #CBD5F5 !important; }
+.landing-page .text-gray-200 { color: #E2E8F0 !important; }
+.landing-page .text-gray-100 { color: #F1F5F9 !important; }
+
+/* ── 3. BACKGROUND + BORDER SYSTEM ───────────────────── */
+.landing-page .bg-gray-50  { background-color: #F8FAFC !important; }
+.landing-page .bg-gray-100 { background-color: #F1F5F9 !important; }
+.landing-page .bg-gray-200 { background-color: #E2E8F0 !important; }
+
+.landing-page .border-gray-100 { border-color: #F1F5F9 !important; }
+.landing-page .border-gray-200 { border-color: #E2E8F0 !important; }
+
+/* ── 4. PRIMARY COLOR SYSTEM ─────────────────────────── */
+.landing-page {
+  --color-primary:        #1D4ED8;
+  --color-primary-hover:  #1E40AF;
+  --color-primary-active: #1E3A8A;
+  --color-primary-subtle: #EFF6FF;
+  --color-primary-muted:  #DBEAFE;
+  --color-primary-border: #93C5FD;
+  --color-primary-text:   #1E3A8A;
+
+  --primary-50:  #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-200: #BFDBFE;
+  --primary-300: #93C5FD;
+  --primary-400: #60A5FA;
+  --primary-500: #3B82F6;
+  --primary-600: #1D4ED8;
+  --primary-700: #1E40AF;
+  --primary-800: #1E3A8A;
+  --primary-900: #172554;
+}
+
+/* ── FORCE PRIMARY (gradient upgrade) ─────────────────── */
+.landing-page .bg-primary {
+  background: linear-gradient(135deg, #1D4ED8, #38BDF8) !important;
+}
+
+.landing-page .text-primary { color: #1D4ED8 !important; }
+.landing-page .border-primary { border-color: #1D4ED8 !important; }
+.landing-page .ring-primary { --tw-ring-color: #1D4ED8 !important; }
+
+.landing-page .hover\:bg-primary:hover {
+  background: linear-gradient(135deg, #1E40AF, #0EA5E9) !important;
+}
+
+.landing-page .hover\:text-primary:hover { color: #1D4ED8 !important; }
+
+.landing-page .bg-primary\/90 { background-color: rgb(29 78 216 / 0.9) !important; }
+.landing-page .bg-primary\/20 { background-color: rgb(29 78 216 / 0.2) !important; }
+.landing-page .bg-primary\/10 { background-color: rgb(29 78 216 / 0.1) !important; }
+
+.landing-page .text-primary\/80 { color: rgb(29 78 216 / 0.8) !important; }
+
+.landing-page .focus\:ring-primary:focus {
+  --tw-ring-color: rgb(29 78 216 / 0.4) !important;
+}
+
+/* ── 5. TYPOGRAPHY POLISH ───────────────────────────── */
+.landing-page p,
+.landing-page li {
+  line-height: 1.78 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.landing-page a {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+
+/* Minimum readable font sizes */
+.landing-page .text-sm  { font-size: 14px !important; line-height: 1.6 !important; }
+.landing-page .text-xs  { font-size: 12px !important; }
+.landing-page .text-base { font-size: 16px !important; }
+
+/* Service page body text readability boost */
+.landing-page .text-gray-700,
+.landing-page .text-gray-600 {
+  font-size: 15px;
+}
+
+.landing-page .tracking-widest { letter-spacing: 0.1em !important; }
+.landing-page .tracking-wider { letter-spacing: 0.07em !important; }
+
+/* ── 6. THEME TOKENS ─────────────────────────────────── */
 @theme {
-  --color-primary: #6869AC;
-  --color-secondary: #F0F0F7;
-  --color-textdark: #170F49;
-  --color-textlight: #888888;
+  --color-primary:   #1D4ED8;
+  --color-secondary: #F8FAFC;
+  --color-accent:    #38BDF8;
+
+  --color-textdark:   #020617;
+  --color-textlight:  #475569;
   --color-textbright: #FFFFFF;
-  --color-bright: #FFFFFF;
-  --color-dark: #000000;
-  --color-red: #D11C16;
-  --color-yellow: #F0B604;
+
+  --color-muted:   #4B5563;
+  --color-subtle:  #94A3B8;
+
+  --color-bright:   #FFFFFF;
+  --color-dark:     #020617;
+  --color-bodydark: #020617;
+
+  --color-surface:   #FFFFFF;
+  --color-surface-2: #F1F5F9;
+  --color-surface-3: #E2E8F0;
+
+  --color-border:      #E2E8F0;
+  --color-border-soft: #F1F5F9;
+
+  --color-highlight: #93C5FD;
+
+  --color-yellow:  #F59E0B;
+  --color-success: #16A34A;
+  --color-error:   #DC2626;
+  --color-info:    #0EA5E9;
+}
+
+/* ── 7. COMPONENTS ───────────────────────────────────── */
+@layer components {
+  .btn-primary {
+    @apply text-white px-4 py-2;
+    background: linear-gradient(135deg, #1D4ED8, #38BDF8);
+  }
+
+  .btn-secondary {
+    @apply border px-4 py-2;
+    border-color: #1D4ED8;
+    background-color: #EFF6FF;
+    color: #1E3A8A;
+  }
+
+  .border {
+    @apply border-2;
+    border-color: #E2E8F0;
+  }
 }

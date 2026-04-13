@@ -138,7 +138,7 @@ export default function Nav() {
           </span>
           <button
             onClick={() => navigate("/contact")}
-            className="ml-2 block bg-red-600 lg:hidden hover:bg-red-700 px-4 py-1 rounded font-semibold"
+            className="ml-2 block bg-primary lg:hidden hover:bg-primary/90 px-4 py-1 rounded font-semibold"
           >
             Enquire Now
           </button>
@@ -201,7 +201,7 @@ export default function Nav() {
                 >
                   <button
                     className={`flex items-center gap-1 font-medium transition-colors ${
-                      isCatActive(cat) ? "text-red-600" : "text-gray-700 hover:text-red-500"
+                      isCatActive(cat) ? "text-primary" : "text-gray-700 hover:text-primary"
                     }`}
                   >
                     {cat.categoryName}
@@ -237,7 +237,7 @@ export default function Nav() {
                       onMouseLeave={scheduleClose}
                     >
                       {/* top red accent */}
-                      <div className="absolute inset-x-0 top-0 h-0.5 bg-red-600 z-10" />
+                      <div className="absolute inset-x-0 top-0 h-0.5 bg-primary z-10" />
 
                       {/* ── LEFT: subcategory list (only for non-merged multi-sub cats) ── */}
                       {showLeftPanel && (
@@ -252,7 +252,7 @@ export default function Nav() {
                               onClick={() => goToSub(sub)}
                               className={`w-full text-left px-4 py-2 text-sm font-medium transition-colors flex items-center justify-between gap-1 ${
                                 activeSubId === sub.subCategoryId
-                                  ? "bg-red-50 text-red-600"
+                                  ? "bg-secondary text-primary"
                                   : "text-gray-700 hover:bg-gray-100"
                               }`}
                             >
@@ -286,8 +286,8 @@ export default function Nav() {
                                       onClick={() => goToService(sub, svc)}
                                       className={`block w-full text-left px-2.5 py-1.5 rounded-lg text-sm transition-colors ${
                                         isActive
-                                          ? "text-red-600 bg-red-50 font-medium"
-                                          : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                          ? "text-primary bg-secondary font-medium"
+                                          : "text-gray-600 hover:text-primary hover:bg-secondary"
                                       }`}
                                     >
                                       {strip(svc.name)}
@@ -313,8 +313,8 @@ export default function Nav() {
                                       onClick={() => goToService(activeSub, service)}
                                       className={`block w-full text-left px-2.5 py-1.5 rounded-lg text-sm transition-colors ${
                                         isActive
-                                          ? "text-red-600 bg-red-50 font-medium"
-                                          : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                          ? "text-primary bg-secondary font-medium"
+                                          : "text-gray-600 hover:text-primary hover:bg-secondary"
                                       }`}
                                     >
                                       {strip(service.name)}
@@ -334,7 +334,7 @@ export default function Nav() {
 
             <button
               onClick={() => navigate("/login")}
-              className="ml-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold"
+              className="ml-2 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-semibold"
             >
               Login
             </button>
@@ -361,7 +361,7 @@ export default function Nav() {
               to="/"
               onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
-                `block py-3 text-sm font-medium ${isActive ? "text-red-600" : "text-gray-700"}`
+                `block py-3 text-sm font-medium ${isActive ? "text-primary" : "text-gray-700"}`
               }
             >
               Home
@@ -377,7 +377,7 @@ export default function Nav() {
                 <div key={cat.categoryId}>
                   <button
                     className={`w-full flex justify-between py-3 text-sm font-semibold ${
-                      catActive ? "text-red-600" : "text-gray-800"
+                      catActive ? "text-primary" : "text-gray-800"
                     }`}
                     onClick={() =>
                       setMobileOpenCat(isCatOpen ? null : cat.categoryId)
@@ -404,8 +404,8 @@ export default function Nav() {
                                   onClick={() => goToService(sub, service)}
                                   className={`text-sm py-2 px-3 rounded-lg w-full text-left transition-colors ${
                                     isActive
-                                      ? "text-red-600 bg-red-50 font-medium"
-                                      : "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                      ? "text-primary bg-secondary font-medium"
+                                      : "text-gray-600 hover:text-primary hover:bg-secondary"
                                   }`}
                                 >
                                   {strip(service.name)}
@@ -425,7 +425,7 @@ export default function Nav() {
                               <button
                                 onClick={() => setMobileOpenSub(isSubOpen ? null : sub.subCategoryId)}
                                 className={`w-full flex justify-between items-center py-2 pl-3 pr-2 text-sm font-medium transition-colors ${
-                                  isSubActive ? "text-red-600" : "text-gray-700"
+                                  isSubActive ? "text-primary" : "text-gray-700"
                                 }`}
                               >
                                 <span className="text-left">{strip(sub.subCategoryName)}</span>
@@ -447,8 +447,8 @@ export default function Nav() {
                                           onClick={() => goToService(sub, service)}
                                           className={`text-sm py-2 px-3 rounded-lg w-full text-left transition-colors ${
                                             isActive
-                                              ? "text-red-600 bg-red-50 font-medium"
-                                              : "text-gray-500 hover:text-red-600 hover:bg-red-50"
+                                              ? "text-primary bg-secondary font-medium"
+                                              : "text-gray-500 hover:text-primary hover:bg-secondary"
                                           }`}
                                         >
                                           {strip(service.name)}
@@ -474,7 +474,7 @@ export default function Nav() {
                 to={to}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `block py-3 text-sm font-medium ${isActive ? "text-red-600" : "text-gray-700"}`
+                  `block py-3 text-sm font-medium ${isActive ? "text-primary" : "text-gray-700"}`
                 }
               >
                 {label}
@@ -490,13 +490,13 @@ export default function Nav() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setMobileOpen(false); navigate("/login"); }}
-                className="flex-1 border border-red-600 text-red-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-red-50 transition-colors"
+                className="flex-1 border border-primary text-primary text-sm font-semibold py-2.5 rounded-lg hover:bg-secondary transition-colors"
               >
                 Login
               </button>
               <button
                 onClick={() => { setMobileOpen(false); navigate("/contact"); }}
-                className="flex-1 bg-red-600 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 bg-primary text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Enquire Now
               </button>

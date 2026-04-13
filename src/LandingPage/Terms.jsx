@@ -59,7 +59,7 @@ const Terms = () => {
     <div className="bg-gray-50 min-h-screen flex flex-col items-center">
       {/* HERO SECTION */}
       <div className="text-center py-16 max-w-3xl px-6">
-        <p className="text-red-500 font-medium text-sm mb-3">
+        <p className="text-primary font-medium text-sm mb-3">
           Privacy Policy
         </p>
 
@@ -102,7 +102,7 @@ const Terms = () => {
       </div>
       
       <div className="container mx-auto ">
-        <div className="flex flex-col md:flex-row md:w-[80%] my-10 justify-center pl-10 md:p-0 text-[#213454]">
+        <div className="flex flex-col md:flex-row md:w-[80%] my-10 justify-center pl-10 md:p-0 text-textdark">
           {/* LEFT SIDE MENU - STICKY */}
           <div className="md:w-[40%] md:flex flex-col items-center md:space-y-7 space-y-5 md:sticky md:top-34 md:self-start">
             <div className="space-y-5 text-xl flex flex-col font-semibold">
@@ -141,7 +141,7 @@ const Terms = () => {
             <div ref={termsRef} data-section="terms" className="space-y-5 scroll-mt-32 w-full">
               <div className="text-2xl space-y-2">
                 <h1 className="font-medium">Terms and Conditions</h1>
-                <hr className="border-[0.2rem] border-[#213454] w-[10%] ml-1" />
+                <hr className="border-[0.2rem] border-textdark w-[10%] ml-1" />
 
                 <p className="opacity-75 text-base">
                   Welcome to Insight Consulting. By accessing or using our
@@ -210,7 +210,7 @@ const Terms = () => {
             <div ref={privacyRef} data-section="privacy" className="space-y-5 scroll-mt-32 w-full">
               <div className="text-2xl space-y-2">
                 <h1 className="font-medium">Privacy Policy</h1>
-                <hr className="border-[0.2rem] border-[#213454] w-[10%] ml-1" />
+                <hr className="border-[0.2rem] border-textdark w-[10%] ml-1" />
 
                 <p className="opacity-75 text-base">
                   Insight Consulting values your privacy and is committed to
@@ -264,7 +264,7 @@ const Terms = () => {
             <div ref={refundRef} data-section="refund" className="space-y-5 scroll-mt-32 w-full">
               <div className="text-2xl space-y-2">
                 <h1 className="font-medium">Cancellation / Refund Policy</h1>
-                <hr className="border-[0.2rem] border-[#213454] w-[10%] ml-1" />
+                <hr className="border-[0.2rem] border-textdark w-[10%] ml-1" />
 
                 <p className="opacity-75 text-base">
                   Insight Consulting aims to provide professional and reliable

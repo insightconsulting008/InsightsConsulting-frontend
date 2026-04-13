@@ -108,7 +108,7 @@ export default function Blogdesc() {
 
     doc.querySelectorAll("blockquote").forEach((el) => {
       el.className =
-        "border-l-4 border-red-500 pl-4 italic text-gray-700 my-8";
+        "border-l-4 border-primary pl-4 italic text-gray-700 my-8";
     });
 
     doc.querySelectorAll("ul").forEach((el) => {
@@ -206,7 +206,7 @@ export default function Blogdesc() {
         <div className="text-center">
           <div className="mb-6">
             <svg 
-              className="mx-auto h-24 w-24 text-red-500" 
+              className="mx-auto h-24 w-24 text-primary"
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -227,7 +227,7 @@ export default function Blogdesc() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             Try Again
           </button>
@@ -264,7 +264,7 @@ export default function Blogdesc() {
           </p>
           <a
             href="/blogs"
-            className="inline-block bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+            className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             Back to Blogs
           </a>
@@ -279,7 +279,7 @@ export default function Blogdesc() {
       <div className="grid md:grid-cols-2 gap-10 items-center relative">
         <div className="relative">
           <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-            <span className="bg-red-100 text-red-500 px-3 py-1 rounded-full text-xs">
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs">
               {blog.category || ""}
             </span>
             {blog.readTime && (
@@ -326,7 +326,7 @@ export default function Blogdesc() {
       <div className="grid md:grid-cols-4 gap-10 mt-14">
         {/* TOC — collapsible on mobile */}
         <aside className="md:col-span-1 md:sticky md:top-35 md:h-fit">
-          <h3 className="text-red-500 text-xl font-semibold mb-4">
+          <h3 className="text-primary text-xl font-semibold mb-4">
             Table of contents
           </h3>
 
@@ -363,7 +363,7 @@ export default function Blogdesc() {
                     }, 500);
                   }}
                   className={`transition ${activeId === item.id
-                      ? "text-red-500 font-semibold border-l-2 border-red-500 pl-2"
+                      ? "text-primary font-semibold border-l-2 border-primary pl-2"
                       : "text-gray-600 hover:text-black"
                     }`}
                 >
