@@ -154,6 +154,7 @@ function rawSectionToGeneric(s) {
   }
   return {
     heading: s.title,
+    ...(s.inlineDoc && { inlineDoc: true }),
     ...(paragraphs.length && { paragraphs }),
     ...buildPointsField(s.points),
     // when points exist: extraDescription → closingParagraphs (array) or intro text for extraItems (string wrapped)
@@ -739,7 +740,7 @@ function normalizeCfoService(rawData) {
   const darkSections = [];
   const heroSections = [];
 
-  const HERO_TITLES = ['VCFO – SUCCESS PILLARS', 'VCFO - SUCCESS PILLARS'];
+  const HERO_TITLES = [];
   const INTRO_TITLE = 'INTRO';
 
   // Reference to the intro entry so "WHAT IS..." sections can be injected into it
@@ -767,7 +768,7 @@ function normalizeCfoService(rawData) {
         // transition text rendered as a styled subtitle (not a NoteBox)
         ...(sec.transition && { transitionText: sec.transition.replace(/^👉\s*/,'') }),
       };
-      contentSections.push(introEntry);
+      heroSections.push(introEntry);
 
     // ── "WHAT IS..." sections — inject directly into the intro card ──
     } else if (isWhatIs && sec.content) {

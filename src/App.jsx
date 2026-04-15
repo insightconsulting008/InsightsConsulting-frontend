@@ -107,6 +107,7 @@ const LANDING_EXACT = [
   '/contact',
   '/about',
   '/servicehub',
+  '/terms&conditions'
 ];
 const LANDING_PREFIX = [
   '/resource/',   // /resource/:slug

@@ -38,7 +38,7 @@ const HeroComparisonTable = ({ table }) => {
             {table.headers.map((h, i) => (
               <th
                 key={i}
-                className={`pb-2 font-semibold text-gray-700 ${i === 0 ? "text-left" : "text-center w-24"}`}
+                className={`pb-2 font-semibold text-gray-900 ${i === 0 ? "text-left" : "text-center w-24"}`}
               >
                 <span
                   className={`inline-flex items-center gap-1.5 ${i > 0 ? "justify-center" : ""}`}
@@ -56,7 +56,7 @@ const HeroComparisonTable = ({ table }) => {
               {row.map((cell, j) => (
                 <td
                   key={j}
-                  className={`py-2 text-gray-600 text-[14px] leading-relaxed ${j === 0 ? "font-medium" : "text-center text-base"}`}
+                  className={`py-2 text-gray-900 text-[14px] leading-relaxed ${j === 0 ? "font-medium" : "text-center text-base"}`}
                 >
                   {cell}
                 </td>
@@ -75,26 +75,26 @@ const HeroIntroSection = ({ data }) => (
       {stripLeadingEmoji(data.title)}
     </h3>
     {data.description && (
-      <p className="text-gray-600 text-[15px] lg:text-[16px] leading-relaxed mb-3">
+      <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed mb-3">
         {data.description}
       </p>
     )}
     {data.listHeading && (
-      <p className="text-sm font-semibold text-gray-800 mb-2">
+      <p className="text-sm font-semibold text-gray-900 mb-2">
         {data.listHeading}
       </p>
     )}
     {data.items?.length > 0 && (
       <ul className="space-y-1.5 mb-2">
         {data.items.map((item, i) => (
-          <li key={i} className="text-gray-600 text-[14px] leading-relaxed">
+          <li key={i} className="text-gray-900 text-[14px] leading-relaxed">
             {item}
           </li>
         ))}
       </ul>
     )}
     {data.note && (
-      <p className="text-gray-500 text-[13px] leading-relaxed italic">
+      <p className="text-gray-900 text-[13px] leading-relaxed italic">
         {data.note}
       </p>
     )}
@@ -109,21 +109,21 @@ const HeroCombinedSection = ({ data }) => {
         {stripLeadingEmoji(data.title)}
       </h3>
       {data.introText && (
-        <p className="text-gray-600 text-[15px] lg:text-[16px] leading-relaxed mb-1">
+        <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed mb-1">
           {data.introText}
         </p>
       )}
       <HeroComparisonTable table={data.table} />
       {bulletItems.length > 0 && (
         <>
-          <p className="text-sm font-semibold text-gray-800 mt-3 mb-2">
+          <p className="text-sm font-semibold text-gray-900 mt-3 mb-2">
             Together they:
           </p>
           <ul className="space-y-1.5 mb-2">
             {bulletItems.map((item, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-gray-600 text-[14px] leading-relaxed"
+                className="flex items-start gap-2 text-gray-900 text-[14px] leading-relaxed"
               >
                 <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                 {item}
@@ -133,7 +133,7 @@ const HeroCombinedSection = ({ data }) => {
         </>
       )}
       {data.note && (
-        <p className="text-gray-500 text-[13px] leading-relaxed italic">
+        <p className="text-gray-900 text-[13px] leading-relaxed italic">
           {data.note}
         </p>
       )}
@@ -186,7 +186,7 @@ const ServiceInfoSection = () => {
             {categoryName && <span> / {categoryName}</span>}
             {/* {subCategoryName && <span> / {subCategoryName}</span>} */}
             {selectedService && (
-              <span className="text-gray-700 font-medium">
+              <span className="text-gray-900 font-medium">
                 {" "}
                 / {selectedService.name}
               </span>
@@ -221,7 +221,7 @@ const ServiceInfoSection = () => {
                     {selectedService.whyChoose.paragraphs?.map((para, i) => (
                       <p
                         key={i}
-                        className="text-gray-600 text-[15px] lg:text-[17px] leading-relaxed"
+                        className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
                       >
                         {stripLeadingEmoji(para)}
                       </p>
@@ -231,7 +231,7 @@ const ServiceInfoSection = () => {
                         {selectedService.whyChoose.items.map((item, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-3 text-gray-600 text-[15px] lg:text-[17px] leading-relaxed"
+                            className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
                           >
                             <span className="mt-[8px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                             {item}
@@ -240,7 +240,7 @@ const ServiceInfoSection = () => {
                       </ul>
                     )}
                     {selectedService.whyChoose.note && (
-                      <p className="text-gray-600 text-[13px] lg:text-[14px] leading-relaxed italic">
+                      <p className="text-gray-900 text-[13px] lg:text-[14px] leading-relaxed italic">
                         {stripLeadingEmoji(selectedService.whyChoose.note)}
                       </p>
                     )}
@@ -248,7 +248,7 @@ const ServiceInfoSection = () => {
                       (p, i) => (
                         <p
                           key={i}
-                          className="text-gray-600 text-[15px] lg:text-[17px] leading-relaxed"
+                          className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
                         >
                           {p}
                         </p>
@@ -259,7 +259,7 @@ const ServiceInfoSection = () => {
                         {selectedService.whyChoose.extraItems.map((item, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-2 text-gray-600 text-[15px] lg:text-[17px] leading-relaxed"
+                            className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
                           >
                             <span className="flex-shrink-0 text-base leading-snug mt-[1px]">
                               ❌
@@ -270,7 +270,7 @@ const ServiceInfoSection = () => {
                       </ul>
                     )}
                     {selectedService.whyChoose.closingText && (
-                      <p className="text-gray-600 text-[15px] lg:text-[17px] leading-relaxed">
+                      <p className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
                         {selectedService.whyChoose.closingText}
                       </p>
                     )}
@@ -287,7 +287,7 @@ const ServiceInfoSection = () => {
                       {sec.paired.map((card, j) => (
                         <div
                           key={j}
-                          className="bg-white border border-primary/15 rounded-xl p-5 shadow-[0_2px_12px_rgba(124,58,237,0.07)]"
+                          className="bg-white border border-primary rounded-xl p-5 shadow-[0_2px_12px_rgba(124,58,237,0.07)]"
                         >
                           <p className="text-[11px] font-bold tracking-widest uppercase text-primary mb-3">
                             {card.heading}
@@ -296,7 +296,7 @@ const ServiceInfoSection = () => {
                             {card.paragraphs?.map((p, k) => (
                               <p
                                 key={k}
-                                className="text-gray-600 text-sm leading-relaxed"
+                                className="text-gray-900 text-sm leading-relaxed"
                               >
                                 {p}
                               </p>
@@ -310,12 +310,14 @@ const ServiceInfoSection = () => {
                 /* ── Normal hero section ── */
                 return (
                   <div key={i} className="mb-5 lg:mb-8">
-                    <div className="flex items-start gap-3 mb-3 lg:mb-4">
-                      <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-                      <h2 className="text-[17px] lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
-                        {stripLeadingEmoji(sec.heading)}
-                      </h2>
-                    </div>
+                    {sec.heading && (
+                      <div className="flex items-start gap-3 mb-3 lg:mb-4">
+                        <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
+                        <h2 className="text-[17px] lg:text-2xl font-bold text-gray-900 leading-snug tracking-tight">
+                          {stripLeadingEmoji(sec.heading)}
+                        </h2>
+                      </div>
+                    )}
                     {sec.paragraphs?.length > 0 && (
                       <div className="space-y-3 mb-4">
                         {sec.paragraphs.map((p, j) =>
@@ -324,14 +326,14 @@ const ServiceInfoSection = () => {
                               key={j}
                               className="bg-primary/5 border-l-4 border-primary/40 rounded-r-xl px-4 py-2.5 my-1"
                             >
-                              <p className="text-gray-800 text-[15px] lg:text-base font-semibold leading-relaxed">
+                              <p className="text-gray-900 text-[15px] lg:text-base font-semibold leading-relaxed">
                                 {p}
                               </p>
                             </div>
                           ) : (
                             <p
                               key={j}
-                              className="text-gray-600 text-[15px] lg:text-[17px] leading-relaxed"
+                              className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
                             >
                               {p}
                             </p>
@@ -347,11 +349,11 @@ const ServiceInfoSection = () => {
                               {String(j + 1).padStart(2, "0")}
                             </span>
                             <div>
-                              <p className="text-gray-800 text-base font-semibold leading-snug">
+                              <p className="text-gray-900 text-base font-semibold leading-snug">
                                 {step.name}
                               </p>
                               {step.description && (
-                                <p className="text-gray-500 text-sm leading-relaxed mt-0.5">
+                                <p className="text-gray-900 text-sm leading-relaxed mt-0.5">
                                   {step.description}
                                 </p>
                               )}
@@ -359,6 +361,84 @@ const ServiceInfoSection = () => {
                           </li>
                         ))}
                       </ol>
+                    )}
+
+                    {/* subheading label (e.g. symptoms label) */}
+                    {sec.subheading && (
+                      <p className="font-bold text-gray-900 text-[15px] lg:text-[17px] mb-3 mt-1">
+                        {sec.subheading}
+                      </p>
+                    )}
+
+                    {/* items list (e.g. symptoms) */}
+                    {sec.items?.length > 0 && (
+                      <ul className="space-y-2 mb-4 pl-1">
+                        {sec.items.map((item, j) => (
+                          <li key={j} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+                            <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* helpItems (intro + styled bullet points) */}
+                    {sec.helpItems && (
+                      <div className="mt-2 mb-4">
+                        {sec.helpItems.intro && (
+                          <p className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed mb-3">
+                            {sec.helpItems.intro}
+                          </p>
+                        )}
+                        {sec.helpItems.points?.length > 0 && (
+                          <ul className="space-y-2 pl-1">
+                            {sec.helpItems.points.map((pt, j) => (
+                              <li key={j} className="flex items-start gap-3 text-gray-900 text-[15px] leading-relaxed">
+                                <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                                {stripLeadingEmoji(pt)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+
+                    {/* closingParagraphs */}
+                    {sec.closingParagraphs?.length > 0 && (
+                      <div className="space-y-3 mb-3">
+                        {sec.closingParagraphs.map((p, j) =>
+                          p.endsWith("?") ? (
+                            <div key={j} className="bg-primary/5 border-l-4 border-primary rounded-r-xl px-4 py-2.5 my-1">
+                              <p className="text-gray-900 text-[15px] lg:text-base font-semibold leading-relaxed">{p}</p>
+                            </div>
+                          ) : (
+                            <p key={j} className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">{p}</p>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {/* transitionText */}
+                    {sec.transitionText && (
+                      <p className="text-gray-900 text-[15px] lg:text-[17px] italic leading-relaxed mt-2 mb-3">
+                        {sec.transitionText}
+                      </p>
+                    )}
+
+                    {/* whatIs paired cards */}
+                    {sec.whatIs?.length > 0 && (
+                      <div className="grid sm:grid-cols-2 gap-4 mt-4 mb-2">
+                        {sec.whatIs.map((card, j) => (
+                          <div key={j} className="bg-white border border-primary rounded-xl p-5 shadow-[0_2px_12px_rgba(124,58,237,0.07)]">
+                            <p className="text-[11px] font-bold tracking-widest uppercase text-primary mb-3">{card.heading}</p>
+                            <div className="space-y-2">
+                              {card.paragraphs?.map((p, k) => (
+                                <p key={k} className="text-gray-900 text-sm leading-relaxed">{p}</p>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 );
@@ -377,7 +457,7 @@ const ServiceInfoSection = () => {
                     {process.map((step, i) => (
                       <li
                         key={i}
-                        className="flex items-start gap-3 text-gray-700 text-[15px] lg:text-base"
+                        className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
                       >
                         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
                           {String(i + 1).padStart(2, "0")}
@@ -413,7 +493,7 @@ const ServiceInfoSection = () => {
                     alt="Google"
                     className="w-4 h-4"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-900">
                     4.8 Rating
                   </span>
                   <div className="flex text-yellow-400">
@@ -436,7 +516,7 @@ const ServiceInfoSection = () => {
                       +
                     </div>
                   </div>
-                  <span className="text-sm text-gray-600 font-medium">
+                  <span className="text-sm text-gray-900 font-medium">
                     24,739 Happy Clients
                   </span>
                 </div>

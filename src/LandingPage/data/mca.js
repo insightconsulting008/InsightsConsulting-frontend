@@ -2324,6 +2324,9 @@ const mca = {
             "Statement of accounts",
             "Affidavit & indemnity bond",
             "No objection certificates (if required)",
+            "Statement regarding pending litigations",
+            "Latest Income Tax return acknowledgement",
+            "Bank account closure proof",
           ],
           note: "We guide you step-by-step on documentation.",
         },
@@ -2459,13 +2462,56 @@ const mca = {
         { title: "Shape" },
         {
           title: "Documents Required",
-          points: [
-            "LLP agreement",
-            "Consent of partners",
-            "Statement of accounts",
-            "Affidavit & indemnity",
-            "Income tax return filings",
-            "NOC (if applicable)",
+          subSections: [
+            {
+              title: "Core Statutory Documents",
+              points: [
+                "Partners' resolution for closure of LLP",
+                "Consent of all partners for winding-up",
+                "Application in Form 24 (MCA filing)",
+                "Authorization letter to designated partner (if applicable)",
+              ],
+            },
+            {
+              title: "Financial & Compliance Documents",
+              points: [
+                "Statement of Accounts (Nil assets & liabilities) certified by CA (not older than 30 days)",
+                "Latest Income-tax return acknowledgement (if filed earlier)",
+                "Bank account closure certificate / statement",
+              ],
+            },
+            {
+              title: "Declarations from Partners",
+              points: [
+                "Affidavit from all partners declaring no liabilities",
+                "Indemnity bond from partners for future liabilities (if any arise)",
+              ],
+            },
+            {
+              title: "Entity & Partner Documents",
+              points: [
+                "Copy of LLP Agreement",
+                "PAN of LLP",
+                "PAN & address proof of partners",
+                "DSC of designated partners for filing",
+              ],
+            },
+            {
+              title: "If Creditors Exist",
+              points: [
+                "NOC from creditors (mandatory before closure)",
+              ],
+            },
+            {
+              title: "Additional Prerequisites Before Filing Closure",
+              points: [
+                "All Form 8 & Form 11 filings must be completed",
+                "No outstanding liabilities",
+                "GST registration closed (if applicable)",
+                "Bank account closed",
+                "No active business for at least 1 year (for strike-off route)",
+              ],
+            },
           ],
           note: "We guide you on complete documentation.",
         },
@@ -2589,6 +2635,7 @@ const mca = {
         { title: "Shape" },
         {
           title: "Documents Required",
+          inlineDoc: true,
           points: [
             "Bank statement showing share capital received",
             "Certificate of Incorporation",

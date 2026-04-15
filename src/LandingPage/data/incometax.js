@@ -524,12 +524,11 @@ const incometax={
             "Startups & funded entities",
             "Companies with domestic or international transactions"
           ],
-          "note": "Mandatory for all companies, irrespective of profit or loss"
+          "note": "Mandatory for all companies, irrespective of profit or loss (other than those claiming exempltion under sec 11)"
         },
         {
           "title": "Applicable ITR Form",
           "points": ["ITR-6"],
-          "note": "Other than those claiming exemption under Section 11"
         },
         {
           "title": "Why Professional Filing Matters",

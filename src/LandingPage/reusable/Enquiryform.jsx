@@ -1,17 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { servicesData } from "../data/servicesData";
 import { Headphones } from "lucide-react";
+import axiosInstance from "@src/providers/axiosInstance";
 
 /* 
   Safely build flat list of all services – skip any missing subcategories, 
   services arrays, or invalid service objects.
 */
-const ALL_SERVICES = (servicesData || [])
-  .flatMap((cat) => cat?.subcategories ?? [])
-  .flatMap((sub) => sub?.services ?? [])
-  .filter((service) => service && typeof service.name === "string");
+const SCHEME_SERVICE = {
+  serviceId: "scheme-2026",
+  name: "Companies Compliance Facilitation Scheme, 2026",
+};
+
+const ALL_SERVICES = [
+  SCHEME_SERVICE, // ✅ added on top
+  ...(servicesData || [])
+    .flatMap((cat) => cat?.subcategories ?? [])
+    .flatMap((sub) => sub?.services ?? [])
+    .filter((service) => service && typeof service.name === "string"),
+];
 
 const Enquiryform = ({ initialService = "" }) => {
   const [formData, setFormData] = useState({
@@ -80,11 +88,10 @@ const Enquiryform = ({ initialService = "" }) => {
     setErrorMsg("");
 
     try {
-      const res = await axios.post(
-        "https://insightsconsult-backend.onrender.com/enquiry",
+      const res = await axiosInstance.post(
+        "/enquiry",
         formData
       );
-
       if (res.status === 200 || res.status === 201) {
         setSuccess(true);
         setFormData({

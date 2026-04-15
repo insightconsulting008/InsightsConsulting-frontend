@@ -20,17 +20,6 @@ const About = () => {
       borderColor: "border-violet-100",
     },
     {
-      name: "Bhalaaji Muthuswamy",
-      role: "B. Sc (Physics), ACA",
-      experience: "30+ Years",
-      expertise: "FMCG & Manufacturing",
-      desc: "With over 30 years of leadership experience across FMCG, manufacturing, consumer durables, media, and hospitality sectors, Bhalaaji works closely with founders and management teams on finance transformation, operating-model strengthening, and building scalable finance environments that support structured growth and better decision-making.",
-      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/balaji.png",
-      color: "from-emerald-50 to-teal-50",
-      badgeColor: "bg-emerald-100 text-emerald-700",
-      borderColor: "border-emerald-100",
-    },
-    {
       name: "Gopalakrishnan Sethuraman",
       role: "B. Com, FCA, ACMA, CISA, IIM(B)",
       experience: "30+ Years",
@@ -40,6 +29,17 @@ const About = () => {
       color: "from-blue-50 to-sky-50",
       badgeColor: "bg-blue-100 text-blue-700",
       borderColor: "border-blue-100",
+    },
+    {
+      name: "Bhalaaji Muthuswamy",
+      role: "B. Sc (Physics), ACA",
+      experience: "30+ Years",
+      expertise: "FMCG & Manufacturing",
+      desc: "With over 30 years of leadership experience across FMCG, manufacturing, consumer durables, media, and hospitality sectors, Bhalaaji works closely with founders and management teams on finance transformation, operating-model strengthening, and building scalable finance environments that support structured growth and better decision-making.",
+      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/balaji.png",
+      color: "from-emerald-50 to-teal-50",
+      badgeColor: "bg-emerald-100 text-emerald-700",
+      borderColor: "border-emerald-100",
     },
     {
       name: "Venugopal Bhuvanagiri",
@@ -181,7 +181,7 @@ const About = () => {
       {/* ── Hero ── */}
       <section className="w-full bg-white pt-10 pb-12 lg:pt-20 lg:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="w-full flex flex-col items-center gap-5 text-center lg:max-w-[800px] lg:mx-auto">
+          <div className="w-full flex flex-col items-center gap-5 text-center lg:max-w-[900px] lg:mx-auto">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-[13px] font-semibold tracking-wide uppercase">
               About Us
             </span>
@@ -189,8 +189,8 @@ const About = () => {
               Where Clarity Meets Growth
             </h1>
             {/* Hero paragraph — increased from 17px to 19px */}
-            <p className="text-[19px] leading-[30px] font-normal text-muted max-w-[640px]">
-              Insight Consulting is a professional firm of Chartered Accountants committed to delivering impactful outcomes that reflect our promise of excellence, responsibility, and trust.
+            <p className="text-[19px] leading-[30px] font-normal text-muted max-w-full">
+              Insight Consulting is a professional services firm bringing together professionals from diverse backgrounds to deliver impactful outcomes that reflect our commitment to excellence, responsibility, and trust—partnering with businesses to navigate change, strengthen compliance, and enable sustainable growth.
             </p>
           </div>
         </div>
@@ -291,71 +291,71 @@ const About = () => {
         </div>
       </section>
 
-      {/* ── Leadership Team ── */}
-      <section className="w-full bg-white py-14 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     {/* ── Leadership Team ── */}
+<section className="w-full bg-white py-14 lg:py-24">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Header */}
-          <div className="flex flex-col items-center gap-4 text-center mb-12 lg:mb-16">
-            <span className="text-[13px] font-semibold text-primary tracking-widest uppercase">
-              Leadership
-            </span>
-            <h2 className="text-dark text-[28px] lg:text-[42px] font-semibold tracking-[-0.03em] leading-[1.2] max-w-[600px]">
-              Our Leadership Team
-            </h2>
-            {/* Leadership subheading — increased from 16–17px to 18–19px */}
-            <p className="text-muted text-[18px] lg:text-[19px] leading-[1.75] max-w-[540px]">
-              Our founding partners bring 25–30+ years of real-world experience across finance, compliance, and business strategy.
-            </p>
-          </div>
+    {/* Header */}
+    <div className="flex flex-col items-center gap-4 text-center mb-12 lg:mb-16">
+      <div className="inline-flex items-center gap-2 bg-primary/5 px-4 py-1.5 rounded-full">
+        <span className="w-2 h-2 rounded-full bg-primary" />
+        <span className="text-[12px] font-semibold text-primary tracking-wider uppercase">
+          Leadership
+        </span>
+      </div>
+      <h2 className="text-dark text-[32px] lg:text-[44px] font-bold tracking-tight leading-[1.2] max-w-[600px]">
+        Our Leadership Team
+      </h2>
+      <p className="text-gray-600 text-[18px] lg:text-[20px] leading-relaxed max-w-[600px]">
+        Our founding partners bring 25–30+ years of real-world experience across finance, compliance, and business strategy.
+      </p>
+    </div>
 
-          {/* Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {teamMembers.map((member, index) => (
-              <div
-                key={index}
-                className={`rounded-2xl overflow-hidden border ${member.borderColor} bg-gradient-to-br ${member.color} shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full`}
-              >
-                {/* Image */}
-                <div className="w-full md:h-[600px] overflow-hidden">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
+    {/* Cards – alternating layout, no image scaling, full‑width image on mobile */}
+    <div className="flex flex-col gap-8 lg:gap-12">
+      {teamMembers.map((member, index) => (
+        <div
+          key={index}
+          className={`group relative w-full rounded-3xl bg-white border ${member.borderColor || 'border-gray-100'} shadow-sm hover:shadow-md transition-all duration-300 ease-out overflow-hidden`}
+        >
+          <div className={`flex flex-col lg:flex-row ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+            {/* Image container – full width on mobile, fixed width on desktop */}
+            <div className="lg:w-56 xl:w-64 flex-shrink-0 overflow-hidden bg-gray-50">
+              <img
+                src={member.image}
+                alt={member.name}
+                className="w-full h-100 lg:h-full object-cover object-top transition-none"
+              />
+            </div>
 
-                {/* Content */}
-                <div className="flex flex-col p-6 lg:p-7 gap-4 flex-1">
-                  <div>
-                    <h3 className="text-gray-900 text-[20px] lg:text-[22px] font-semibold leading-tight">
-                      {member.name}
-                    </h3>
-                    <p className="text-primary text-[14px] font-semibold mt-1 opacity-80">
-                      {member.role}
-                    </p>
-                  </div>
-
-                  {/* Member desc — increased from 14px to 16px */}
-                  <details className="group">
-                    <summary className="list-none cursor-pointer">
-                      <p className="text-gray-600 text-[18px] leading-[1.85] line-clamp-4 group-open:line-clamp-none">
-                        {member.desc}
-                      </p>
-                      <span className="text-primary text-[16px] font-semibold mt-2 inline-block group-open:hidden">
-                        Read More
-                      </span>
-                      <span className="text-primary text-[16px] font-semibold mt-2 hidden group-open:inline-block">
-                        Read Less
-                      </span>
-                    </summary>
-                  </details>
-                </div>
+            {/* Content – clean, no accent lines */}
+            <div className="flex-1 p-6 lg:p-8 xl:p-10">
+              <div className="mb-4">
+                <h3 className="text-gray-900 text-2xl lg:text-3xl font-bold leading-tight tracking-tight">
+                  {member.name}
+                </h3>
+                <p className="text-primary text-base font-semibold mt-1.5 tracking-wide">
+                  {member.role}
+                </p>
               </div>
-            ))}
+
+              <p className="text-gray-700 text-base lg:text-[17px] leading-relaxed">
+                {member.desc}
+              </p>
+
+              {/* Decorative quote icon (optional – remove if not wanted) */}
+              <div className="mt-5 text-right opacity-30 hidden md:block">
+                <svg className="w-6 h-6 text-primary inline-block" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* ── The Insight Advantage ── */}
       <section className="w-full bg-gray-50 py-14 lg:py-24">
@@ -411,6 +411,7 @@ const About = () => {
 
       {/* ── Our Commitment ── */}
       <section className="w-full py-16 relative overflow-hidden bg-primary">
+        <div className="absolute top-0 bg-black/10 w-full h-full"></div>
         <div
           className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none opacity-60 blur-3xl"
           style={{ background: "radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)", transform: "translate(30%, -30%)" }}
@@ -421,7 +422,7 @@ const About = () => {
         />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col items-center gap-6 text-center mb-16 lg:mb-20">
+          <div className="flex flex-col items-center gap-6 text-center mb-12">
             <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-widest uppercase border border-white/30 text-white bg-white/10 backdrop-blur-sm">
               Our Commitment
             </span>
@@ -432,7 +433,7 @@ const About = () => {
             <p className="text-[18px] lg:text-[20px] leading-[1.9] max-w-[600px] text-white/90">
               We work alongside founders, promoters, and leadership teams to strengthen regulatory compliance confidence, build resilient finance functions, enhance decision-making visibility and support sustainable, scalable enterprise growth.
             </p>
-            <p className="text-[17px] leading-[1.8] text-white/80">
+            <p className="text-[17px] leading-[1.8] text-white/80 italic">
               We bring the experience, structure, and responsiveness needed to support your journey.
             </p>
           </div>

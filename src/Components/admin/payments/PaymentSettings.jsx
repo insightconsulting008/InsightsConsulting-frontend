@@ -1,668 +1,848 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import axiosInstance from "@src/providers/axiosInstance";
-import PageHeader from '../page-header/PageHeader';
-import {
-  FiCreditCard, FiEye, FiEyeOff, FiSave, FiEdit2, FiTrash2,
-  FiX, FiCheck, FiAlertCircle, FiKey, FiLock, FiMail,
-  FiShield, FiSettings, FiPlusCircle,
-} from "react-icons/fi";
 
-/* ─────────────────────────── Spinner ─────────────────────────── */
-const Spinner = ({ sm }) => (
-  <span
-    className={`inline-block rounded-full border-2 border-white/30 border-t-white animate-spin ${sm ? "w-3.5 h-3.5" : "w-5 h-5"}`}
-  />
+const API_BASE = "/api";
+const WEBHOOK_SUFFIX = "/razorpay/webhook";
+
+// ─── Icons ───────────────────────────────────────────────────
+const CardIcon = ({ size = 16, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" />
+  </svg>
+);
+const PlusIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+const XIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="1" y1="1" x2="13" y2="13" /><line x1="13" y1="1" x2="1" y2="13" />
+  </svg>
+);
+const EyeIcon = ({ size = 14, off = false }) => off ? (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+) : (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+  </svg>
+);
+const TrashIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6M9 6V4h6v2" />
+  </svg>
+);
+const CheckIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const AlertIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+const LockIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+const SpinIcon = ({ size = 14 }) => (
+  <svg className="animate-spin" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+  </svg>
+);
+const GlobeIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
+const KeyIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+  </svg>
+);
+const MailIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
+const ZapIcon = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
 );
 
-/* ─────────────────────────── StatusBadge ─────────────────────── */
-const StatusBadge = ({ enabled }) =>
-  enabled ? (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-100">
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{ boxShadow: "0 0 5px #10b981" }} />
-      Active
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-neutral-100 text-neutral-400 border border-neutral-200">
-      <span className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
-      Inactive
+// ─── Toggle ──────────────────────────────────────────────────
+function Toggle({ value, onChange, size = "sm", disabled = false }) {
+  const lg = size === "lg";
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={value}
+      onClick={() => !disabled && onChange(!value)}
+      disabled={disabled}
+      className={`relative inline-flex flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      style={{
+        background: value ? "#e53e3e" : "#e5e7eb",
+        width: lg ? 44 : 36,
+        height: lg ? 24 : 20,
+      }}
+    >
+      <span
+        className="inline-block rounded-full bg-white shadow transition-transform duration-200"
+        style={{
+          width: lg ? 20 : 16,
+          height: lg ? 20 : 16,
+          transform: value ? `translateX(${lg ? 20 : 16}px)` : "translateX(0px)",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
+        }}
+      />
+    </button>
+  );
+}
+
+// ─── Badge ───────────────────────────────────────────────────
+function Badge({ children, color = "gray" }) {
+  const styles = {
+    gray: "bg-gray-100 text-gray-500 border border-gray-200",
+    red: "bg-red-50 text-red-600 border border-red-200",
+    green: "bg-green-50 text-green-700 border border-green-200",
+    amber: "bg-amber-50 text-amber-700 border border-amber-200",
+  };
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${styles[color]}`}>
+      {color === "red" && (
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+      )}
+      {children}
     </span>
   );
+}
 
-/* ─────────────────────── Field Component ─────────────────────── */
-const Field = ({ label, labelSuffix, icon: Icon, type, placeholder, value, onChange, hint, showToggle, toggleState, onToggle, required }) => (
-  <div className="space-y-1.5">
-    <label className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-neutral-500">
-      {label}
-      {required && <span className="text-red-400 text-[10px] normal-case font-normal tracking-normal">*required</span>}
-      {labelSuffix && <span className="text-[10px] font-normal text-neutral-400 normal-case tracking-normal">{labelSuffix}</span>}
-    </label>
-    <div className="relative group">
-      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-primary transition-colors duration-150 pointer-events-none">
-        <Icon className="w-[15px] h-[15px]" />
-      </div>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full h-11 pl-10 pr-10 border border-neutral-200 rounded-xl bg-neutral-50 text-sm text-neutral-800 placeholder-neutral-400 outline-none transition-all duration-150 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-white"
-        style={{ fontFamily: "inherit" }}
-      />
-      {showToggle && (
-        <button
-          type="button"
-          onClick={onToggle}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
-        >
-          {toggleState ? <FiEyeOff className="w-[15px] h-[15px]" /> : <FiEye className="w-[15px] h-[15px]" />}
-        </button>
-      )}
+// ─── Field ───────────────────────────────────────────────────
+function Field({ label, required, icon, children }) {
+  return (
+    <div>
+      <label className="block text-xs font-bold text-gray-800 uppercase tracking-widest mb-1.5">
+        {icon && <span className="mr-1 inline-block align-middle opacity-60">{icon}</span>}
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {children}
     </div>
-    {hint && <p className="text-[11px] text-neutral-400 leading-relaxed">{hint}</p>}
-  </div>
-);
+  );
+}
 
-/* ──────────────────── Password Confirm Modal ─────────────────── */
-const ACTION_CONFIG = {
-  save: {
-    title: "Confirm & Save",
-    desc: "Enter your profile password to save the new payment configuration.",
-    btn: "Save",
-    btnCls: "bg-primary hover:bg-primary-hover",
-    accentCls: "from-primary to-primary-hover",
-    iconCls: "bg-primary/10 text-primary",
-    Icon: FiShield,
-  },
-  update: {
-    title: "Confirm & Update",
-    desc: "Enter your profile password to apply the changes to this payment configuration.",
-    btn: "Update Configuration",
-    btnCls: "bg-primary hover:bg-primary-hover",
-    accentCls: "from-primary to-primary-hover",
-    iconCls: "bg-primary/10 text-primary",
-    Icon: FiShield,
-  },
-  delete: {
-    title: "Confirm Deletion",
-    desc: "This action is permanent and cannot be undone. Enter your profile password to proceed.",
-    btn: "Delete",
-    btnCls: "bg-red-600 hover:bg-red-700",
-    accentCls: "from-red-500 to-red-600",
-    iconCls: "bg-red-50 text-red-600",
-    Icon: FiTrash2,
-  },
-};
+// ─── Input styles (shared) ────────────────────────────────────
+const inputCls =
+  "w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl outline-none transition-all duration-150 bg-white text-gray-800 placeholder-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100";
+const monoCls = "font-mono text-[13px]";
 
-const PasswordConfirmModal = ({ open, action, targetLabel, onConfirm, onCancel, loading, error }) => {
-  const [profilePassword, setProfilePassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+// ─── Add Account Drawer ───────────────────────────────────────
+function AddDrawer({ onCancel, onSuccess }) {
+  const [form, setForm] = useState({
+    razorpayKeyId: "",
+    razorpaySecret: "",
+    alertEmail: "",
+    webhookDomain: "",
+  });
+  const [error, setError] = useState("");
+  const [showSecret, setShowSecret] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
 
-  useEffect(() => {
-    if (!open) { setProfilePassword(""); setShowPassword(false); }
-  }, [open]);
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  if (!open) return null;
+  const getMode = (k) =>
+    k.startsWith("rzp_live_") ? "LIVE" : k.startsWith("rzp_test_") ? "TEST" : null;
+  const mode = getMode(form.razorpayKeyId);
 
-  const cfg = ACTION_CONFIG[action] ?? ACTION_CONFIG.save;
-  const isDelete = action === "delete";
-  const { Icon } = cfg;
+  const handleReview = () => {
+    setError("");
+    if (!form.razorpayKeyId.trim()) { setError("Key ID is required."); return; }
+    if (!form.razorpaySecret.trim()) { setError("Secret key is required."); return; }
+    if (!form.alertEmail.trim()) { setError("Alert email is required."); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.alertEmail.trim())) { setError("Please enter a valid email address."); return; }
+    if (!form.webhookDomain.trim()) { setError("Webhook domain is required."); return; }
+    setPendingSubmit(true);
+  };
+
+  const handleConfirm = async (profilePassword) => {
+    setPwError("");
+    const webhookUrl = `https://${form.webhookDomain.trim()}${WEBHOOK_SUFFIX}`;
+    setPwLoading(true);
+    try {
+      await axiosInstance.post(`/settings/payment`, {
+        razorpayKeyId: form.razorpayKeyId.trim(),
+        razorpaySecret: form.razorpaySecret.trim(),
+        alertEmail: form.alertEmail.trim(),
+        webhookUrl,
+        profilePassword,
+      });
+      setPendingSubmit(false);
+      onSuccess("Payment account added and activated successfully.");
+    } catch (e) {
+      const msg = e.response?.data?.message || "Something went wrong. Please try again.";
+      setPwError(msg);
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ animation: "fadeIn 0.15s ease" }}>
-      <div
-        className="absolute inset-0 backdrop-blur-sm"
-        style={{ background: "rgba(8,12,24,0.55)" }}
-        onClick={!loading ? onCancel : undefined}
-      />
-      <div
-        className="relative w-full max-w-[380px] bg-white overflow-hidden"
-        style={{
-          borderRadius: 22,
-          boxShadow: "0 0 0 1px rgba(0,0,0,0.06), 0 24px 64px -12px rgba(0,0,0,0.22)",
-          animation: "modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both",
-        }}
-      >
-        {/* Top accent */}
-        <div className={`h-[3px] w-full bg-gradient-to-r ${cfg.accentCls}`} />
+    <>
+      <div className="fixed inset-0 z-50 flex items-stretch justify-end bg-black/40 backdrop-blur-sm animate-fade-in">
+        <div className="absolute inset-0" onClick={onCancel} />
+        <div className="relative z-10 flex flex-col bg-white w-full max-w-lg h-full shadow-2xl animate-slide-in-right overflow-hidden">
 
-        {/* Header */}
-        <div className="px-6 pt-5 pb-4 border-b border-neutral-100">
-          <div className="flex items-start justify-between gap-3">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
             <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.iconCls}`}>
-                <Icon className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center">
+                <PlusIcon size={14} />
               </div>
               <div>
-                <h3 className="font-bold text-neutral-900 text-[15px] leading-tight">{cfg.title}</h3>
-                {targetLabel && <p className="text-[11px] text-neutral-400 mt-0.5 font-mono">{targetLabel}</p>}
+                <p className="font-bold text-sm text-gray-800">New Razorpay Account</p>
+                <p className="text-xs text-gray-400">Activates immediately on save</p>
               </div>
             </div>
-            <button
-              onClick={!loading ? onCancel : undefined}
-              disabled={loading}
-              className="text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-40 mt-0.5"
-            >
-              <FiX className="w-4 h-4" />
+            <button onClick={onCancel} className="text-gray-800 cursor-pointer transition-colors p-1">
+              <XIcon size={15} />
             </button>
           </div>
-        </div>
 
-        {/* Body */}
-        <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-neutral-500 leading-relaxed">{cfg.desc}</p>
-
-          {isDelete && (
-            <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs leading-relaxed">
-              <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              This configuration will be permanently removed from your account.
-            </div>
-          )}
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold tracking-widest uppercase text-neutral-500">Profile Password</label>
-            <div className="relative">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
-                <FiLock className="w-[15px] h-[15px]" />
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
+            {error && (
+              <div className="flex items-start gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 animate-fade-in">
+                <AlertIcon size={14} />
+                <span>{error}</span>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your profile password"
-                value={profilePassword}
-                onChange={(e) => setProfilePassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && profilePassword.trim()) onConfirm(profilePassword);
-                  if (e.key === "Escape" && !loading) onCancel();
-                }}
-                autoFocus
-                className="w-full h-11 pl-10 pr-10 border border-neutral-200 rounded-xl bg-neutral-50 text-sm text-neutral-800 placeholder-neutral-400 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-white"
-              />
+            )}
+
+            <div className="grid grid-cols-1 gap-4">
+              <Field label="Key ID" required icon={<KeyIcon />}>
+                <div className="relative">
+                  <input
+                    value={form.razorpayKeyId}
+                    onChange={(e) => set("razorpayKeyId", e.target.value)}
+                    placeholder="rzp_live_xxxx or rzp_test_xxxx"
+                    className={`${inputCls} ${monoCls} ${mode ? "pr-14" : ""}`}
+                  />
+                  {mode && (
+                    <span className={`absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold px-2 py-0.5 rounded font-mono ${mode === "LIVE" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                      {mode}
+                    </span>
+                  )}
+                </div>
+              </Field>
+
+              <Field label="Secret key" required icon={<LockIcon />}>
+                <div className="relative">
+                  <input
+                    type={showSecret ? "text" : "password"}
+                    value={form.razorpaySecret}
+                    onChange={(e) => set("razorpaySecret", e.target.value)}
+                    placeholder="Your Razorpay secret key"
+                    className={`${inputCls} ${monoCls} pr-10`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSecret((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <EyeIcon off={showSecret} />
+                  </button>
+                </div>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <Field label="Alert email" required icon={<MailIcon />}>
+                <input
+                  type="email"
+                  value={form.alertEmail}
+                  onChange={(e) => set("alertEmail", e.target.value)}
+                  placeholder="alerts@yourcompany.com"
+                  className={inputCls}
+                />
+              </Field>
+            </div>
+
+            <div>
+              <Field label="Webhook domain" required icon={<GlobeIcon />}>
+                <div className="flex border border-gray-200 rounded-xl overflow-hidden focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100 transition-all">
+                  <span className="flex items-center px-3 bg-gray-50 text-xs font-mono text-gray-400 border-r border-gray-100 whitespace-nowrap select-none">
+                    https://
+                  </span>
+                  <input
+                    type="text"
+                    value={form.webhookDomain}
+                    onChange={(e) => set("webhookDomain", e.target.value)}
+                    placeholder="yourdomain.com"
+                    className="flex-1 px-3 py-2.5 text-sm font-mono border-none outline-none bg-white text-gray-700 min-w-0"
+                  />
+                  <span className="hidden sm:flex items-center px-2.5 bg-gray-50 text-[11px] font-mono text-red-400 font-semibold border-l border-gray-100 whitespace-nowrap select-none">
+                    {WEBHOOK_SUFFIX}
+                  </span>
+                </div>
+                {form.webhookDomain ? (
+                  <p className="text-xs font-mono text-red-400 mt-1.5">
+                    ↳ https://{form.webhookDomain}{WEBHOOK_SUFFIX}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400 mt-1">Enter your domain — webhook path is added automatically.</p>
+                )}
+              </Field>
+            </div>
+
+            {/* Info banner */}
+            <div className="flex gap-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+              <ZapIcon size={13} />
+              <div>
+                <p className="font-bold mb-0.5">This account activates immediately</p>
+                <p className="leading-relaxed">
+                  Once saved, this becomes your <strong>active payment gateway</strong>. Any currently active account will be automatically switched off.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+            <p className="text-xs text-gray-400 flex items-center gap-1">
+              <LockIcon size={10} /> Credentials stored encrypted
+            </p>
+            <div className="flex gap-2">
               <button
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                onClick={onCancel}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
               >
-                {showPassword ? <FiEyeOff className="w-[15px] h-[15px]" /> : <FiEye className="w-[15px] h-[15px]" />}
+                Cancel
+              </button>
+              <button
+                onClick={handleReview}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors shadow-sm shadow-red-200"
+              >
+                <CheckIcon size={13} /> Review & save
               </button>
             </div>
           </div>
+        </div>
+      </div>
 
+      {pendingSubmit && (
+        <PasswordModal
+          title="Confirm your identity"
+          subtitle="Enter your profile password to save and activate this payment account."
+          danger={false}
+          loading={pwLoading}
+          error={pwError}
+          onConfirm={handleConfirm}
+          onCancel={() => { setPendingSubmit(false); setPwError(""); }}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Password Confirm Modal ───────────────────────────────────
+function PasswordModal({ title, subtitle, danger = false, loading, error, onConfirm, onCancel }) {
+  const [pw, setPw] = useState("");
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-scale-in">
+        <div className="flex gap-3 items-start p-5 pb-4 border-b border-gray-100">
+          <div className={`w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center ${danger ? "bg-red-50" : "bg-green-50"}`}>
+            <LockIcon size={16} />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-sm text-gray-800">{title}</p>
+            {subtitle && <p className="text-xs text-gray-400 mt-1 leading-snug">{subtitle}</p>}
+          </div>
+          <button onClick={onCancel} className="text-gray-300 hover:text-gray-500 p-0.5">
+            <XIcon />
+          </button>
+        </div>
+
+        <div className="p-5">
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+            Profile password
+          </label>
+          <div className="relative">
+            <input
+              type={show ? "text" : "password"}
+              value={pw}
+              autoFocus
+              onChange={(e) => setPw(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && pw && !loading && onConfirm(pw)}
+              placeholder="Enter your password"
+              className={`${inputCls} pr-10 ${error ? "border-red-400 ring-2 ring-red-100" : ""}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShow((s) => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <EyeIcon off={show} />
+            </button>
+          </div>
           {error && (
-            <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
-              <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              {error}
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-red-600 animate-fade-in">
+              <AlertIcon size={12} />
+              <span>{error}</span>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 pb-6 flex items-center gap-2.5">
+        <div className="flex gap-2 justify-end px-5 pb-5">
           <button
             onClick={onCancel}
-            disabled={loading}
-            className="flex-1 min-w-0 h-11 rounded-xl border border-neutral-200 text-neutral-600 font-semibold text-sm whitespace-nowrap overflow-hidden text-ellipsis hover:bg-neutral-50 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(profilePassword)}
-            disabled={loading || !profilePassword.trim()}
-            className={`flex-1 min-w-0 h-11 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${cfg.btnCls}`}
+            disabled={!pw || loading}
+            onClick={() => onConfirm(pw)}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${danger ? "bg-red-500 hover:bg-red-600" : "bg-green-600 hover:bg-green-700"}`}
           >
-            {loading ? (
-              <><Spinner sm /><span className="truncate">Verifying…</span></>
-            ) : (
-              <><Icon className="w-4 h-4 flex-shrink-0" /><span className="truncate">{cfg.btn}</span></>
-            )}
+            {loading ? <><SpinIcon size={13} /> Verifying…</> : "Confirm"}
           </button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.94) translateY(12px); }
-          to   { opacity: 1; transform: scale(1) translateY(0); }
-        }
-      `}</style>
     </div>
   );
-};
+}
 
-/* ──────────────────────── Main Component ─────────────────────── */
-const PaymentSettings = () => {
-  const [isRazorpayEnabled, setIsRazorpayEnabled] = useState(false);
-  const [razorpayKeyId, setRazorpayKeyId]         = useState("");
-  const [razorpaySecret, setRazorpaySecret]       = useState("");
-  const [alertEmail, setAlertEmail]               = useState("");
-  const [showRazorpaySecret, setShowRazorpaySecret] = useState(false);
-  const [editingId, setEditingId]                 = useState(null);
-  const [paymentMethods, setPaymentMethods]       = useState([]);
-  const [refreshing, setRefreshing]               = useState(false);
-  const [error, setError]                         = useState("");
-  const [success, setSuccess]                     = useState("");
-  const [modal, setModal] = useState({
-    open: false, action: "save", targetLabel: "", pendingPayload: null, pendingId: null, loading: false, error: "",
-  });
+// ─── Account Row ─────────────────────────────────────────────
+function AccountRow({ setting, onToggle, onDelete, isLast }) {
+  const isActive = setting.isRazorpayEnabled;
+  const [confirmToggle, setConfirmToggle] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
 
-  const fetchPaymentMethods = async (showRefresh = false) => {
-    if (showRefresh) setRefreshing(true);
+  const handleToggleConfirm = async (pw) => {
+    setPwError("");
+    setPwLoading(true);
     try {
-      const res = await axiosInstance.get("settings/payment");
-      if (res.data?.success) setPaymentMethods(res.data.data);
-    } catch (err) { console.error("Failed to fetch payment methods", err); }
-    finally { if (showRefresh) setRefreshing(false); }
-  };
-
-  useEffect(() => { fetchPaymentMethods(); }, []);
-
-  const resetForm = () => {
-    setEditingId(null); setIsRazorpayEnabled(false);
-    setRazorpayKeyId(""); setRazorpaySecret(""); setAlertEmail("");
-    setShowRazorpaySecret(false); setError(""); setSuccess("");
-  };
-
-  const handleEdit = (item) => {
-    setEditingId(item.paymentSettingId);
-    setIsRazorpayEnabled(item.isRazorpayEnabled);
-    setRazorpayKeyId(item.razorpayKeyId || "");
-    setAlertEmail(item.alertEmail || "");
-    setRazorpaySecret(""); setError(""); setSuccess("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const openModal = (action, pendingPayload = null, pendingId = null, targetLabel = "") =>
-    setModal({ open: true, action, targetLabel, pendingPayload, pendingId, loading: false, error: "" });
-
-  const closeModal = () => setModal((m) => ({ ...m, open: false, loading: false, error: "" }));
-
-  const handleSubmit = () => {
-    setError(""); setSuccess("");
-    if (!razorpayKeyId.trim()) { setError("Razorpay Key ID is required."); return; }
-    if (!razorpaySecret.trim()) { setError("Razorpay Secret Key is required."); return; }
-    if (!alertEmail.trim()) { setError("Alert Email is required."); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alertEmail)) { setError("Please enter a valid email address."); return; }
-    const payload = {
-      isRazorpayEnabled,
-      razorpayKeyId,
-      alertEmail,
-      ...(razorpaySecret.trim() && { razorpaySecret }),
-    };
-    openModal(
-      editingId ? "update" : "save",
-      payload,
-      editingId,
-      editingId ? `${razorpayKeyId.slice(0, 12)}••••` : "",
-    );
-  };
-
-  const handleDeleteClick = (item) =>
-    openModal("delete", null, item.paymentSettingId, `${item.razorpayKeyId.slice(0, 12)}••••`);
-
-  const handlePasswordConfirm = async (profilePassword) => {
-    if (!profilePassword.trim()) { setModal((m) => ({ ...m, error: "Profile password is required." })); return; }
-    setModal((m) => ({ ...m, loading: true, error: "" }));
-    const safeConfig = { headers: { "Content-Type": "application/json" }, skipAuthInterceptor: true };
-    try {
-      if (modal.action === "delete") {
-        await axiosInstance.delete(`settings/payment/${modal.pendingId}`, { ...safeConfig, data: { profilePassword } });
-        setSuccess("Payment configuration deleted.");
-      } else if (modal.action === "update") {
-        await axiosInstance.put(`settings/payment/${modal.pendingId}`, { ...modal.pendingPayload, profilePassword }, safeConfig);
-        setSuccess("Payment settings updated successfully.");
-      } else {
-        await axiosInstance.post("settings/payment", { ...modal.pendingPayload, profilePassword }, safeConfig);
-        setSuccess("Payment settings saved successfully.");
-      }
-      closeModal(); resetForm(); fetchPaymentMethods();
-      setTimeout(() => setSuccess(""), 4000);
-    } catch (err) {
-      const msg = err?.response?.data?.message || (
-        modal.action === "delete"
-          ? "Deletion failed — check your password and try again."
-          : modal.action === "update"
-            ? "Update failed — please try again."
-            : "Save failed — please try again."
-      );
-      setModal((m) => ({ ...m, loading: false, error: msg }));
+      await onToggle(setting.paymentSettingId, !isActive, pw);
+      setConfirmToggle(false);
+    } catch (e) {
+      setPwError(e?.message || "Incorrect password. Please try again.");
+    } finally {
+      setPwLoading(false);
     }
   };
 
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const handleDeleteConfirm = async (pw) => {
+    setPwError("");
+    setPwLoading(true);
+    try {
+      await onDelete(setting.paymentSettingId, pw);
+      setConfirmDelete(false);
+    } catch (e) {
+      setPwError(e?.message || "Incorrect password. Please try again.");
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
-  const enabledCount  = paymentMethods.filter((p) => p.isRazorpayEnabled).length;
-  const disabledCount = paymentMethods.filter((p) => !p.isRazorpayEnabled).length;
+  const keyId = setting.razorpayKeyId || "";
+  const shortKeyId = keyId.length > 22 ? keyId.slice(0, 22) + "…" : keyId;
+  const mode = keyId.startsWith("rzp_live_") ? "LIVE" : keyId.startsWith("rzp_test_") ? "TEST" : null;
 
-  /* ──── JSX ──── */
   return (
-    <div className="font-sans min-h-screen" style={{ background: "linear-gradient(150deg, var(--primary-50) 0%, #f5f7ff 50%, #f8f9fc 100%)" }}>
-      <PasswordConfirmModal
-        open={modal.open} action={modal.action} targetLabel={modal.targetLabel}
-        onConfirm={handlePasswordConfirm} onCancel={closeModal}
-        loading={modal.loading} error={modal.error}
-      />
-
-      <PageHeader title="Payment Settings" subtitle="Configure your Razorpay payment gateway" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-
-        {/* ── Stats ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: "Total",    value: paymentMethods.length,                                     note: "configurations" },
-            { label: "Active",   value: enabledCount,                                               note: "enabled",   accent: "text-emerald-600" },
-            { label: "Inactive", value: disabledCount,                                              note: "disabled",  accent: "text-neutral-400" },
-            { label: "Latest",   value: paymentMethods[0]?.razorpayKeyId?.slice(0, 8) || "—", note: "most recent", mono: true },
-          ].map(({ label, value, note, accent, mono }) => (
-            <div
-              key={label}
-              className="bg-white rounded-2xl border border-neutral-100 p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-              style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px -4px rgba(0,0,0,0.06)" }}
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{label}</p>
-              <p className={`font-extrabold leading-none tracking-tight mb-1 ${mono ? "text-base font-mono text-neutral-700" : "text-3xl text-neutral-900"} ${accent || ""}`}>
-                {value}
-              </p>
-              <p className="text-[11px] text-neutral-400">{note}</p>
+    <>
+      <tr className={`group hover:bg-gray-50 transition-colors ${!isLast ? "border-b border-gray-100" : ""}`}>
+        {/* Account */}
+        <td className="px-5 py-3.5">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border ${isActive ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200"}`}>
+              <CardIcon size={13} color={isActive ? "#e53e3e" : "#9ca3af"} />
             </div>
-          ))}
-        </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="font-mono text-xs font-medium text-gray-700">{shortKeyId}</p>
+                {mode && (
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded font-mono ${mode === "LIVE" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                    {mode}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-gray-300">Payment account</p>
+            </div>
+          </div>
+        </td>
 
-        {/* ── Two-column layout ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Status */}
+        <td className="px-3 py-3.5">
+          <Badge color={isActive ? "red" : "gray"}>{isActive ? "Active" : "Inactive"}</Badge>
+        </td>
 
-          {/* ── FORM CARD ── */}
-          <div
-            className="lg:col-span-5 bg-white rounded-2xl border border-neutral-100 overflow-hidden"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -8px rgba(0,0,0,0.08)" }}
+        {/* Email */}
+        <td className="px-3 py-3.5">
+          <div className="flex items-center gap-1.5 text-gray-500">
+            <MailIcon size={11} />
+            <span className="font-mono text-xs">{setting.alertEmail || "—"}</span>
+          </div>
+        </td>
+
+        {/* Webhook URL */}
+        <td className="px-3 py-3.5 max-w-[220px]">
+          {setting.webhookUrl ? (
+            <div className="flex items-center gap-1.5 text-gray-400">
+              <GlobeIcon size={11} />
+              <span
+                className="font-mono text-xs truncate block max-w-[190px]"
+                title={setting.webhookUrl}
+              >
+                {setting.webhookUrl.replace("https://", "")}
+              </span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-300">Not configured</span>
+          )}
+        </td>
+
+        {/* Actions */}
+        <td className="px-5 py-3.5">
+          <div className="flex items-center gap-2.5 justify-end">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-400 w-5">{isActive ? "On" : "Off"}</span>
+              <Toggle value={isActive} onChange={() => { setPwError(""); setConfirmToggle(true); }} />
+            </div>
+            {!isActive && (
+              <button
+                onClick={() => { setPwError(""); setConfirmDelete(true); }}
+                className="p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                title="Delete account"
+              >
+                <TrashIcon />
+              </button>
+            )}
+          </div>
+        </td>
+      </tr>
+
+      {confirmToggle && (
+        <PasswordModal
+          title={isActive ? "Disable this account?" : "Enable this account?"}
+          subtitle={
+            !isActive
+              ? "This account will become your active gateway. The current active account will be switched off."
+              : "Payments through this account will be paused. Make sure you have another account ready."
+          }
+          danger={isActive}
+          loading={pwLoading}
+          error={pwError}
+          onConfirm={handleToggleConfirm}
+          onCancel={() => { setConfirmToggle(false); setPwError(""); }}
+        />
+      )}
+      {confirmDelete && (
+        <PasswordModal
+          title="Delete this account?"
+          subtitle="This will permanently remove the API credentials and unregister the Razorpay webhook. This cannot be undone."
+          danger
+          loading={pwLoading}
+          error={pwError}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => { setConfirmDelete(false); setPwError(""); }}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Empty State ─────────────────────────────────────────────
+function EmptyState({ onAdd }) {
+  return (
+    <tr>
+      <td colSpan={5}>
+        <div className="flex flex-col items-center py-14 px-6 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center mb-4">
+            <CardIcon size={22} color="#d1d5db" />
+          </div>
+          <p className="font-bold text-gray-700 text-sm mb-1.5">No payment accounts yet</p>
+          <p className="text-sm text-gray-400 mb-5 max-w-xs leading-relaxed">
+            Add your first Razorpay account to start accepting payments on your platform.
+          </p>
+          <button
+            onClick={onAdd}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors shadow-sm shadow-red-200"
           >
-            {/* Card header */}
-            <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))", boxShadow: "0 3px 10px rgb(239 68 68 / 0.25)" }}>
-                {editingId ? <FiEdit2 className="w-3.5 h-3.5 text-white" /> : <FiPlusCircle className="w-3.5 h-3.5 text-white" />}
+            <PlusIcon size={14} /> Add first account
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────
+export default function PaymentSettings() {
+  const [settings, setSettings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [fetchError, setFetchError] = useState("");
+
+  const gatewayEnabled = settings.some((s) => s.isRazorpayEnabled);
+  const slots = 3 - settings.length;
+
+  const showToast = (msg, type = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    setFetchError("");
+    try {
+      const res = await axiosInstance.get("/settings/payment");
+      setSettings(res.data.data || []);
+    } catch (e) {
+      setFetchError(e.response?.data?.message || "Failed to load payment accounts. Please refresh and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchSettings(); }, []);
+
+  const handleToggle = async (id, newState, pw) => {
+    try {
+      await axiosInstance.put(`/settings/payment/${id}`, { isRazorpayEnabled: newState, profilePassword: pw });
+      showToast(`Account ${newState ? "enabled and set as active gateway" : "disabled"}.`);
+      fetchSettings();
+    } catch (e) {
+      const msg = e.response?.data?.message || "Update failed.";
+      showToast(msg, "error");
+      throw new Error(msg);
+    }
+  };
+
+  const handleDelete = async (id, pw) => {
+    try {
+      await axiosInstance.delete(`/settings/payment/${id}`, { data: { profilePassword: pw } });
+      showToast("Account deleted successfully.");
+      fetchSettings();
+    } catch (e) {
+      const msg = e.response?.data?.message || "Delete failed.";
+      showToast(msg, "error");
+      throw new Error(msg);
+    }
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
+        .animate-fade-in    { animation: fadeIn 0.2s ease both }
+        .animate-slide-in-right { animation: slideInRight 0.3s cubic-bezier(.16,1,.3,1) both }
+        .animate-scale-in   { animation: scaleIn 0.22s cubic-bezier(.16,1,.3,1) both }
+        .animate-toast-in   { animation: toastIn 0.28s cubic-bezier(.16,1,.3,1) both }
+        .z-60 { z-index: 60 }
+      `}</style>
+
+      <div className="min-h-screen bg-gray-100">
+
+        {/* ── Header ── */}
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-100">
+          <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-2.5">
+              <div>
+                <h1 className="text-md font-bold text-gray-900">Payment Settings</h1>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Configure your Razorpay gateway. Add up to 3 accounts and switch between them anytime.
+                </p>
+              </div>
+            </div>
+            {slots > 0 ? (
+              <button
+                onClick={() => setShowAdd(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors shadow-sm shadow-red-200 whitespace-nowrap"
+              >
+                <PlusIcon size={14} /> Add account
+                {slots < 3 && <span className="text-[11px] opacity-70 ml-1">({slots} left)</span>}
+              </button>
+            ) : (
+              <Badge color="amber">Limit reached · 3/3</Badge>
+            )}
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-5">
+
+          {/* Status + Slots cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                style={{
+                  background: gatewayEnabled ? "linear-gradient(135deg,#e53e3e,#c53030)" : "#f3f4f6",
+                  boxShadow: gatewayEnabled ? "0 4px 14px rgba(229,62,62,.25)" : "none",
+                }}
+              >
+                <CardIcon size={18} color={gatewayEnabled ? "#fff" : "#9ca3af"} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-neutral-900 text-sm leading-tight">
-                  {editingId ? "Edit Configuration" : "New Configuration"}
-                </p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  {editingId ? "Update your Razorpay credentials" : "Connect your Razorpay account"}
+                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                  <span className="font-bold text-sm text-gray-800">Razorpay Gateway</span>
+                  <Badge color={gatewayEnabled ? "red" : "gray"}>
+                    {gatewayEnabled ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+                <p className="text-xs text-gray-400 truncate">
+                  {gatewayEnabled
+                    ? "✓ Payments are live and processing successfully."
+                    : "No active account — toggle an account below to activate."}
                 </p>
               </div>
-              {editingId && (
-                <button
-                  onClick={resetForm}
-                  className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-500 hover:text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 rounded-lg px-2.5 py-1.5 transition-all"
-                >
-                  <FiX className="w-3 h-3" /> Cancel
-                </button>
-              )}
+              <Toggle value={gatewayEnabled} onChange={() => {}} size="lg" disabled />
             </div>
 
-            <div className="p-5 space-y-5">
-
-              {/* Toggle */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-100">
-                <div>
-                  <p className="text-sm font-semibold text-neutral-800">Enable Razorpay</p>
-                  <p className="text-[11px] text-neutral-400 mt-0.5">Accept payments via Razorpay gateway</p>
-                </div>
-                <button
-                  onClick={() => setIsRazorpayEnabled((v) => !v)}
-                  className="relative flex-shrink-0 w-11 h-6 rounded-full border-none cursor-pointer transition-all duration-250 focus:outline-none"
-                  style={{
-                    background: isRazorpayEnabled
-                      ? "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))"
-                      : "#d1d5db",
-                    boxShadow: isRazorpayEnabled ? "0 0 0 3px rgb(239 68 68 / 0.15)" : "none",
-                  }}
-                >
-                  <span
-                    className="absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white transition-all duration-250"
-                    style={{
-                      left: isRazorpayEnabled ? "calc(100% - 21px)" : "3px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                      transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1)",
-                    }}
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Account slots</p>
+              <div className="flex gap-2 mb-3">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="flex-1 h-1.5 rounded-full transition-colors duration-300"
+                    style={{ background: i < settings.length ? "#e53e3e" : "#f0f0f4" }}
                   />
-                </button>
+                ))}
               </div>
-
-              {/* Key ID */}
-              <Field
-                label="Razorpay Key ID"
-                icon={FiKey}
-                type="text"
-                placeholder="rzp_live_xxxxxxxxxxxx"
-                value={razorpayKeyId}
-                onChange={(e) => setRazorpayKeyId(e.target.value)}
-                required={true}
-              />
-
-              {/* Secret Key — always required */}
-              <Field
-                label="Razorpay Secret Key"
-                icon={FiLock}
-                type={showRazorpaySecret ? "text" : "password"}
-                placeholder={editingId ? "Enter your secret key" : "Enter your secret key"}
-                value={razorpaySecret}
-                onChange={(e) => setRazorpaySecret(e.target.value)}
-                hint={editingId ? null : "Stored securely with encryption"}
-                showToggle
-                toggleState={showRazorpaySecret}
-                onToggle={() => setShowRazorpaySecret((v) => !v)}
-                required={true}
-              />
-
-              {/* Alert Email */}
-              <Field
-                label="Alert Email"
-                icon={FiMail}
-                type="email"
-                placeholder="admin@example.com"
-                value={alertEmail}
-                onChange={(e) => setAlertEmail(e.target.value)}
-                hint="Receives payment failure alerts and notifications"
-                required={true}
-              />
-
-              {/* Alerts */}
-              {error && (
-                <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
-                  <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm">
-                  <FiCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  {success}
-                </div>
-              )}
-
-              {/* Submit */}
-              <button
-                onClick={handleSubmit}
-                className="w-full h-11 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.99]"
-                style={{
-                  background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))",
-                  boxShadow: "0 2px 12px rgb(239 68 68 / 0.3)",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 20px rgb(239 68 68 / 0.4)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 12px rgb(239 68 68 / 0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-              >
-                {editingId
-                  ? <><FiSave className="w-4 h-4" /> Update </>
-                  : <><FiPlusCircle className="w-4 h-4" /> Save Configuration</>}
-              </button>
+              <p className="text-sm text-gray-700">
+                <strong className={`text-lg ${slots > 0 ? "text-green-600" : "text-red-500"}`}>{slots}</strong>
+                <span className="text-gray-400 text-xs ml-1">slot{slots !== 1 ? "s" : ""} available</span>
+              </p>
+              <p className="text-xs text-gray-300 mt-0.5">Max 3 accounts total</p>
             </div>
           </div>
 
-          {/* ── LIST CARD ── */}
-          <div
-            className="lg:col-span-7 bg-white rounded-2xl border border-neutral-100 overflow-hidden"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -8px rgba(0,0,0,0.07)" }}
-          >
-            {/* Header */}
-            <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+          {/* Toast */}
+          {toast && (
+            <div className={`animate-toast-in flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium border ${toast.type === "success" ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${toast.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
+                {toast.type === "success" ? <CheckIcon size={11} /> : <AlertIcon size={11} />}
+              </div>
+              {toast.msg}
+            </div>
+          )}
+
+          {fetchError && (
+            <div className="animate-fade-in flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
+              <AlertIcon size={14} /> {fetchError}
+            </div>
+          )}
+
+          {/* Accounts table card */}
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 className="font-bold text-neutral-900 text-sm">Payment Methods</h2>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  {paymentMethods.length === 0
-                    ? "No configurations yet"
-                    : `${paymentMethods.length} configuration${paymentMethods.length !== 1 ? "s" : ""}`}
+                <p className="font-bold text-sm text-gray-800">Razorpay Accounts</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {settings.length === 0
+                    ? "No accounts configured yet"
+                    : `${settings.length} account${settings.length !== 1 ? "s" : ""} · ${settings.filter((s) => s.isRazorpayEnabled).length} active`}
                 </p>
               </div>
-              <button
-                onClick={() => fetchPaymentMethods(true)}
-                disabled={refreshing}
-                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 rounded-lg px-3 py-1.5 transition-all disabled:opacity-50 flex items-center gap-1.5"
-              >
-                <span className={refreshing ? "animate-spin" : ""}>↻</span> Refresh
-              </button>
             </div>
 
-            {/* ── Desktop Table ── */}
-            <div className="hidden md:block overflow-x-auto">
-              {refreshing ? (
-                <div className="p-5 space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-3 rounded-lg bg-neutral-100 animate-pulse" style={{ width: `${60 + i * 10}%` }} />
-                  ))}
-                </div>
-              ) : paymentMethods.length === 0 ? (
-                <div className="py-16 flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-100 border-2 border-dashed border-neutral-200 flex items-center justify-center">
-                    <FiCreditCard className="w-5 h-5 text-neutral-400" />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-neutral-500">No configurations</p>
-                    <p className="text-xs text-neutral-400 mt-0.5">Add your first configuration using the form</p>
-                  </div>
-                </div>
-              ) : (
-                <table className="w-full text-sm border-collapse">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+                <SpinIcon size={22} />
+                <p className="text-sm">Loading accounts…</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse" style={{ minWidth: 560 }}>
                   <thead>
-                    <tr className="border-b border-neutral-100 bg-neutral-50">
-                      {["Status", "Key ID", "Email", "Updated", ""].map((h) => (
-                        <th
-                          key={h}
-                          className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-neutral-400 first:pl-5 last:pr-5"
-                        >
-                          {h}
+                    <tr className="border-b border-gray-100 bg-gray-50">
+                      {[
+                        { label: "Account", cls: "pl-5 pr-3" },
+                        { label: "Status", cls: "px-3" },
+                        { label: "Alert email", cls: "px-3" },
+                        { label: "Webhook URL", cls: "px-3" },
+                        { label: "Actions", cls: "pl-3 pr-5 text-right" },
+                      ].map((h) => (
+                        <th key={h.label} className={`py-2.5 text-[10.5px] font-bold text-gray-400 uppercase tracking-widest ${h.cls}`}>
+                          {h.label}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {paymentMethods.map((item, i) => (
-                      <tr
-                        key={item.paymentSettingId}
-                        className="border-b border-neutral-50 last:border-0 hover:bg-neutral-50 transition-colors duration-100"
-                      >
-                        <td className="px-4 py-3.5 pl-5">
-                          <StatusBadge enabled={item.isRazorpayEnabled} />
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="font-mono text-xs bg-neutral-100 text-neutral-700 px-2.5 py-1 rounded-lg border border-neutral-200">
-                            {item.razorpayKeyId.slice(0, 6)}••••
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="text-xs text-neutral-500">{item.alertEmail.split("@")[0]}@…</span>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="text-[11px] text-neutral-400">{formatDate(item.updatedAt)}</span>
-                        </td>
-                        <td className="px-4 py-3.5 pr-5">
-                          <div className="flex items-center gap-2 justify-end">
-                            <button
-                              onClick={() => handleEdit(item)}
-                              className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 hover:border-neutral-300 rounded-lg px-2.5 py-1.5 transition-all"
-                            >
-                              <FiEdit2 className="w-3 h-3" /> Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(item)}
-                              className="flex items-center gap-1.5 text-[11px] font-semibold text-red-500 hover:text-red-700 bg-white hover:bg-red-50 border border-red-100 hover:border-red-200 rounded-lg px-2.5 py-1.5 transition-all"
-                            >
-                              <FiTrash2 className="w-3 h-3" /> Delete
-                            </button>
-                          </div>
+                    {settings.length === 0 ? (
+                      <EmptyState onAdd={() => setShowAdd(true)} />
+                    ) : (
+                      settings.map((s, i) => (
+                        <AccountRow
+                          key={s.paymentSettingId}
+                          setting={s}
+                          onToggle={handleToggle}
+                          onDelete={handleDelete}
+                          isLast={i === settings.length - 1}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                  {settings.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t border-gray-100 bg-gray-50">
+                        <td colSpan={5} className="px-5 py-2.5">
+                          <p className="text-xs text-gray-300">
+                            Showing {settings.length} of {settings.length} account{settings.length !== 1 ? "s" : ""}
+                          </p>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
+                    </tfoot>
+                  )}
                 </table>
-              )}
-            </div>
-
-            {/* ── Mobile Cards ── */}
-            <div className="block md:hidden">
-              {refreshing ? (
-                <div className="p-4 space-y-3">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="rounded-xl border border-neutral-100 p-4 space-y-2 animate-pulse">
-                      <div className="h-3 rounded bg-neutral-100 w-1/3" />
-                      <div className="h-3 rounded bg-neutral-100 w-2/3" />
-                    </div>
-                  ))}
-                </div>
-              ) : paymentMethods.length === 0 ? (
-                <div className="py-12 flex flex-col items-center gap-2">
-                  <FiCreditCard className="w-8 h-8 text-neutral-300" />
-                  <p className="text-sm text-neutral-400">No configurations yet</p>
-                </div>
-              ) : (
-                <div className="p-4 space-y-3">
-                  {paymentMethods.map((item) => (
-                    <div
-                      key={item.paymentSettingId}
-                      className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <StatusBadge enabled={item.isRazorpayEnabled} />
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-neutral-600 bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 transition-all hover:bg-neutral-50"
-                          >
-                            <FiEdit2 className="w-3 h-3" /> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(item)}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-red-500 bg-white border border-red-100 rounded-lg px-2.5 py-1.5 transition-all hover:bg-red-50"
-                          >
-                            <FiTrash2 className="w-3 h-3" /> Delete
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Key ID</p>
-                          <span className="font-mono text-xs bg-white border border-neutral-200 text-neutral-700 px-2 py-0.5 rounded-lg">
-                            {item.razorpayKeyId.slice(0, 6)}••••
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Email</p>
-                          <p className="text-xs text-neutral-600">{item.alertEmail.split("@")[0]}@…</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Updated</p>
-                          <p className="text-[11px] text-neutral-500">{formatDate(item.updatedAt)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-export default PaymentSettings;
+          {/* Footer note */}
+          <div className="flex items-center justify-center gap-1.5 pb-2">
+            <LockIcon size={11} />
+            <p className="text-xs text-gray-300">
+              All credentials are encrypted at rest. Only one account can be active at a time.
+            </p>
+          </div>
+        </main>
+      </div>
+
+      {/* Add Drawer */}
+      {showAdd && (
+        <AddDrawer
+          onCancel={() => setShowAdd(false)}
+          onSuccess={(msg) => {
+            showToast(msg);
+            setShowAdd(false);
+            fetchSettings();
+          }}
+        />
+      )}
+    </>
+  );
+}
+

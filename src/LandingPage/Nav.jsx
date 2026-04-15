@@ -125,10 +125,10 @@ export default function Nav() {
       <header className="w-full sticky top-0 bg-white shadow-sm z-40">
 
         {/* ── Top bar ── */}
-        <div className="bg-neutral-900 text-white text-sm py-2 px-4 flex items-center justify-center lg:justify-between flex-wrap">
+        <div className="bg-primary relative text-white text-sm py-2 px-4 flex items-center justify-center lg:justify-between flex-wrap">
           <span className="hidden lg:block">
             Reliable solutions for{" "}
-            <span className="text-yellow-400 font-semibold">
+            <span className="text-gray-700 font-semibold">
               compliance, filings, and regulatory requirements
             </span>{" "}
             supporting businesses at every stage.
@@ -149,7 +149,7 @@ export default function Nav() {
                 to={to}
                 className={({ isActive }) =>
                   `px-3 py-1 text-sm transition-colors ${
-                    isActive ? "text-yellow-400" : "text-gray-300 hover:text-white"
+                    isActive ? "text-yellow-300" : "text-white hover:text-yellow-300"
                   }`
                 }
               >
