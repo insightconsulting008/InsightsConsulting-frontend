@@ -42,9 +42,9 @@ import UTMTracker from './providers/UTMTracker';
 const ADMIN_EXACT = [
   '/admin-dashboard',
   '/employees',
-  '/services-hub',           // list
+  '/services-hub',        // list
   '/orders',             // list
-  '/settings',           // payment settings
+  '/settings',          // payment settings
   '/customers',
   '/reports',
   '/amendment',
@@ -106,6 +106,7 @@ const LANDING_EXACT = [
   '/contact',
   '/about',
   '/servicehub',
+  '/terms&conditions'
 ];
 const LANDING_PREFIX = [
   '/resource/',   // /resource/:slug
