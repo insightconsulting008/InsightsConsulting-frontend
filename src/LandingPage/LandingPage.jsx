@@ -16,7 +16,7 @@ import Terms from './Terms';
 
 const LandingPage = () => {
   return (
-    <>
+    <div className="landing-page">
       <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -34,7 +34,7 @@ const LandingPage = () => {
         <Route path="/terms&conditions" element={<Terms />} />
       </Routes>
       <Footer />
-    </>
+    </div>
   );
 };
 

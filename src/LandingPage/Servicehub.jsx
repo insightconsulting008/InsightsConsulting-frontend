@@ -304,7 +304,7 @@ export default function RecommendedServices() {
         onClick={() => setCurrentPage(n)}
         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-medium transition-colors flex-shrink-0 ${
           currentPage === n
-            ? "bg-red-50 text-red-600 font-semibold"
+            ? "bg-secondary text-primary font-semibold"
             : "text-gray-500 hover:bg-gray-100"
         }`}
       >
@@ -339,19 +339,19 @@ export default function RecommendedServices() {
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-100 px-4 lg:px-12 py-3">
           <nav className="flex items-center gap-1 text-gray-400 text-sm flex-wrap">
-            <span className="text-red-500 cursor-pointer hover:underline" onClick={handleAllServicesSelect}>
+            <span className="text-primary cursor-pointer hover:underline" onClick={handleAllServicesSelect}>
               All Services
             </span>
             {selectedCat && (
               <>
                 <span className="mx-1">›</span>
-                <span className="text-red-500">{selectedCat.categoryName}</span>
+                <span className="text-primary">{selectedCat.categoryName}</span>
               </>
             )}
             {selectedSub && (
               <>
                 <span className="mx-1">›</span>
-                <span className="text-red-600 font-semibold">{selectedSub.subCategoryName}</span>
+                <span className="text-primary font-semibold">{selectedSub.subCategoryName}</span>
               </>
             )}
           </nav>
@@ -380,7 +380,7 @@ export default function RecommendedServices() {
                   onClick={handleAllServicesSelect}
                   className={`px-3 py-1.5 rounded-lg md:text-base text-xs font-medium transition-all duration-200 flex-shrink-0 ${
                     !selectedCatId && !selectedSubId
-                      ? 'bg-red-600 text-white  shadow-sm shadow-red-200'
+                      ? 'bg-primary text-white  shadow-sm shadow-primary/20'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -398,11 +398,11 @@ export default function RecommendedServices() {
                       onClick={() => handleCategoryClick(cat.categoryId)}
                       className={`px-3 py-1.5 rounded-lg md:text-base text-xs font-medium transition-all duration-200 flex items-center gap-1 whitespace-nowrap ${
                         selectedCatId === cat.categoryId && !selectedSubId
-                          ? 'bg-red-600 text-white shadow-sm shadow-red-200'
+                          ? 'bg-primary text-white shadow-sm shadow-primary/20'
                           : selectedCatId === cat.categoryId && selectedSubId
-                          ? 'bg-red-100 text-red-700 border border-red-200'
+                          ? 'bg-primary/10 text-primary border border-primary/20'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      } ${openDropdownId === cat.categoryId ? 'ring-2 ring-red-200' : ''}`}
+                      } ${openDropdownId === cat.categoryId ? 'ring-2 ring-primary/20' : ''}`}
                     >
                       {cat.categoryName}
                       {openDropdownId === cat.categoryId ? <FiChevronUp className="w-3 h-3" /> : <FiChevronDown className="w-3 h-3" />}
@@ -419,8 +419,8 @@ export default function RecommendedServices() {
                               onClick={() => handleSelectAllCategory(cat.categoryId)}
                               className={`w-full text-left px-4 py-1 text-sm transition-colors font-medium ${
                                 selectedCatId === cat.categoryId && !selectedSubId
-                                  ? 'bg-red-50 text-red-600'
-                                  : 'hover:bg-red-50 hover:text-red-600'
+                                  ? 'bg-secondary text-primary'
+                                  : 'hover:bg-secondary hover:text-primary'
                               }`}
                             >
                               All 
@@ -433,8 +433,8 @@ export default function RecommendedServices() {
                                 onClick={() => handleSelectSubcategory(cat.categoryId, sub.subCategoryId)}
                                 className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                                   selectedSubId === sub.subCategoryId
-                                    ? 'bg-red-50 text-red-600 font-medium'
-                                    : 'hover:bg-red-50 hover:text-red-600'
+                                    ? 'bg-secondary text-primary font-medium'
+                                    : 'hover:bg-secondary hover:text-primary'
                                 }`}
                               >
                                 {sub.subCategoryName}
@@ -486,7 +486,7 @@ export default function RecommendedServices() {
               <div className="relative" ref={sortRef}>
                 <button
                   onClick={() => setShowSortDropdown(prev => !prev)}
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-all duration-150 flex-shrink-0"
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:border-primary/30 hover:text-primary hover:bg-secondary transition-all duration-150 flex-shrink-0"
                 >
                   <span className="hidden sm:inline">Sort: </span>
                   <span className="text-gray-900 font-semibold">{sortBy.split(' ')[0]}</span>
@@ -501,12 +501,12 @@ export default function RecommendedServices() {
                         onClick={() => { setSortBy(option); setShowSortDropdown(false); }}
                         className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                           sortBy === option
-                            ? 'bg-red-50 text-red-600 font-medium'
-                            : 'hover:bg-red-50 hover:text-red-600'
+                            ? 'bg-secondary text-primary font-medium'
+                            : 'hover:bg-secondary hover:text-primary'
                         }`}
                       >
                         {option}
-                        {sortBy === option && <FiCheck className="ml-2 inline text-red-600" />}
+                        {sortBy === option && <FiCheck className="ml-2 inline text-primary" />}
                       </button>
                     ))}
                   </div>
@@ -578,7 +578,7 @@ export default function RecommendedServices() {
                           <span className="text-gray-400 lg:text-base text-sm">Need More Info?</span>
                           <button
                             onClick={() => navigateTo(service, 'buy')}
-                            className="font-semibold lg:text-base text-sm text-gray-800 flex items-center gap-1 hover:text-red-600 transition-colors"
+                            className="font-semibold lg:text-base text-sm text-gray-800 flex items-center gap-1 hover:text-primary transition-colors"
                           >
                             Explore service
                             <FiArrowUpRight className="w-3.5 h-3.5" />
@@ -588,13 +588,13 @@ export default function RecommendedServices() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => navigateTo(service, 'buy')}
-                            className="flex-1 bg-red-600 hover:bg-red-700 text-white lg:text-base text-sm font-semibold py-2.5 rounded-lg transition-colors"
+                            className="flex-1 bg-primary hover:bg-primary/90 text-white lg:text-base text-sm font-semibold py-2.5 rounded-lg transition-colors"
                           >
                             Buy Now
                           </button>
                           <button
                             onClick={() => navigateTo(service, 'details')}
-                            className="flex-1 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 lg:text-base text-sm text-red-600 font-semibold py-2.5 rounded-lg transition-colors"
+                            className="flex-1 bg-white border border-gray-200 hover:bg-secondary hover:border-primary/20 lg:text-base text-sm text-primary font-semibold py-2.5 rounded-lg transition-colors"
                           >
                             Details
                           </button>
@@ -617,7 +617,7 @@ export default function RecommendedServices() {
                     <span className="hidden sm:inline">Prev</span>
                   </button>
 
-                  <div className="flex bg-red-50 items-center gap-0.5 sm:gap-1 rounded-lg px-1 sm:px-2 overflow-x-auto max-w-[calc(100vw-160px)] sm:max-w-none scrollbar-hide py-1">
+                  <div className="flex bg-secondary items-center gap-0.5 sm:gap-1 rounded-lg px-1 sm:px-2 overflow-x-auto max-w-[calc(100vw-160px)] sm:max-w-none scrollbar-hide py-1">
                     {renderPageNumbers()}
                   </div>
 

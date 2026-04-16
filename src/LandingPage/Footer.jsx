@@ -48,7 +48,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-white container mx-auto antialiased font-inter">
+    <footer className="w-full bg-white container mx-auto antialiased">
 
 
       
@@ -64,7 +64,7 @@ const Footer = () => {
                 <img src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/image%2033%201%20(1)%201.png?updatedAt=1771313237021" alt="Logo" className="w-40 object-contain" />
                
               </div>
-              <p className="text-[#535862] text-[16px] leading-[24px]">
+              <p className="text-muted text-[16px] leading-[24px]">
                 Simplifying business registrations, taxation, and compliance with reliable expert support you can trust.
               </p>
             </div>
@@ -73,7 +73,7 @@ const Footer = () => {
             <div className="w-full max-w-7xl grid grid-cols-2 md:grid-cols-3  justify-between">
               {footerData.map((col) => (
                 <div key={col.title} className="flex flex-col gap-[16px]  lg:w-[140.8px]">
-                  <h4 className="text-[#717680] text-[14px] font-semibold capitalize">
+                  <h4 className="text-subtle text-[14px] font-semibold capitalize">
                     {col.title}
                   </h4>
 
@@ -84,7 +84,7 @@ const Footer = () => {
                         {/* IMPORTANT FIX */}
                         <a
                           href={link.path}
-                          className="text-[#535862] text-[16px] font-semibold hover:text-black transition-colors"
+                          className="text-muted text-[16px] font-semibold hover:text-black transition-colors"
                         >
                           {link.label}
                         </a>
@@ -102,12 +102,12 @@ const Footer = () => {
 
       {/* <section className="w-full pb-[48px]">
         <div className="max-w-[1280px] mx-auto px-[20px] lg:px-[32px]">
-          <div className="max-w-[1216px] mx-auto h-[1px] bg-[#E9EAEB]"></div>
+          <div className="max-w-[1216px] mx-auto h-[1px] bg-border"></div>
 
           <div className="max-w-[1216px] mx-auto pt-[32px] flex flex-col md:flex-row justify-between items-center gap-[24px]">
 
 
-            <p className="text-[#717680] text-[16px] leading-[24px] font-normal w-full lg:w-[920px] text-center md:text-left">
+            <p className="text-subtle text-[16px] leading-[24px] font-normal w-full lg:w-[920px] text-center md:text-left">
               © 2077 Untitled UI. All rights reserved.
             </p>
 

@@ -8,19 +8,14 @@ import {
   FaSyncAlt,
   FaTasks,
 } from "react-icons/fa";
-import { FaLightbulb, } from "react-icons/fa";
+import { FaLightbulb } from "react-icons/fa";
 import { LuShieldCheck } from "react-icons/lu";
 import { FaUserGroup } from "react-icons/fa6";
 import { IoFlagSharp } from "react-icons/io5";
 import { BiChalkboard } from "react-icons/bi";
 import { HiArrowRight } from "react-icons/hi2";
 
-import {
-  FaUserTie,
-  FaSlack,
-  FaDropbox,
-  FaHistory,
-} from "react-icons/fa";
+import { FaUserTie, FaSlack, FaDropbox, FaHistory } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { FaBolt } from "react-icons/fa";
@@ -34,40 +29,36 @@ import Enquiryform from "./reusable/Enquiryform";
 import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup.jsx";
 
-
 const steps = [
   {
     no: "01",
-    icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/info-folder%201.png',
+    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/info-folder%201.png",
     title: "Choose a Service",
     desc: "Browse, enquire, or purchase services from our website",
   },
   {
     no: "02",
-    icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%201.png',
+    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%201.png",
     title: "Login & Submit Details",
     desc: "Access your dashboard and upload required documents",
   },
   {
     no: "03",
-    icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%202.png',
+    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%202.png",
     title: "Representative Assigned",
     desc: "A representative manages your service and updates everything.",
   },
   {
     no: "04",
-    icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/info-folder%203.png',
+    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/info-folder%203.png",
     title: "Fast disbursement",
     desc: "Get certificates & ongoing follow-ups for recurring services.",
   },
 ];
 
-
 export default function Home() {
   const [openPopup, setOpenPopup] = useState(false);
   const navigate = useNavigate();
-
-
 
   const services = [
     "GST Registration",
@@ -123,22 +114,22 @@ export default function Home() {
     //   desc: "Browse, select, and purchase compliance services directly — with clear pricing, guided onboarding, and no manual follow-ups.",
     // },
     {
-      icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(1).png?updatedAt=1771417293237',
+      icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(1).png?updatedAt=1771417293237",
       title: "Dedicated Service Ownership",
       desc: "Each service is assigned to a responsible team member, so clients always know who’s handling their work.",
     },
     {
-      icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(2).png?updatedAt=1771417293299',
+      icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(2).png?updatedAt=1771417293299",
       title: "Built-In Follow-Ups & Tracking",
       desc: "Automated reminders and status tracking replace manual follow-ups and last-minute rushes.",
     },
     {
-      icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(3).png?updatedAt=1771417293273',
+      icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(3).png?updatedAt=1771417293273",
       title: " Dashboards",
       desc: "Clients track progress transparently, while teams manage workloads with clear visibility.",
     },
     {
-      icon: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(4).png?updatedAt=1771417293232',
+      icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(4).png?updatedAt=1771417293232",
       title: "Recurring Compliance Management",
       desc: "Monthly and periodic compliances are proactively handled — renewals and filings stay on schedule.",
     },
@@ -221,17 +212,32 @@ From documentation to filing, Insight Consulting made compliance feel surprising
   ];
 
   const logos = [
-    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png", name: "Layers" },
-    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png", name: "Sisyphus" },
-    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png", name: "Circooles" },
-    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark3.png", name: "Catalog" },
-    { src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark1.png", name: "Quotient" },
+    {
+      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png",
+      name: "Layers",
+    },
+    {
+      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png",
+      name: "Sisyphus",
+    },
+    {
+      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png",
+      name: "Circooles",
+    },
+    {
+      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark3.png",
+      name: "Catalog",
+    },
+    {
+      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark1.png",
+      name: "Quotient",
+    },
   ];
-
 
   return (
     <>
-      <section className="relative bg-cover  bg-center bg-no-repeat"
+      <section
+        className="relative bg-cover  bg-center bg-no-repeat"
         style={{
           backgroundImage:
             "url('https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/a887b935f178ca98fda0052257faa5c0f46c4a37.jpg')",
@@ -239,19 +245,23 @@ From documentation to filing, Insight Consulting made compliance feel surprising
       >
         {/* overlay */}
         <div className="absolute inset-0 bg-white/90"></div>
-        <img src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Vector%20157.png" alt="" className="absolute -bottom-10  md:right-16 lg:right-0   lg:w-[50%]  h-160 md:h-180 lg:h-140   " />
+        <img
+          src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Vector%20157.png"
+          alt=""
+          className="absolute -bottom-10  md:right-16 lg:right-0   lg:w-[50%]  h-160 md:h-180 lg:h-140   "
+        />
 
         <div className="relative lg:px-12 px-4 container  mx-auto  pt-20 grid lg:grid-cols-2 gap-12 items-center">
-
           {/* LEFT CONTENT */}
           <div className=" ">
             <p className="text-sm text-gray-600 mb-4">
-              Trusted by <span className="text-red font-semibold">1,000+</span> Business Owners ❤️
+              Trusted by{" "}
+              <span className="text-primary font-semibold">1,000+</span>{" "}
+              Business Owners ❤️
             </p>
 
             <h1 className="text-2xl md:text-5xl font-semibold text-gray-800 leading-tight">
-              Compliance Made Simple for{" "} <br />
-
+              Compliance Made Simple for <br />
               <span className="text-green-600 font-bold">
                 <Typewriter
                   words={[
@@ -271,13 +281,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </h1>
 
             <p className="mt-4  text-gray-600 max-w-lg">
-              From registrations to ongoing filings, we help businesses stay compliant
-              across multiple regulatory requirements.
+              From registrations to ongoing filings, we help businesses stay
+              compliant across multiple regulatory requirements.
             </p>
 
             <button
               onClick={() => navigate("/contact")}
-              className="mt-6 bg-red text-white px-6 py-3 rounded-lg font-medium shadow"
+              className="mt-6 bg-primary text-white px-6 py-3 rounded-lg font-medium shadow"
             >
               Get started
             </button>
@@ -285,14 +295,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
           {/* RIGHT FORM */}
           <div className="relative  ">
-
-
             <Enquiryform />
           </div>
-
         </div>
-
-
       </section>
 
       {/* <section className="bg-white mt-14 border-t  border-b border-gray-200 overflow-hidden w-full">
@@ -338,30 +343,22 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         </style>
       </section> */}
 
-      <section className="bg-[#05070c] text-white mt-10  py-10 lg:py-20">
-        <div className=" container mx-auto">
-          <div className=" lg:px-12 px-4  mx-auto ">
-
+      <section className="mt-10 py-10 lg:py-20 bg-secondary text-gray-900">
+        <div className="container mx-auto">
+          <div className="lg:px-12 px-4 mx-auto">
             {/* Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+            <div className="flex flex-col gap-6 mb-12">
               <div>
-                <h2 className="text-2xl md:text-5xl font-semibold mb-4">
+                <h2 className="text-2xl md:text-5xl font-semibold mb-4 text-gray-900">
                   Built From Real Compliance Challenges
                 </h2>
 
-                <p className="text-gray-400 max-w-2xl">
+                <p className="text-gray-600 max-w-2xl">
                   Working closely with businesses, we noticed that compliance
                   failures rarely happen due to lack of intent but due to poor
                   tracking, manual follow-ups, and fragmented processes.
                 </p>
               </div>
-
-              <button
-                className="self-start lg:self-auto bg-white text-black px-5 py-3 rounded-lg font-medium hover:bg-gray-200 transition"
-                onClick={() => navigate("/about")}
-              >
-                Know More &gt;&gt;
-              </button>
             </div>
 
             <EnquiryPopup
@@ -374,31 +371,36 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               {challenges.map((item, index) => (
                 <div
                   key={index}
-                  className={`bg-gradient-to-br from-[#0b0f17] to-[#0a0d14] border border-white/5 rounded-xl p-6 backdrop-blur-md hover:border-white/10 transition
-      ${index >= challenges.length - 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
+                  className={`rounded-xl p-6
+            bg-white
+            border border-gray-200
+            shadow-sm
+            ${index >= challenges.length - 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
                 >
-                  <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/5 text-white text-xl mb-4">
+                  {/* Icon */}
+                  <div
+                    className="w-12 h-12 flex items-center justify-center rounded-lg 
+              bg-blue-50 text-blue-600 text-xl mb-4"
+                  >
                     {item.icon}
                   </div>
 
-                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
+                    {item.title}
+                  </h3>
 
-                  <p className="text-[#797C86] leading-relaxed">
-                    {item.desc}
-                  </p>
+                  <p className="text-gray-600 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </section>
-      <section className="bg-[#f5f6f7]  py-10 lg:py-20">
+      <section className="bg-secondary  py-10 lg:py-20">
         <div className="container mx-auto">
           <div className="lg:px-12 px-4 mx-auto ">
-
             {/* Top Row */}
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
-
               {/* Left Content */}
               <div>
                 <p className="text-yellow-600 text-sm font-semibold mb-3">
@@ -432,10 +434,10 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 <div className="border border-dashed hidden lg:block border-gray-300 absolute top-[55%] w-full "></div>
                 {features.map((item, index) => (
                   <div key={index} className="flex gap-4 ">
-
-                    <img src={item.icon} className="w-10 h-9 flex items-center justify-center " />
-
-
+                    <img
+                      src={item.icon}
+                      className="w-10 h-9 flex items-center justify-center "
+                    />
 
                     <div>
                       <h3 className="font-semibold text-lg text-gray-800 mb-1">
@@ -449,7 +451,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 ))}
 
                 {/* CTA block */}
-
               </div>
               <div className="lg:col-span-1  border border-gray-300 p-3 rounded-md border-dashed flex flex-col mt-5 lg:mt-0  items-center justify-center">
                 <p className="  text-center  italic mb-4">
@@ -457,20 +458,21 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   <span className="font-semibold">Manual Coordination</span>
                 </p>
 
-                <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium w-max" onClick={() => navigate("/contact")}>
+                <button
+                  className="bg-primary  text-white px-6 py-3 rounded-lg font-medium w-max"
+                  onClick={() => setOpenPopup(true)}
+                >
                   Talk to Our Team &gt;&gt;
                 </button>
-
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-[#FFFAF1]   py-10 lg:py-20">
+      <section className="bg-yellow/5   py-10 lg:py-20">
         <div className="mx-auto container">
           <div className=" px-4 lg:px-12 mx-auto ">
-
             {/* Header */}
             <div className="text-center mb-12">
               <p className="text-yellow text-sm font-semibold mb-2">
@@ -482,12 +484,12 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </h2>
 
               <p className="text-gray-600 max-w-2xl mx-auto mb-6">
-                We don’t just deliver compliance services — we change how businesses
-                experience compliance, communication, and follow-ups.
+                We don’t just deliver compliance services — we change how
+                businesses experience compliance, communication, and follow-ups.
               </p>
 
               {/* <button
-                className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-medium w-fit"
                 onClick={() => navigate('/resource')}
               >
                 Learn From Our Blog &gt;&gt;
@@ -496,15 +498,17 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
             {/* Cards Grid */}
             <div className="grid lg:grid-cols-3 gap-6">
-
               {/* Left Card */}
-              <div className="relative bg-[#E6F3DA] rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
+              <div className="relative bg-secondary rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
                 <h3 className="text-xl  font-semibold text-green-600 ">
                   Hassle Free
                 </h3>
-                <h4 className="font-semibold text-xl text-gray-800 mb-4 ">Process</h4>
+                <h4 className="font-semibold text-xl text-gray-800 mb-4 ">
+                  Process
+                </h4>
                 <p className="text-gray-600 text-sm max-w-xs">
-                  Simple steps, clear communication, and minimal back-and-forth throughout the service.
+                  Simple steps, clear communication, and minimal back-and-forth
+                  throughout the service.
                 </p>
 
                 {/* Dummy Image */}
@@ -517,14 +521,18 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
               {/* Middle Column */}
               <div className="flex flex-col gap-6">
-
                 {/* Card 2 */}
-                <div className="relative bg-[#E9EEF2] rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
+                <div className="relative bg-secondary rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
                   <h3 className="text-xl font-semibold text-gray-800">
                     No <span className="text-blue-600">Chasing</span>
                   </h3>
                   <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                    We proactively manage <br className="hidden lg:block xl:hidden" />follow-ups  and renewals, <br className="hidden lg:block  xl:hidden" /> so clients don’t have to <br className="hidden lg:block  xl:hidden" /> remind us.
+                    We proactively manage{" "}
+                    <br className="hidden lg:block xl:hidden" />
+                    follow-ups and renewals,{" "}
+                    <br className="hidden lg:block  xl:hidden" /> so clients
+                    don’t have to <br className="hidden lg:block  xl:hidden" />{" "}
+                    remind us.
                   </p>
 
                   <img
@@ -535,12 +543,16 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 </div>
 
                 {/* Card 3 */}
-                <div className="relative bg-[#FFF6D7] rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
+                <div className="relative bg-yellow/10 rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
                   <h3 className="text-xl font-semibold text-yellow-600">
                     Clear Ownership
                   </h3>
                   <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                    Every step and update is <br className="md:block hidden  xl:hidden" /> communicated clearly no <br className="md:block hidden  xl:hidden" /> confusion, <br className="md:block hidden  xl:hidden" />no surprises.
+                    Every step and update is{" "}
+                    <br className="md:block hidden  xl:hidden" /> communicated
+                    clearly no <br className="md:block hidden  xl:hidden" />{" "}
+                    confusion, <br className="md:block hidden  xl:hidden" />
+                    no surprises.
                   </p>
 
                   <img
@@ -552,12 +564,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </div>
 
               {/* Right Card */}
-              <div className="relative bg-[#F3EBED] rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
+              <div className="relative bg-secondary rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
                 <h3 className="text-xl font-semibold text-gray-800">
                   Human <span className="text-pink-600">Support</span>
                 </h3>
                 <p className="text-gray-600 text-sm mt-2 max-w-xs">
-                  Real people who understand your business handle your compliance.
+                  Real people who understand your business handle your
+                  compliance.
                 </p>
 
                 <img
@@ -566,15 +579,13 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   className="absolute bottom-0 h-46 md:h-72 right-4"
                 />
               </div>
-
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-[#f5f6f7]  py-10 md:py-16">
+      <section className="bg-secondary  py-10 md:py-16">
         <div className="container  lg:px-12 px-4 mx-auto ">
-
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
             <div>
@@ -593,7 +604,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </div>
 
             <button
-              className="bg-red text-white px-6 py-3 rounded-lg font-medium w-fit"
+              className="bg-primary text-white px-6 py-3 rounded-lg font-medium w-fit"
               onClick={() => setOpenPopup(true)}
             >
               Enquire Now &gt;&gt;
@@ -605,24 +616,30 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="flex items-start gap-4 bg-white rounded-xl  shadow-sm"
+                className="flex items-start gap-4 bg-white rounded-xl shadow-sm"
               >
                 {/* Number */}
-                <div className="bg-yellow rounded-tl-lg  h-full text-white font-semibold px-3 py-2">
+                <div className="bg-yellow rounded-tl-lg h-full text-white font-semibold px-4 py-3 text-lg">
                   {step.no}
                 </div>
 
                 {/* Content */}
-                <div className=" relative  px-2 py-6">
-                  <img className="h-14 absolute -top-7 right-0 text-gray-700 mb-2 " src={step.icon} />
+                <div className="relative px-3 py-6">
+                  <img
+                    className="h-14 absolute -top-7 right-0 text-gray-700 mb-2"
+                    src={step.icon}
+                    alt=""
+                  />
 
-
-
-                  <h3 className="font-semibold text-gray-800 mb-1">
+                  {/* ✅ Larger title */}
+                  <h3 className="font-semibold text-gray-800 mb-2 text-base md:text-lg">
                     {step.title}
                   </h3>
 
-                  <p className="text-sm text-gray-600">{step.desc}</p>
+                  {/* ✅ Larger description */}
+                  <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -632,7 +649,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
       <section className=" lg:py-16 py-10 ">
         <div className="container lg:px-12 px-4 mx-auto ">
-
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
             <div>
@@ -657,15 +673,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 Compliance You Don’t Have to Chase
               </h3>
               <p className="text-gray-600 text-sm">
-                We don’t stop at one-time services. Our system is built to manage
-                recurring compliances, renewals, and follow-ups proactively.
+                We don’t stop at one-time services. Our system is built to
+                manage recurring compliances, renewals, and follow-ups
+                proactively.
               </p>
             </div>
           </div>
 
           {/* Content */}
-          <div className="bg-[#eef0f2] rounded-2xl p-3 lg:p-6 grid lg:grid-cols-3 gap-6 items-center">
-
+          <div className="bg-secondary rounded-2xl p-3 lg:p-6 grid lg:grid-cols-3 gap-6 items-center">
             {/* Left Image */}
             <div className="relative h-[380px] rounded-xl overflow-hidden">
               <img
@@ -690,8 +706,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                   </div>
                 </div>
 
-                <button className="bg-red pl-2 pr-4 py-2 flex items-center gap-2 rounded-full w-max" onClick={() => navigate('/about')}>
-                  < HiArrowRight size={10} className="w-8 h-8 p-2 text-black bg-white rounded-full" /> Explore Our Story
+                <button
+                  className="bg-primary pl-2 pr-4 py-2 flex items-center gap-2 rounded-full w-max"
+                  onClick={() => navigate("/about")}
+                >
+                  <HiArrowRight
+                    size={10}
+                    className="w-8 h-8 p-2 text-black bg-white rounded-full"
+                  />{" "}
+                  Explore Our Story
                 </button>
               </div>
             </div>
@@ -699,7 +722,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             {/* RIGHT FEATURES (CENTERED) */}
             <div className="lg:col-span-2 h-full mb-4  rounded-3xl flex items-center">
               <div className="grid lg:grid-cols-2 w-full">
-
                 {/* Item 1 */}
                 <div className="flex gap-4   lg:p-6 md:border-b lg:border-r border-gray-200">
                   <div className="w-10 h-10 p-2 rounded-full bg-yellow flex items-center justify-center text-white">
@@ -759,18 +781,16 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      <section className="bg-[#FDFBFF] py-16 ">
+      <section className="bg-secondary py-16 ">
         <div className="lg:px-12 px-4 container  mx-auto">
           {/* Top Label */}
-          <p className="text-red font-semibold text-sm tracking-wider">
+          <p className="text-primary font-semibold text-sm tracking-wider">
             ONE PLATFORM
           </p>
 
@@ -781,13 +801,14 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 Everything You Need, Connected in One Place
               </h2>
               <p className="text-gray-500 mt-2 max-w-xl">
-                From communication to documents and follow-ups all managed within a single system.
+                From communication to documents and follow-ups all managed
+                within a single system.
               </p>
             </div>
 
             <div className="flex lg:justify-end lg:w-80">
               <button
-                className="bg-red text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
+                className="bg-primary text-white lg:px-6 px-4 py-3 rounded-md font-medium transition w-fit"
                 onClick={() => setOpenPopup(true)}
               >
                 Enquire Now →
@@ -833,7 +854,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
         <div className="lg:px-12 px-4 container  mx-auto text-center">
           {/* Icon */}
           <div className="flex justify-center mb-4">
-            <div className="w-10 h-10 flex items-center   justify-center rounded-full bg-[#F7F8F8] text-red">
+            <div className="w-10 h-10 flex items-center   justify-center rounded-full bg-secondary text-primary">
               <FaBolt />
             </div>
           </div>
@@ -855,7 +876,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                 key={i}
                 className="border-r last:border-none border-gray-200 px-4"
               >
-                <p className="text-3xl md:text-4xl font-semibold text-red">
+                <p className="text-3xl md:text-4xl font-semibold text-primary">
                   {item.value}
                 </p>
                 <p className="text-gray-600 text-sm mt-2">{item.label}</p>
@@ -869,10 +890,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </p>
 
           {/* Logos */}
-
         </div>
       </section>
-      <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
+      {/* <section className="w-full bg-white py-16 lg:py-24 overflow-hidden">
         <div className="mx-auto">
 
 
@@ -885,7 +905,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                     alt={`${logo.name} mark`}
                     className=" w-6 md:w-11 h-6 md:h-11 object-contain"
                   />
-                  <span className="text-[24px] font-bold text-[#535862] tracking-tight">
+                  <span className="text-[24px] font-bold text-muted tracking-tight">
                     {logo.name}
                   </span>
                 </div>
@@ -907,12 +927,12 @@ From documentation to filing, Insight Consulting made compliance feel surprising
       }
     `}
         </style>
-      </section>
+      </section> */}
 
       {/* <section className="bg-[#F4EBFF33] py-10 lg:py-16 ">
         <div className="lg:px-12 px-4 container mx-auto">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-14 h-10 rounded-full bg-blue-50 flex items-center justify-center border border-[#3E72F9] text-blue-600">
+            <div className="w-14 h-10 rounded-full bg-blue-50 flex items-center justify-center border border-primary text-blue-600">
               <FaUsers />
             </div>
             <h2 className="text-2xl md:text-5xl font-semibold text-gray-900">
@@ -943,7 +963,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                       alt={item.name}
                       className="w-14 h-14 rounded-full object-cover"
                     />
-                    < BiBadgeCheck className="absolute bottom-4 -right-3 w-8 h-8 p-1 bg-[#3E72F9] text-white rounded-full text-lg" />
+                    < BiBadgeCheck className="absolute bottom-4 -right-3 w-8 h-8 p-1 bg-primary text-white rounded-full text-lg" />
                   </div>
 
                   <div>
@@ -997,16 +1017,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </p>
             </div>
 
-            <button className="bg-red  text-white px-6 py-3 rounded-lg font-medium transition" onClick={() => setOpenPopup(true)}>
+            <button className="bg-primary  text-white px-6 py-3 rounded-lg font-medium transition" onClick={() => setOpenPopup(true)}>
               Enquire Now ››
             </button>
           </div>
         </div>
       </section> */}
 
-      <section className="bg-[#F5F8FA] py-10 lg:py-20">
+      <section className="bg-secondary py-10 lg:py-20">
         <div className="px-4 lg:px-12 container mx-auto py-5 ">
-
           {/* Heading */}
           <div className="text-center mb-14">
             <p className="text-yellow text-sm font-semibold mb-2">
@@ -1018,18 +1037,15 @@ From documentation to filing, Insight Consulting made compliance feel surprising
             </h2>
 
             <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
-              A message from our founder on simplifying compliance, empowering entrepreneurs,
-              and helping businesses grow with confidence.
+              A message from our founder on simplifying compliance, empowering
+              entrepreneurs, and helping businesses grow with confidence.
             </p>
           </div>
 
-
           {/* Content */}
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-
             {/* Left */}
             <div>
-
               {/* Founder Info */}
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative">
@@ -1039,12 +1055,9 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <BiBadgeCheck className="text-blue-500 absolute bottom-0 -right-2 bg-white w-6 h-6 rounded-full text-sm" />
-
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">
-                    Pravin Kumar
-                  </h4>
+                  <h4 className="font-semibold text-gray-800">Pravin Kumar</h4>
 
                   <p className="text-gray-500 text-sm">
                     Founder, Insight Consulting
@@ -1053,7 +1066,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
               </div>
 
               {/* Tag */}
-              <p className="text-red text-xs font-semibold mb-4 tracking-wide">
+              <p className="text-primary text-xs font-semibold mb-4 tracking-wide">
                 ● OUR VISION & MISSION
               </p>
 
@@ -1064,22 +1077,24 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
               {/* Description */}
               <p className="text-gray-500 mb-6 max-w-lg">
-                Insight Consulting was built with a simple goal — to remove the complexity
-                of registrations, filings, and regulatory requirements so entrepreneurs
-                can focus on growing their businesses with clarity and confidence.
+                Insight Consulting was built with a simple goal — to remove the
+                complexity of registrations, filings, and regulatory
+                requirements so entrepreneurs can focus on growing their
+                businesses with clarity and confidence.
               </p>
 
               {/* Button */}
-              <button onClick={() => navigate("/contact")} className="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition">
+              <button
+                onClick={() => navigate("/contact")}
+                className="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition"
+              >
                 Contact us
               </button>
             </div>
 
             {/* Right Video Card */}
             <div className="relative">
-
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden border">
-
                 {/* Browser Bar */}
                 <div className="bg-gray-600 px-4 py-2 flex items-center gap-2">
                   <span className="w-3 h-3 bg-gray-300 rounded-full"></span>
@@ -1102,18 +1117,16 @@ From documentation to filing, Insight Consulting made compliance feel surprising
                     </div>
                   </div>
                 </div>
-
               </div>
-
             </div>
           </div>
         </div>
       </section>
 
-      {/* <section className="lg:py-15 py-10 bg-[#f5f6f7]">
+      {/* <section className="lg:py-15 py-10 bg-secondary">
         <div className="lg:px-12 mx-auto px-4">
 
-          <div className="relative overflow-hidden rounded-2xl border border-[#E5EFFF] bg-white px-8 py-12 text-center">
+          <div className="relative overflow-hidden rounded-2xl border border-secondary bg-white px-8 py-12 text-center">
 
            
             <div
@@ -1157,7 +1170,7 @@ From documentation to filing, Insight Consulting made compliance feel surprising
 
       
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-          <button  onClick={() => navigate("/servicehub")} className="bg-red text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
+          <button  onClick={() => navigate("/servicehub")} className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition">
             Explore Our Services
           </button>
 
@@ -1175,7 +1188,6 @@ From documentation to filing, Insight Consulting made compliance feel surprising
           </div>
         </div>
       </section> */}
-
     </>
   );
 }

@@ -104,7 +104,6 @@ const DARK_KEYWORDS = [
   'strategic insight',
   'why insight',
   'we go beyond',
-  'important points',
 ];
 const isDarkHeading = (title = '') => {
   const t = title.toLowerCase();
@@ -212,11 +211,41 @@ function normalizeSectionsService(rawData) {
   const skipTitles = new Set([introSection?.title, processSection?.title, ctaSection?.title, 'Shape']);
 
   // Build indexed list so we can detect sections that fall after all dark sections
-  const indexed = sections
+  const rawIndexed = sections
     .map((s, i) => ({ s, i }))
     .filter(({ s }) => s && !skipTitles.has(s.title))
-    .map(({ s, i }) => ({ generic: rawSectionToGeneric(s), origIdx: i }))
+    .map(({ s, i }) => ({ s, generic: rawSectionToGeneric(s), origIdx: i }))
     .filter(({ generic }) => generic !== null);
+
+  // Group consecutive sections that share the same sectionGroup into one entry
+  const indexed = [];
+  let ri = 0;
+  while (ri < rawIndexed.length) {
+    const cur = rawIndexed[ri];
+    const groupId = cur.s?.sectionGroup;
+    if (groupId) {
+      const groupItems = [];
+      while (ri < rawIndexed.length && rawIndexed[ri].s?.sectionGroup === groupId) {
+        groupItems.push(rawIndexed[ri]);
+        ri++;
+      }
+      const genericList = groupItems.map(({ generic }) => generic);
+      indexed.push({
+        s: groupItems[0].s,
+        generic: {
+          ...groupItems[0].generic,
+          // 2-item groups render side-by-side; 3+ go into one stacked card
+          ...(genericList.length === 2
+            ? { pairedSections: genericList }
+            : { groupedSections: genericList }),
+        },
+        origIdx: groupItems[0].origIdx,
+      });
+    } else {
+      indexed.push(cur);
+      ri++;
+    }
+  }
 
   const lastDarkOrigIdx = indexed
     .filter(({ generic }) => isDarkHeading(generic.heading))
@@ -530,9 +559,6 @@ function normalizeComplianceSection(rawData) {
     process = Array.isArray(rawData.services) && typeof rawData.services[0] === 'string'
       ? rawData.services
       : [];
-    if (rawData.importance) {
-      darkSections.push({ heading: rawData.importance.title, items: rawData.importance.points, fullWidth: true });
-    }
     if (rawData.eligibility) {
       const pts = rawData.eligibility.points;
       const haveIdx = pts.findIndex(p => p === 'Have:');
@@ -548,67 +574,92 @@ function normalizeComplianceSection(rawData) {
         nestedItems,
       });
     }
+    if (rawData.importance) {
+      contentSections.push({ heading: rawData.importance.title, items: rawData.importance.points });
+    }
   }
 
   // ── DSC ──
   if (rawData.what_is_dsc) {
-    // strip *bold* markers from DSC data (authored with markdown-style asterisks)
     const stripMd = (s) => typeof s === 'string' ? s.replace(/\*/g, '').trim() : s;
 
-    whyChoose = { heading: undefined, paragraphs: rawData.what_is_dsc.description || [] };
+    // 1. What is DSC? (intro)
+    whyChoose = {
+      heading: '🔹 What is DSC?',
+      paragraphs: rawData.what_is_dsc.description || [],
+    };
 
+    // 2. Why DSC is Important
     if (rawData.importance) {
-      darkSections.push({
+      contentSections.push({
         heading: stripMd(rawData.importance.title),
         items: rawData.importance.points.map(stripMd),
-        fullWidth: true,
       });
     }
 
+    // 3. Types of DSC We Offer
     if (rawData.types) {
       contentSections.push({
         heading: stripMd(rawData.types.title),
-        subSections: rawData.types.items.map((item) => ({
-          heading: stripMd(item.title),
-          items: [
-            ...(item.usage ? [{ isGroup: true, label: 'Used for:', subItems: item.usage }] : []),
-            ...(item.validity ? [`Validity: ${stripMd(item.validity)}`] : []),
-            ...(item.note ? [stripMd(item.note)] : []),
-            ...(item.details ? item.details.map(stripMd) : []),
-          ],
-        })),
+        subSections: rawData.types.items.map((item) => {
+          const items = [];
+          if (item.usage) {
+            items.push('Used for:');
+            item.usage.forEach((u) => items.push(u));
+          }
+          if (item.validity) items.push(`Validity: ${stripMd(item.validity)}`);
+          if (item.note)    items.push(stripMd(item.note));
+          if (item.details) item.details.forEach((d) => items.push(stripMd(d)));
+          return { heading: stripMd(item.title), items };
+        }),
       });
     }
 
+    // 4–8. Documents block
     if (rawData.documents_required) {
       const dr = rawData.documents_required;
-      const subSections = [];
 
+      // 5. For Individual — intro paragraph shown above the title inside the same card
       if (dr.individual) {
         const ind = dr.individual;
-        const items = [];
-        if (ind.identity_proof) items.push({ isGroup: true, label: stripMd(ind.identity_proof.title), subItems: ind.identity_proof.points });
-        if (ind.address_proof)  items.push({ isGroup: true, label: stripMd(ind.address_proof.title),  subItems: ind.address_proof.points });
-        if (ind.pan)   items.push(stripMd(ind.pan));
-        if (ind.photo) items.push(stripMd(ind.photo));
-        if (ind.contact) items.push({ isGroup: true, label: stripMd(ind.contact.title), subItems: ind.contact.points });
-        subSections.push({ heading: stripMd(ind.title), items });
+        const subSections = [];
+        if (ind.identity_proof) subSections.push({ heading: stripMd(ind.identity_proof.title), items: ind.identity_proof.points });
+        if (ind.address_proof)  subSections.push({ heading: stripMd(ind.address_proof.title),  items: ind.address_proof.points });
+        if (ind.pan)    subSections.push({ heading: '🔹 PAN (Mandatory)',   items: [stripMd(ind.pan)] });
+        if (ind.photo)  subSections.push({ heading: '🔹 Photograph',        items: [stripMd(ind.photo)] });
+        if (ind.contact) subSections.push({ heading: stripMd(ind.contact.title), items: ind.contact.points });
+        contentSections.push({
+          heading: stripMd(ind.title),
+          preHeading: dr.intro ? [
+            { text: 'For obtaining a ' },
+            { text: 'Class 3 Digital Signature Certificate (DSC)', bold: true },
+            { text: ' in India (used for MCA filings, GST, Income Tax, tenders, etc.), the documentation depends on whether the applicant is an ' },
+            { text: 'individual or organization,', bold: true },
+            { text: ' and whether it is for ' },
+            { text: 'signing / encryption / both.', bold: true },
+          ] : undefined,
+          subSections,
+        });
       }
 
+      // 6. Additional for Company / Organization
       if (dr.organization) {
-        const orgItems = dr.organization.points.map((pt) =>
-          pt.startsWith('*') && pt.endsWith('*') ? stripMd(pt) + ':' : pt
-        );
-        subSections.push({ heading: stripMd(dr.organization.title), items: orgItems });
+        const orgSubSections = [];
+        let cur = null;
+        dr.organization.points.forEach((pt) => {
+          if (pt.startsWith('*') && pt.endsWith('*')) {
+            if (cur) orgSubSections.push(cur);
+            cur = { heading: '🔹 ' + stripMd(pt), items: [] };
+          } else if (cur) {
+            cur.items.push(pt);
+          }
+        });
+        if (cur) orgSubSections.push(cur);
+        contentSections.push({ heading: stripMd(dr.organization.title), subSections: orgSubSections });
       }
-
-      contentSections.push({
-        heading: stripMd(dr.title),
-        paragraphs: dr.intro ? [dr.intro] : undefined,
-        subSections,
-      });
     }
 
+    // 7. Verification Process
     if (rawData.verification) {
       contentSections.push({
         heading: stripMd(rawData.verification.title),
@@ -617,6 +668,7 @@ function normalizeComplianceSection(rawData) {
       });
     }
 
+    // 8. USB Token
     if (rawData.usb_token) {
       contentSections.push({
         heading: stripMd(rawData.usb_token.title),
@@ -624,10 +676,15 @@ function normalizeComplianceSection(rawData) {
       });
     }
 
+    // 9. Practical Tips
     if (rawData.tips) {
-      darkSections.push({ heading: stripMd(rawData.tips.title), items: rawData.tips.points, fullWidth: true });
+      contentSections.push({
+        heading: stripMd(rawData.tips.title),
+        items: rawData.tips.points,
+      });
     }
 
+    // 10. Special Cases
     if (rawData.special_cases) {
       contentSections.push({
         heading: stripMd(rawData.special_cases.title),
@@ -667,7 +724,7 @@ function normalizeComplianceSection(rawData) {
     }
     if (rawData.support) {
       process = rawData.support.points || [];
-      darkSections.push({ heading: rawData.support.title, items: rawData.support.points, fullWidth: true });
+      contentSections.push({ heading: rawData.support.title, items: rawData.support.points });
     }
   }
 
@@ -682,42 +739,51 @@ function normalizeCfoService(rawData) {
   const darkSections = [];
   const heroSections = [];
 
-  // Hero-only sections (top): VCFO ONBOARDING only
-  const HERO_TITLES = ['VCFO - SEAMLESS ON-BOARDING PROCESS'];
+  const HERO_TITLES = ['VCFO – SUCCESS PILLARS', 'VCFO - SUCCESS PILLARS'];
+  const INTRO_TITLE = 'INTRO';
 
-  // Combine "UNDERSTANDING THE ROLE" + both "WHAT IS" sections into one block
-  const WHAT_IS_TITLES = ['WHAT IS A FULL-TIME CFO?', 'WHAT IS A VIRTUAL CFO?'];
-  const UNDERSTANDING_TITLE = 'UNDERSTANDING THE ROLE';
-  let understandingSection = null;
+  // Reference to the intro entry so "WHAT IS..." sections can be injected into it
+  let introEntry = null;
   const whatIsSections = [];
 
   rawData.sections.forEach((sec) => {
-    if (sec.title === UNDERSTANDING_TITLE && sec.content) {
-      understandingSection = sec;
-    } else if (WHAT_IS_TITLES.includes(sec.title) && sec.content) {
-      whatIsSections.push(sec);
-    }
-  });
+    const titleUp = sec.title?.toUpperCase() || '';
+    const isHero = HERO_TITLES.some((t) => t.toUpperCase() === titleUp);
+    const isWhatIs = titleUp.startsWith('WHAT IS');
 
-  if (understandingSection) {
-    contentSections.push({
-      heading: understandingSection.title,
-      paragraphs: understandingSection.content,
-      ...(whatIsSections.length > 0 && {
-        whatIs: whatIsSections.map((s) => ({ heading: s.title, paragraphs: s.content })),
-      }),
-    });
-  }
+    // ── Intro — symptoms + vCFO pitch + transition ──
+    if (sec.title === INTRO_TITLE && sec.content) {
+      introEntry = {
+        paragraphs: sec.content,
+        ...(sec.symptomsLabel && { subheading: sec.symptomsLabel }),
+        ...(sec.symptoms?.length && { items: sec.symptoms }),
+        ...((sec.helpIntro || sec.helpPoints?.length) && {
+          helpItems: { intro: sec.helpIntro, points: sec.helpPoints || [] },
+        }),
+        closingParagraphs: [
+          ...(sec.helpClosing ? [sec.helpClosing] : []),
+          ...(sec.question   ? [sec.question]    : []),
+        ],
+        // transition text rendered as a styled subtitle (not a NoteBox)
+        ...(sec.transition && { transitionText: sec.transition.replace(/^👉\s*/,'') }),
+      };
+      contentSections.push(introEntry);
 
-  const SKIP_TITLES = new Set([UNDERSTANDING_TITLE, ...WHAT_IS_TITLES]);
+    // ── "WHAT IS..." sections — inject directly into the intro card ──
+    } else if (isWhatIs && sec.content) {
+      whatIsSections.push({ heading: sec.title, paragraphs: sec.content });
+      // When we have both, attach them as whatIs on the intro entry (same card)
+      if (whatIsSections.length === 2 && introEntry) {
+        introEntry.whatIs = [...whatIsSections];
+        whatIsSections.length = 0;
+      }
 
-  rawData.sections.forEach((sec) => {
-    if (SKIP_TITLES.has(sec.title)) return;
-    const isHero = HERO_TITLES.includes(sec.title);
-
-    if (sec.content) {
+    // ── Sections with plain text content ──
+    } else if (sec.content) {
       const entry = { heading: sec.title, paragraphs: sec.content };
       isHero ? heroSections.push(entry) : contentSections.push(entry);
+
+    // ── Comparison table ──
     } else if (sec.comparison) {
       const keys = Object.keys(sec.comparison.virtualCFO);
       contentSections.push({
@@ -727,37 +793,56 @@ function normalizeCfoService(rawData) {
           rows: keys.map((k) => [k, sec.comparison.virtualCFO[k], sec.comparison.fullTimeCFO[k]]),
         },
       });
+
+    // ── Service cards grid ──
     } else if (sec.services) {
       contentSections.push({
         heading: sec.title,
         serviceItems: sec.services.map((s) => ({ name: s.name, description: s.description })),
       });
+
+    // ── Process steps ──
     } else if (sec.steps) {
       const entry = {
         heading: sec.title,
         processSteps: sec.steps.map((s) => ({ name: s.name, description: s.description })),
       };
       isHero ? heroSections.push(entry) : contentSections.push(entry);
+
+    // ── Dark / Insight Consulting Advantage section ──
     } else if (sec.description) {
-      const isWhyInsight = sec.title?.toLowerCase().includes('why insight');
+      const isInsightAdv = sec.title?.toLowerCase().includes('insight consulting advantage')
+        || sec.title?.toLowerCase().includes('why insight');
       darkSections.push({
         heading: sec.title,
-        paragraphs: [sec.description],
-        ...(isWhyInsight && { fullWidth: true }),
+        paragraphs: [
+          sec.description,
+          ...(sec.helpIntro ? [sec.helpIntro] : []),
+        ],
+        ...(sec.points?.length   && { items: sec.points }),
+        ...(sec.closing          && { closingText: sec.closing }),
+        ...(sec.tagline          && { note: sec.tagline }),
+        ...(isInsightAdv         && { fullWidth: true }),
       });
     }
   });
 
+  // Add infographic + closing tagline as a tail section
+  const tailSections = [{
+    cfoInfographic: true,
+    imageSrc: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Business%20benefits%20and%20features%20infographic.png',
+    closingTagline: 'Where Clarity meets Growth',
+  }];
+
   return {
-    tagline: rawData.title,
-    whyChoose: rawData.introduction
-      ? { heading: 'Introduction', paragraphs: [rawData.introduction] }
-      : undefined,
+    tagline: rawData.tagline || rawData.title,
+    whyChoose: undefined,
     heroSections,
     process: [],
     processSummary: undefined,
     contentSections,
     darkSections,
+    tailSections,
     hideInsightTitle: true,
     cta: undefined,
   };

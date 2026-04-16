@@ -5,421 +5,506 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { FaRegFlag } from "react-icons/fa";
 import { RiFlashlightLine } from "react-icons/ri";
 import Footerctn from "./reusable/Footerctn";
+
 const About = () => {
-  //Team Members
   const teamMembers = [
     {
-      name: "Olivia Rhye",
-      role: "Founder & CEO",
-      desc: "Former co-founder of Opendoor. Early staff at Spotify and Clearbit.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a3.png",
+      name: "Revathy Bhalaaji",
+      role: "B. Com, FCA, ACMA",
+      experience: "30+ Years",
+      expertise: "Financial Reporting & Audit",
+      desc: "With over 30 years of professional experience across financial reporting, internal audit and risk management. Her career reflects deep expertise in building structured finance environments, strengthening governance frameworks, and supporting organizations in navigating evolving regulatory and operational landscapes. She is a recognized speaker and knowledge contributor in areas such as GST, Microfinance, Finance for Non-Finance professionals, and Tax Management, and has delivered 300+ technical and executive sessions in industry forums such as TANSTIA, CODISSIA, and various Corporates.",
+      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/revathy.png",
+      color: "from-violet-50 to-indigo-50",
+      badgeColor: "bg-violet-100 text-violet-700",
+      borderColor: "border-violet-100",
     },
     {
-      name: "Phoenix Baker",
-      role: "Engineering Manager",
-      desc: "Lead engineering teams at Figma, Pitch, and Protocol Labs.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a8.png",
+      name: "Bhalaaji Muthuswamy",
+      role: "B. Sc (Physics), ACA",
+      experience: "30+ Years",
+      expertise: "FMCG & Manufacturing",
+      desc: "With over 30 years of leadership experience across FMCG, manufacturing, consumer durables, media, and hospitality sectors, Bhalaaji works closely with founders and management teams on finance transformation, operating-model strengthening, and building scalable finance environments that support structured growth and better decision-making.",
+      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/balaji.png",
+      color: "from-emerald-50 to-teal-50",
+      badgeColor: "bg-emerald-100 text-emerald-700",
+      borderColor: "border-emerald-100",
     },
     {
-      name: "Lana Steiner",
-      role: "Product Manager",
-      desc: "Former PM for Linear, Lambda School, and On Deck.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a8.png",
+      name: "Gopalakrishnan Sethuraman",
+      role: "B. Com, FCA, ACMA, CISA, IIM(B)",
+      experience: "30+ Years",
+      expertise: "Assurance & Finance Transformation",
+      desc: "With over 30 years of experience across assurance, finance transformation, and business process consulting, Gopalakrishnan specializes in implementing process maturity models and strengthening controls across retail, manufacturing, supply chain & logistics, and service sectors. He supports organizations in building scalable finance processes, improving governance frameworks, and driving transformation-led performance improvement.",
+      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/gopalakrishnan.png",
+      color: "from-blue-50 to-sky-50",
+      badgeColor: "bg-blue-100 text-blue-700",
+      borderColor: "border-blue-100",
     },
     {
-      name: "Demi Wilkinson",
-      role: "Frontend Developer",
-      desc: "Former frontend dev for Linear, Coinbase, and Postscript.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a6.png",
-    },
-    {
-      name: "Candice Wu",
-      role: "Backend Developer",
-      desc: "Lead backend dev at Clearbit. Former Clearbit and Loom.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a8.png",
-    },
-    {
-      name: "Natali Craig",
-      role: "Product Designer",
-      desc: "Founding design team at Figma. Former Pleo, Stripe, and Tile.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a6.png",
-    },
-    {
-      name: "Drew Cano",
-      role: "UX Researcher",
-      desc: "Lead user research for Slack. Contractor for Netflix and Udacity.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a8.png",
-    },
-    {
-      name: "Orlando Diggs",
-      role: "Customer Success",
-      desc: "Lead CX at Wealthsimple. Former PagerDuty and Sqreen.",
-      image:
-        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/a6.png",
+      name: "Venugopal Bhuvanagiri",
+      role: "B. Com, M. Com, MBA",
+      experience: "25+ Years",
+      expertise: "Operations & Business Advisory",
+      desc: "With over 25 years of experience in operations leadership, transition management, and finance transformation, Venu has led large-scale delivery programs for global retail and fashion enterprises and served as CEO – China Operations for a technology and consulting organization. He supports clients in building scalable delivery models and strengthening.",
+      image: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/venugopal.png",
+      color: "from-amber-50 to-orange-50",
+      badgeColor: "bg-amber-100 text-amber-700",
+      borderColor: "border-amber-100",
     },
   ];
 
-  //Features
-  const values = [
+  const services = [
     {
-      title: "Client-Centric Mindset",
-      desc: "We place our clients at the core of every decision, ensuring solutions that genuinely support their growth and compliance needs.",
-      icon: <TbUsers />,
+      title: "Business Setup & Structuring",
+      desc: "Company incorporation, entity structuring, and regulatory registrations to help you start right.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      ),
     },
     {
-      title: "Integrity & Transparency",
-      desc: "We operate with honesty, clarity, and ethical responsibility, building long-term trust through every interaction.",
-      icon: <FaRegHeart />,
+      title: "Virtual CFO & Finance Support",
+      desc: "Strategic finance guidance, MIS reporting, cash-flow visibility, and decision support for growing businesses.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      ),
     },
     {
-      title: "Commitment to Excellence",
-      desc: "We maintain the highest standards of accuracy, quality, and professionalism in every service we deliver.",
-      icon: <AiOutlineRise />,
+      title: "GST Compliance & Advisory",
+      desc: "Registrations, filings, reviews, and practical advisory support to keep your business compliant and efficient.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      ),
     },
     {
-      title: "Reliability & Accountability",
-      desc: "We take ownership of our responsibilities, ensuring dependable service, timely delivery, and consistent support.",
-      icon: <BsEmojiSmile />,
+      title: "Income Tax & Regulatory Compliance",
+      desc: "Income tax filings, TDS compliance, ROC filings, and ongoing regulatory support.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      ),
     },
     {
-      title: "Solution-Driven Approach",
-      desc: "We embrace complex challenges with a practical mindset, focusing on clear, effective, and compliant outcomes.",
-      icon: <FaRegFlag />,
+      title: "Assurance Services",
+      desc: "Independent assurance services that strengthen governance, transparency, and stakeholder confidence.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      ),
     },
     {
-      title: "Attention to Detail",
-      desc: "We believe precision matters. Every process, document, and compliance step is handled with meticulous care.",
-      icon: <RiFlashlightLine />,
+      title: "Business Advisory & Process Support",
+      desc: "Solutions to improve financial clarity, strengthen processes, and support sustainable growth.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      ),
     },
   ];
 
-  //Logos
-  const logos = [
+  const teamCulture = [
+    { icon: "👥", text: "A customer-first mindset in every engagement" },
+    { icon: "🎯", text: "A purpose-driven approach to delivering measurable impact" },
+    { icon: "🤝", text: "Strong ownership and accountability toward outcomes" },
+    { icon: "💡", text: "Active collaboration and knowledge sharing across teams" },
+    { icon: "🌱", text: "A supportive environment that promotes balanced execution and continuous learning" },
+    { icon: "🏆", text: "A culture where we celebrate individual and team success together" },
+  ];
+
+  const principles = [
     {
-      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark4.png",
-      name: "Layers",
+      word: "Clarity",
+      desc: "We cut through complexity to deliver straightforward, actionable guidance for every client.",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      ),
     },
     {
-      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark5.png",
-      name: "Sisyphus",
+      word: "Accountability",
+      desc: "We take full ownership of every engagement and stand behind the outcomes we deliver.",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      ),
     },
     {
-      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark2.png",
-      name: "Circooles",
+      word: "Integrity",
+      desc: "We act with transparency and honesty, building relationships rooted in trust.",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      ),
     },
     {
-      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark3.png",
-      name: "Catalog",
+      word: "Responsiveness",
+      desc: "We prioritize timely, attentive service — because your decisions depend on our speed.",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      ),
     },
     {
-      src: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/mark1.png",
-      name: "Quotient",
+      word: "Excellence",
+      desc: "We hold ourselves to the highest standards in every deliverable, every time.",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      ),
     },
   ];
 
   return (
     <div className="font-inter w-full overflow-x-hidden">
-      {/* Header Section */}
-      <section className="w-full bg-white py-5 lg:py-20">
+
+      {/* ── Hero ── */}
+      <section className="w-full bg-white pt-10 pb-12 lg:pt-20 lg:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="w-full flex flex-col items-center gap-[24px] text-center lg:max-w-[960px] lg:mx-auto">
-            <span className="text-[#D11C16] text-[16px] font-semibold leading-[24px]">
-              About us
-            </span>
-            <h1 className="text-2xl leading-[40px] lg:text-5xl lg:leading-[60px] font-semibold text-[#181D27] tracking-[-0.02em]">
-              Building Reliable Business Solutions
-            </h1>
-
-            {/* <p className="text-[18px] leading-[28px] lg:text-[20px] lg:leading-[30px] font-normal text-[#535862]">
-  We help businesses navigate compliance, taxation, and financial processes with clarity, confidence, and consistency.
-</p> */}
-          </div>
-        </div>
-      </section>
-
-      {/* Metrics Section */}
-      <section className="w-full bg-gray-50 py-10 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-[48px] lg:gap-[96px] items-center">
-            {/* Left side */}
-            <div className="w-full lg:flex-1">
-              <img
-                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/Image%20(4).png"
-                alt="Office"
-                className="w-full h-[360px] md:h-[420px] lg:h-[560px] object-cover"
-              />
-            </div>
-
-            {/* Right side */}
-            <div className="w-full lg:w-[560px] flex flex-col gap-[48px] lg:gap-[64px]">
-              <div className="w-full lg:w-[560px] flex flex-col gap-[12px] text-center lg:text-left">
-                <span className="text-[16px] font-semibold leading-[24px] text-[#D11C16]">
-                  Trusted by growing businesses
-                </span>
-
-                <h2 className="text-[32px] lg:text-[48px] font-semibold leading-[40px] lg:leading-[60px] tracking-[-0.02em] text-[#181D27]">
-                  Supporting businesses at every stage of growth
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-[32px] gap-y-[32px] lg:gap-y-[48px] w-full lg:w-[560px]">
-                <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left ">
-                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
-                    400+
-                  </h3>
-                  <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
-                    Clients Supported
-                  </p>
-                </div>
-
-                <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
-                    30+
-                  </h3>
-                  <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
-                    Years of Experience
-                  </p>
-                </div>
-
-                <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
-                    10k
-                  </h3>
-                  <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
-                    Compliance Filings Managed
-                  </p>
-                </div>
-
-                <div className="w-full lg:w-[264px] flex flex-col gap-[8px] lg:gap-[20px] text-center lg:text-left">
-                  <h3 className="text-2xl lg:text-6xl leading-tight lg:leading-[72px] tracking-[-0.02em] font-semibold text-[#D11C16]">
-                    200+
-                  </h3>
-                  <p className="text-[18px] leading-[28px] font-medium text-[#181D27]">
-                    Businesses Served
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Section  */}
-
-      {/* Hiring Section */}
-      {/* <section className="w-full  mx-auto bg-white md:py-24 py-14 antialiased">
-<div className="md:px-12 px-4 mx-auto ">
-     <div className="max-w-[1216px] mx-auto flex flex-col items-center gap-[40px]">
-      <div className="max-w-[768px] w-full flex flex-col items-center gap-[20px] text-center">
-        <div className="flex flex-col gap-[12px]">
-          <span className="text-[#D11C16] text-[16px] leading-[24px] font-semibold">
-            We’re hiring!
-          </span>
-          <h2 className="text-[#181D27] text-[30px] lg:text-[36px] leading-[38px] lg:leading-[44px] font-semibold tracking-[-0.02em]">
-            Meet our team
-          </h2>
-        </div>
-  <p className="text-[#535862] text-[18px] lg:text-[20px] leading-[28px] lg:leading-[30px] font-normal">
-          Our philosophy is simple — hire a team of diverse, passionate people and foster a culture that empowers you to do you best work.
-        </p>
-      </div>
-
-    <div className="flex flex-row w-full gap-[12px]">
-        <button className="w-full  px-5 py-3 bg-white border border-[#D5D7DA] rounded-[8px] text-[#414651] text-[16px] leading-[24px] font-semibold shadow-sm hover:bg-gray-50 transition-colors">
-          About us
-        </button>
-        <button className="w-full  px-5 py-3 bg-[#D11C16] border border-[#D11C16] rounded-[8px] text-white text-[16px] leading-[24px] font-semibold shadow-sm hover:bg-[#b01712] transition-colors">
-          Open positions
-        </button>
-      </div>
-
-      
-      <div className="w-full mt-[64px]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[32px]">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="bg-[#FAFAFA] p-[24px]  flex flex-col items-center text-center rounded-sm">
-               <div className="w-[80px] h-[80px] rounded-full bg-[#C7B9DA] mb-[20px] overflow-hidden">
-                <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-              </div>
-
-              
-              <div className="flex flex-col gap-[8px] mb-[20px]">
-                <h3 className="text-[18px] font-semibold text-[#181D27] leading-[28px] ">{member.name}</h3>
-                <p className="text-[16px] font-medium text-[#D11C16] leading-[24px] mt-[-4px] ">{member.role}</p>
-                <p className="text-[16px] font-normal text-[#535862] leading-[24px]  ">
-                  {member.desc}
-                </p>
-              </div>
-
-             
-           <div className="flex justify-center gap-[16px]">
-          <img 
-            src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/s1.png" 
-            alt="Twitter" 
-            className="w-[20px] h-[20px] object-contain" 
-          />
-          <img 
-            src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/s2.png" 
-            alt="LinkedIn" 
-            className="w-[20px] h-[20px] object-contain" 
-          />
-           <img 
-            src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/v3%20(1).png" 
-            alt="Icon" 
-            className="w-[20px] h-[20px] object-contain" 
-          />
-        </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-   
-</section> */}
-
-      <section className="w-full bg-white py-10 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 items-center gap-12">
-          {/* LEFT CONTENT */}
-          <div className="flex flex-col lg:col-span-2  text-center md:text-left">
-            <span className="text-[#D11C16] text-sm font-semibold tracking-wide">
+          <div className="w-full flex flex-col items-center gap-5 text-center lg:max-w-[800px] lg:mx-auto">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-[13px] font-semibold tracking-wide uppercase">
               About Us
             </span>
+            <h1 className="text-3xl text-dark leading-[1.2] lg:text-[52px] lg:leading-[1.15] font-semibold tracking-[-0.03em]">
+              Where Clarity Meets Growth
+            </h1>
+            {/* Hero paragraph — increased from 17px to 19px */}
+            <p className="text-[19px] leading-[30px] font-normal text-muted max-w-[640px]">
+              Insight Consulting is a professional firm of Chartered Accountants committed to delivering impactful outcomes that reflect our promise of excellence, responsibility, and trust.
+            </p>
+          </div>
+        </div>
+      </section>
 
-            <h2 className="text-[#181D27] text-[30px] lg:text-[42px] leading-[38px] lg:leading-[52px] font-semibold tracking-[-0.02em] mt-3 relative inline-block">
-              Simplifying Compliance for Growing Businesses
-              {/* underline highlight */}
+      {/* ── About / Company Description ── */}
+      <section className="w-full bg-white pb-14 lg:pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-5 items-start gap-12 lg:gap-16">
+          <div className="flex flex-col lg:col-span-3 text-center md:text-left">
+            <h2 className="text-dark text-[28px] lg:text-[40px] leading-[1.25] font-semibold tracking-[-0.025em] mt-3 relative inline-block">
+              A Trusted CA Firm Built on Three Decades of Expertise
               <img
                 src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Vector%20(1).png?updatedAt=1771488262931"
                 alt="underline"
-                className="absolute -bottom-2 left-0 w-40 opacity-80 hidden lg:block"
+                className="absolute -bottom-2 left-0 w-36 opacity-70 hidden lg:block"
               />
             </h2>
-
-            <p className="text-[#535862] text-[18px] leading-[30px] mt-6">
-              We help businesses navigate complex regulatory and compliance
-              requirements with clarity and confidence. From registrations and
-              filings to ongoing financial and tax support, our solutions are
-              designed to reduce friction and eliminate uncertainty.
-            </p>
-
-            <p className="text-[#535862] text-[18px] leading-[30px] mt-4">
-              Our focus is on precision, transparency, and efficiency — ensuring
-              that every process is handled accurately, every deadline is met,
-              and every client receives dependable professional guidance.
+            {/* About paragraphs — increased from 16px to 18px */}
+            <div className="mt-8 flex flex-col gap-5">
+              {[
+                "Based in Chennai, we provide a comprehensive suite of professional services including Virtual CFO Services, Bookkeeping, Regulatory Compliance (GST, Income Tax, TDS, MCA), Audit & Assurance, and Business Consulting. Our approach combines technical depth with practical execution to support businesses across every stage of their growth journey.",
+                "At Insight Consulting, we enable clients to achieve their business objectives through structured, insight-driven solutions that deliver measurable value in every engagement. Our partner-led delivery model ensures senior-level involvement, responsiveness, and consistently high service quality.",
+                "Our team brings together a diverse blend of professionals with strong experience across finance, compliance, transformation, and business advisory. This multidisciplinary capability allows us to operate as a trusted one-stop solution partner, addressing both strategic priorities and operational requirements with equal rigor.",
+                "Whether solving complex challenges or simplifying layered business environments, we approach every engagement with clarity, structure, and purpose. By taking a holistic view of each client's ecosystem, we deliver solutions that resolve immediate priorities while strengthening the foundation for sustainable long-term growth and value creation.",
+                "We work alongside our clients not just as service providers, but as long-term strategic partners — strengthening governance, enabling better decisions, and building finance functions that support sustainable scale and enterprise value creation.",
+              ].map((para, i) => (
+                <p key={i} className="text-muted text-[18px] leading-[1.85]">{para}</p>
+              ))}
+            </div>
+            <p className="text-primary font-semibold text-[17px] mt-7 italic border-l-2 border-primary pl-4 self-start">
+              Partner with Insight Consulting – where Clarity meets Growth.
             </p>
           </div>
-
-          {/* RIGHT IMAGE */}
-          <div className=" p-8 md:p-0 lg:pr-12 lg:col-span-1 mx-auto">
-            <div className="flex-1 w-full max-w-[520px] relative ">
-              <div className="">
-                <img
-                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop"
-                  alt="Team working"
-                  className="w-full h-[320px] lg:h-[420px] object-cover rounded-2xl shadow-md"
-                />
-
-                {/* decorative shape */}
-                <img
-                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Abstract%20Design%20(4).png?updatedAt=1771772119170"
-                  className="absolute md:-top-10 -top-6 md:-right-20 -right-5 w-10 md:w-20"
-                  alt=""
-                />
+          <div className="lg:col-span-2 flex justify-center lg:justify-end lg:pt-6">
+            <div className="relative w-full max-w-[420px]">
+              <img
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop"
+                alt="Team working"
+                className="w-full h-[300px] lg:h-[480px] object-cover rounded-2xl"
+              />
+              <img
+                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Abstract%20Design%20(4).png?updatedAt=1771772119170"
+                className="absolute -top-5 -right-5 w-12 md:w-16 opacity-80"
+                alt=""
+              />
+              <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl shadow-lg border border-gray-100 px-5 py-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">3</div>
+                <div>
+                  <p className="text-dark font-semibold text-[14px] leading-tight">Decades</p>
+                  <p className="text-muted text-[12px]">of expertise</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <section className="w-full bg-white py-10 lg:py-20 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-[16px] leading-[24px] font-medium text-[#535862] text-center mb-10">
-              Trusted by startups, SMEs, and growing enterprises
-            </p>
-
-            <div className="relative w-full overflow-hidden">
-              <div className="flex gap-[48px] animate-marquee">
-                {[...logos, ...logos, ...logos].map((logo, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-[12px] flex-shrink-0"
-                  >
-                    <img
-                      src={logo.src}
-                      alt={`${logo.name} mark`}
-                      className="w-[44px] h-[44px] object-contain"
-                    />
-                    <span className="text-[24px] font-bold text-[#535862] tracking-tight">
-                      {logo.name}
-                    </span>
+      {/* ── Metrics ── */}
+      <section className="w-full bg-gray-50 py-14 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+            <div className="w-full lg:w-[46%] rounded-2xl overflow-hidden">
+              <img
+                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/Image%20(4).png"
+                alt="Office"
+                className="w-full h-[320px] md:h-[400px] lg:h-[520px] object-cover"
+              />
+            </div>
+            <div className="w-full lg:w-[54%] flex flex-col gap-10">
+              <div className="flex flex-col gap-3 text-center lg:text-left">
+                <span className="text-[14px] font-semibold leading-[24px] text-primary tracking-wide uppercase">
+                  Trusted by growing businesses
+                </span>
+                {/* Metrics heading — unchanged, it's a heading not a paragraph */}
+                <h2 className="text-[28px] lg:text-[42px] font-semibold leading-[1.2] tracking-[-0.025em] text-dark">
+                  Supporting businesses at every stage of growth
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-10">
+                {[
+                  { stat: "400+", label: "Clients Supported" },
+                  { stat: "30+", label: "Years of Experience" },
+                  { stat: "10k+", label: "Compliance Filings Managed" },
+                  { stat: "200+", label: "Businesses Served" },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col gap-2 text-center lg:text-left">
+                    <div className="text-[40px] lg:text-[56px] leading-[1] tracking-[-0.04em] font-semibold text-primary">
+                      {item.stat}
+                    </div>
+                    <div className="w-8 h-[2px] bg-primary/30 mx-auto lg:mx-0 rounded-full" />
+                    {/* Stat labels — increased from 15px to 17px */}
+                    <p className="text-[17px] leading-[24px] font-medium text-dark mt-1">{item.label}</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-
-          <style>
-            {`
-      @keyframes marquee {
-        from { transform: translateX(0); }
-        to { transform: translateX(-50%); }
-      }
-
-      .animate-marquee {
-        width: max-content;
-        animation: marquee 35s linear infinite;
-      }
-    `}
-          </style>
-        </section>
-
-        {/* Divider Section */}
+        </div>
       </section>
 
-      {/* --- Our values section --- */}
-      <section className="w-full bg-[#FAFAFA] py-10 lg:py-20 antialiased">
+      {/* ── Leadership Team ── */}
+      <section className="w-full bg-white py-14 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center gap-[48px] lg:gap-[64px]">
-            <div className="w-full max-w-[768px] flex flex-col items-center gap-[20px] text-center">
-              <div className="flex flex-col gap-[12px]">
-                <span className="text-[#D11C16] text-[16px] leading-[24px] font-semibold">
-                  Our values
-                </span>
-                <h2 className="text-[#181D27] text-[30px] lg:text-[36px] leading-[38px] lg:leading-[44px] font-semibold tracking-[-0.02em]">
-                  How We Deliver Value to Businesses
+
+          {/* Header */}
+          <div className="flex flex-col items-center gap-4 text-center mb-12 lg:mb-16">
+            <span className="text-[13px] font-semibold text-primary tracking-widest uppercase">
+              Leadership
+            </span>
+            <h2 className="text-dark text-[28px] lg:text-[42px] font-semibold tracking-[-0.03em] leading-[1.2] max-w-[600px]">
+              Our Leadership Team
+            </h2>
+            {/* Leadership subheading — increased from 16–17px to 18–19px */}
+            <p className="text-muted text-[18px] lg:text-[19px] leading-[1.75] max-w-[540px]">
+              Our founding partners bring 25–30+ years of real-world experience across finance, compliance, and business strategy.
+            </p>
+          </div>
+
+          {/* Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+            {teamMembers.map((member, index) => (
+              <div
+                key={index}
+                className={`rounded-2xl overflow-hidden border ${member.borderColor} bg-gradient-to-br ${member.color} shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full`}
+              >
+                {/* Image */}
+                <div className="w-full md:h-[600px] overflow-hidden">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col p-6 lg:p-7 gap-4 flex-1">
+                  <div>
+                    <h3 className="text-gray-900 text-[20px] lg:text-[22px] font-semibold leading-tight">
+                      {member.name}
+                    </h3>
+                    <p className="text-primary text-[14px] font-semibold mt-1 opacity-80">
+                      {member.role}
+                    </p>
+                  </div>
+
+                  {/* Member desc — increased from 14px to 16px */}
+                  <details className="group">
+                    <summary className="list-none cursor-pointer">
+                      <p className="text-gray-600 text-[18px] leading-[1.85] line-clamp-4 group-open:line-clamp-none">
+                        {member.desc}
+                      </p>
+                      <span className="text-primary text-[16px] font-semibold mt-2 inline-block group-open:hidden">
+                        Read More
+                      </span>
+                      <span className="text-primary text-[16px] font-semibold mt-2 hidden group-open:inline-block">
+                        Read Less
+                      </span>
+                    </summary>
+                  </details>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── The Insight Advantage ── */}
+      <section className="w-full bg-gray-50 py-14 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            <div className="flex flex-col gap-6">
+              <div>
+                <span className="text-[13px] font-semibold text-primary tracking-widest uppercase">Our Culture</span>
+                <h2 className="text-dark text-[28px] lg:text-[36px] font-semibold tracking-[-0.025em] leading-[1.25] mt-2">
+                  The Insight Advantage
                 </h2>
               </div>
-              <p className="text-[#535862] text-[18px] lg:text-[20px] leading-[30px] font-normal">
-                We combine expertise, efficiency, and transparency to simplify
-                complex compliance processes for growing organizations.
+              {/* Culture paragraphs — increased from 16px to 18px */}
+              <p className="text-muted text-[18px] leading-[1.85]">
+                At Insight Consulting, our strength lies in our people. Our team is a thoughtful blend of energetic young professionals and experienced practitioners, working together in a purpose-driven environment focused on delivering meaningful outcomes for our clients.
+              </p>
+              <p className="text-muted text-[18px] leading-[1.85]">
+                We believe strong client impact begins with strong team ownership and collaboration.
+              </p>
+
+              <div className="flex items-center gap-3 mt-1">
+                <div className="w-1 h-7 bg-primary rounded-full flex-shrink-0" />
+                <h3 className="text-dark font-bold text-[20px] lg:text-[22px] leading-tight">
+                  Our culture reflects this commitment:
+                </h3>
+              </div>
+
+              {/* Culture list items — increased from 15–16px to 17–18px */}
+              <ul className="flex flex-col gap-3">
+                {teamCulture.map((point, i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-4 bg-white rounded-xl px-5 py-4 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:border-primary/30 hover:shadow-[0_4px_16px_rgba(0,0,0,0.09)] transition-all duration-200"
+                  >
+                    <span className="text-[24px] flex-shrink-0 leading-none mt-0.5">{point.icon}</span>
+                    <span className="text-dark text-[17px] lg:text-[18px] leading-[1.75] font-medium">{point.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="relative rounded-2xl overflow-hidden sticky top-8">
+              <img
+                src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/footer/Image%20(4).png"
+                alt="Our Team"
+                className="w-full h-[440px] lg:h-[680px] object-cover rounded-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Our Commitment ── */}
+      <section className="w-full py-16 relative overflow-hidden bg-primary">
+        <div
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none opacity-60 blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)", transform: "translate(30%, -30%)" }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none opacity-50 blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)", transform: "translate(-30%, 30%)" }}
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col items-center gap-6 text-center mb-16 lg:mb-20">
+            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-widest uppercase border border-white/30 text-white bg-white/10 backdrop-blur-sm">
+              Our Commitment
+            </span>
+            <h2 className="text-white text-[30px] lg:text-[46px] font-semibold tracking-[-0.03em] leading-[1.2] max-w-[680px]">
+              Our work is anchored in five core principles
+            </h2>
+            {/* Commitment paragraphs — increased from 16–18px to 18–20px */}
+            <p className="text-[18px] lg:text-[20px] leading-[1.9] max-w-[600px] text-white/90">
+              We work alongside founders, promoters, and leadership teams to strengthen regulatory compliance confidence, build resilient finance functions, enhance decision-making visibility and support sustainable, scalable enterprise growth.
+            </p>
+            <p className="text-[17px] leading-[1.8] text-white/80">
+              We bring the experience, structure, and responsiveness needed to support your journey.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            {principles.map((p, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-5 p-6 lg:p-7 rounded-2xl transition-all duration-300 group backdrop-blur-md border border-white/20 bg-white/10 hover:bg-white/15"
+              >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/15 text-white group-hover:bg-white/25 transition-all duration-300">
+                  {p.icon}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-semibold text-white/60">0{i + 1}</span>
+                    <div className="h-[1px] flex-1 bg-white/20" />
+                  </div>
+                  <h3 className="text-white text-[20px] lg:text-[22px] font-semibold tracking-tight">{p.word}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How We Can Help (Services) ── */}
+      <section className="w-full bg-gray-50 py-14 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center gap-10 lg:gap-14">
+            <div className="flex flex-col items-center gap-4 text-center max-w-[580px]">
+              <span className="text-[13px] font-semibold text-primary tracking-widest uppercase">Services</span>
+              <h2 className="text-dark text-[28px] lg:text-[38px] font-semibold tracking-[-0.025em] leading-[1.2]">
+                How We Can Help
+              </h2>
+              {/* Services subheading — increased from 16px to 18px */}
+              <p className="text-muted text-[18px] leading-[1.8]">
+                Our team supports businesses across their growth journey with practical, dependable, and timely professional services.
               </p>
             </div>
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[48px] lg:gap-y-[64px]">
-              {values.map((item, index) => (
+
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {services.map((svc, index) => (
                 <div
                   key={index}
-                  className="w-full max-w-[384px] flex flex-col items-center gap-[20px] mx-auto"
+                  className="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-default"
+                  onMouseEnter={e => {
+                    const box = e.currentTarget.querySelector(".svc-icon-box");
+                    const svg = e.currentTarget.querySelector(".svc-icon-box svg");
+                    if (box) box.style.backgroundColor = "#7c3aed";
+                    if (svg) svg.style.stroke = "#ffffff";
+                  }}
+                  onMouseLeave={e => {
+                    const box = e.currentTarget.querySelector(".svc-icon-box");
+                    const svg = e.currentTarget.querySelector(".svc-icon-box svg");
+                    if (box) box.style.backgroundColor = "rgba(124,58,237,0.10)";
+                    if (svg) svg.style.stroke = "#7c3aed";
+                  }}
                 >
-                  <div className="w-[48px] h-[48px] text-[#D11C16] bg-[#F4EBFF] rounded-full  flex items-center justify-center bg-[#F4EBFF]">
-                    {item.icon}
+                  <div
+                    className="svc-icon-box w-[48px] h-[48px] rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                    style={{ backgroundColor: "rgba(124,58,237,0.10)" }}
+                  >
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", transition: "color 0.3s" }}>
+                      {svc.icon}
+                    </span>
                   </div>
-                  <div className="flex flex-col gap-[8px] text-center">
-                    <h3
-                      style={{ fontWeight: 525 }}
-                      className="text-[#181D27] text-[20px]  leading-[30px]  antialiased "
-                    >
-                      {item.title}
-                    </h3>
-                    <p className="text-[#535862] text-[16px] leading-[24px] font-normal">
-                      {item.desc}
-                    </p>
+                  <div className="flex flex-col gap-2">
+                    {/* Service card title — increased from 16px to 17px */}
+                    <h3 className="text-dark text-[17px] font-semibold leading-[1.4]">{svc.title}</h3>
+                    {/* Service card desc — increased from 14px to 16px */}
+                    <p className="text-muted text-[16px] leading-[1.8]">{svc.desc}</p>
                   </div>
                 </div>
               ))}

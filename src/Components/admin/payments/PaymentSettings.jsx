@@ -3,54 +3,93 @@ import axiosInstance from "@src/providers/axiosInstance";
 import PageHeader from '../page-header/PageHeader';
 import {
   FiCreditCard, FiEye, FiEyeOff, FiSave, FiEdit2, FiTrash2,
-  FiX, FiCheck, FiRefreshCw, FiAlertCircle, FiClock,
-  FiKey, FiLock, FiMail, FiShield, FiZap, FiSettings,
+  FiX, FiCheck, FiAlertCircle, FiKey, FiLock, FiMail,
+  FiShield, FiSettings, FiPlusCircle,
 } from "react-icons/fi";
 
-/* ─────────────────────────── helpers ─────────────────────────── */
-
+/* ─────────────────────────── Spinner ─────────────────────────── */
 const Spinner = ({ sm }) => (
-  <span className={`inline-block rounded-full border-2 border-primary-200 border-t-primary animate-spin ${sm ? "w-3.5 h-3.5" : "w-5 h-5"}`} />
+  <span
+    className={`inline-block rounded-full border-2 border-white/30 border-t-white animate-spin ${sm ? "w-3.5 h-3.5" : "w-5 h-5"}`}
+  />
 );
 
+/* ─────────────────────────── StatusBadge ─────────────────────── */
 const StatusBadge = ({ enabled }) =>
   enabled ? (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-success-50 text-success-700 border border-success-100">
-      <span className="w-1.5 h-1.5 rounded-full bg-success-500 shadow-sm" style={{ boxShadow: "0 0 4px #10b981" }} />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-100">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{ boxShadow: "0 0 5px #10b981" }} />
       Active
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-neutral-100 text-neutral-500 border border-neutral-200">
-      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-neutral-100 text-neutral-400 border border-neutral-200">
+      <span className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
       Inactive
     </span>
   );
 
-/* ─────────────────── Password Confirm Modal ───────────────────── */
+/* ─────────────────────── Field Component ─────────────────────── */
+const Field = ({ label, labelSuffix, icon: Icon, type, placeholder, value, onChange, hint, showToggle, toggleState, onToggle, required }) => (
+  <div className="space-y-1.5">
+    <label className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-neutral-500">
+      {label}
+      {required && <span className="text-red-400 text-[10px] normal-case font-normal tracking-normal">*required</span>}
+      {labelSuffix && <span className="text-[10px] font-normal text-neutral-400 normal-case tracking-normal">{labelSuffix}</span>}
+    </label>
+    <div className="relative group">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-primary transition-colors duration-150 pointer-events-none">
+        <Icon className="w-[15px] h-[15px]" />
+      </div>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="w-full h-11 pl-10 pr-10 border border-neutral-200 rounded-xl bg-neutral-50 text-sm text-neutral-800 placeholder-neutral-400 outline-none transition-all duration-150 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-white"
+        style={{ fontFamily: "inherit" }}
+      />
+      {showToggle && (
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+        >
+          {toggleState ? <FiEyeOff className="w-[15px] h-[15px]" /> : <FiEye className="w-[15px] h-[15px]" />}
+        </button>
+      )}
+    </div>
+    {hint && <p className="text-[11px] text-neutral-400 leading-relaxed">{hint}</p>}
+  </div>
+);
+
+/* ──────────────────── Password Confirm Modal ─────────────────── */
 const ACTION_CONFIG = {
   save: {
-    title:     "Confirm Your Identity",
-    desc:      "Enter your profile password to save the new payment settings.",
-    btn:       "Save Settings",
-    btnCls:    "bg-primary hover:bg-primary-hover",
+    title: "Confirm & Save",
+    desc: "Enter your profile password to save the new payment configuration.",
+    btn: "Save",
+    btnCls: "bg-primary hover:bg-primary-hover",
     accentCls: "from-primary to-primary-hover",
-    iconCls:   "bg-primary/10 text-primary",
+    iconCls: "bg-primary/10 text-primary",
+    Icon: FiShield,
   },
   update: {
-    title:     "Confirm Your Identity",
-    desc:      "Enter your profile password to update the payment settings.",
-    btn:       "Update Settings",
-    btnCls:    "bg-primary hover:bg-primary-hover",
+    title: "Confirm & Update",
+    desc: "Enter your profile password to apply the changes to this payment configuration.",
+    btn: "Update Configuration",
+    btnCls: "bg-primary hover:bg-primary-hover",
     accentCls: "from-primary to-primary-hover",
-    iconCls:   "bg-primary/10 text-primary",
+    iconCls: "bg-primary/10 text-primary",
+    Icon: FiShield,
   },
   delete: {
-    title:     "Confirm Deletion",
-    desc:      "This action is irreversible. Enter your profile password to permanently delete this configuration.",
-    btn:       "Delete",
-    btnCls:    "bg-error-600 hover:bg-error-700",
-    accentCls: "from-error-500 to-error-600",
-    iconCls:   "bg-error-50 text-error-600",
+    title: "Confirm Deletion",
+    desc: "This action is permanent and cannot be undone. Enter your profile password to proceed.",
+    btn: "Delete",
+    btnCls: "bg-red-600 hover:bg-red-700",
+    accentCls: "from-red-500 to-red-600",
+    iconCls: "bg-red-50 text-red-600",
+    Icon: FiTrash2,
   },
 };
 
@@ -66,48 +105,43 @@ const PasswordConfirmModal = ({ open, action, targetLabel, onConfirm, onCancel, 
 
   const cfg = ACTION_CONFIG[action] ?? ACTION_CONFIG.save;
   const isDelete = action === "delete";
+  const { Icon } = cfg;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ animation: "fadeIn 0.15s ease" }}>
       <div
         className="absolute inset-0 backdrop-blur-sm"
-        style={{ background: "rgba(10,15,28,0.6)" }}
+        style={{ background: "rgba(8,12,24,0.55)" }}
         onClick={!loading ? onCancel : undefined}
       />
       <div
-        className="relative w-full max-w-sm bg-white overflow-hidden"
+        className="relative w-full max-w-[380px] bg-white overflow-hidden"
         style={{
-          borderRadius: 20,
-          boxShadow: "0 0 0 1px rgba(0,0,0,0.06), 0 8px 32px -4px rgba(0,0,0,0.18), 0 32px 64px -16px rgba(0,0,0,0.14)",
-          animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both",
+          borderRadius: 22,
+          boxShadow: "0 0 0 1px rgba(0,0,0,0.06), 0 24px 64px -12px rgba(0,0,0,0.22)",
+          animation: "modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both",
         }}
       >
-        {/* Gradient accent top bar */}
-        <div className={`h-1 w-full bg-gradient-to-r ${cfg.accentCls}`} />
+        {/* Top accent */}
+        <div className={`h-[3px] w-full bg-gradient-to-r ${cfg.accentCls}`} />
 
         {/* Header */}
-        <div
-          className="px-6 pt-5 pb-4"
-          style={{
-            borderBottom: "1px solid var(--primary-50)",
-            background: "linear-gradient(to bottom, var(--primary-50), #fff)",
-          }}
-        >
+        <div className="px-6 pt-5 pb-4 border-b border-neutral-100">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.iconCls}`}
-                style={{ boxShadow: isDelete ? "0 2px 8px rgba(225,29,72,0.15)" : "0 2px 8px rgb(239 68 68 / 0.15)" }}
-              >
-                {isDelete ? <FiTrash2 className="w-5 h-5" /> : <FiShield className="w-5 h-5" />}
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.iconCls}`}>
+                <Icon className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-neutral-900 text-base leading-tight">{cfg.title}</h3>
-                {targetLabel && <p className="text-xs text-neutral-400 mt-0.5 font-mono">{targetLabel}</p>}
+                <h3 className="font-bold text-neutral-900 text-[15px] leading-tight">{cfg.title}</h3>
+                {targetLabel && <p className="text-[11px] text-neutral-400 mt-0.5 font-mono">{targetLabel}</p>}
               </div>
             </div>
-            <button onClick={!loading ? onCancel : undefined} disabled={loading}
-              className="text-neutral-400 hover:text-neutral-700 transition-colors mt-0.5 disabled:opacity-40">
+            <button
+              onClick={!loading ? onCancel : undefined}
+              disabled={loading}
+              className="text-neutral-400 hover:text-neutral-700 transition-colors disabled:opacity-40 mt-0.5"
+            >
               <FiX className="w-4 h-4" />
             </button>
           </div>
@@ -115,20 +149,20 @@ const PasswordConfirmModal = ({ open, action, targetLabel, onConfirm, onCancel, 
 
         {/* Body */}
         <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-neutral-600 leading-relaxed">{cfg.desc}</p>
+          <p className="text-sm text-neutral-500 leading-relaxed">{cfg.desc}</p>
 
           {isDelete && (
-            <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-error-50 border border-error-100 text-error-700 text-xs">
+            <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs leading-relaxed">
               <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              Once deleted, this configuration cannot be recovered.
+              This configuration will be permanently removed from your account.
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest">Profile Password</label>
+            <label className="text-[11px] font-semibold tracking-widest uppercase text-neutral-500">Profile Password</label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                <FiLock className="w-4 h-4" />
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+                <FiLock className="w-[15px] h-[15px]" />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
@@ -140,43 +174,52 @@ const PasswordConfirmModal = ({ open, action, targetLabel, onConfirm, onCancel, 
                   if (e.key === "Escape" && !loading) onCancel();
                 }}
                 autoFocus
-                style={{ borderRadius: 10 }}
-                className="w-full h-11 pl-9 pr-10 border border-neutral-200 bg-neutral-50 text-sm text-neutral-900 placeholder-neutral-400 outline-none transition-all focus:border-primary focus:ring-2 focus:bg-white"
+                className="w-full h-11 pl-10 pr-10 border border-neutral-200 rounded-xl bg-neutral-50 text-sm text-neutral-800 placeholder-neutral-400 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-white"
               />
-              <button onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors">
-                {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+              <button
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+              >
+                {showPassword ? <FiEyeOff className="w-[15px] h-[15px]" /> : <FiEye className="w-[15px] h-[15px]" />}
               </button>
             </div>
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-error-50 border border-error-100 text-error-700 text-sm">
-              <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />{error}
+            <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+              <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              {error}
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 pb-6 flex items-center gap-3">
-          <button onClick={onCancel} disabled={loading}
-            style={{ borderRadius: 10 }}
-            className="flex-1 h-11 border border-neutral-200 text-neutral-600 font-semibold text-sm hover:bg-neutral-50 transition-colors disabled:opacity-50">
+        <div className="px-6 pb-6 flex items-center gap-2.5">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 min-w-0 h-11 rounded-xl border border-neutral-200 text-neutral-600 font-semibold text-sm whitespace-nowrap overflow-hidden text-ellipsis hover:bg-neutral-50 transition-colors disabled:opacity-50"
+          >
             Cancel
           </button>
-          <button onClick={() => onConfirm(profilePassword)} disabled={loading || !profilePassword.trim()}
-            style={{ borderRadius: 10 }}
-            className={`flex-1 h-11 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm ${cfg.btnCls}`}>
-            {loading
-              ? <><Spinner sm /> Verifying...</>
-              : <>{isDelete ? <FiTrash2 className="w-4 h-4" /> : <FiCheck className="w-4 h-4" />}{cfg.btn}</>}
+          <button
+            onClick={() => onConfirm(profilePassword)}
+            disabled={loading || !profilePassword.trim()}
+            className={`flex-1 min-w-0 h-11 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${cfg.btnCls}`}
+          >
+            {loading ? (
+              <><Spinner sm /><span className="truncate">Verifying…</span></>
+            ) : (
+              <><Icon className="w-4 h-4 flex-shrink-0" /><span className="truncate">{cfg.btn}</span></>
+            )}
           </button>
         </div>
       </div>
 
       <style>{`
+        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.94) translateY(10px); }
+          from { opacity: 0; transform: scale(0.94) translateY(12px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>
@@ -185,18 +228,17 @@ const PasswordConfirmModal = ({ open, action, targetLabel, onConfirm, onCancel, 
 };
 
 /* ──────────────────────── Main Component ─────────────────────── */
-
 const PaymentSettings = () => {
-  const [isRazorpayEnabled, setIsRazorpayEnabled]   = useState(false);
-  const [razorpayKeyId, setRazorpayKeyId]           = useState("");
-  const [razorpaySecret, setRazorpaySecret]         = useState("");
-  const [alertEmail, setAlertEmail]                 = useState("");
+  const [isRazorpayEnabled, setIsRazorpayEnabled] = useState(false);
+  const [razorpayKeyId, setRazorpayKeyId]         = useState("");
+  const [razorpaySecret, setRazorpaySecret]       = useState("");
+  const [alertEmail, setAlertEmail]               = useState("");
   const [showRazorpaySecret, setShowRazorpaySecret] = useState(false);
-  const [editingId, setEditingId]                   = useState(null);
-  const [paymentMethods, setPaymentMethods]         = useState([]);
-  const [refreshing, setRefreshing]                 = useState(false);
-  const [error, setError]                           = useState("");
-  const [success, setSuccess]                       = useState("");
+  const [editingId, setEditingId]                 = useState(null);
+  const [paymentMethods, setPaymentMethods]       = useState([]);
+  const [refreshing, setRefreshing]               = useState(false);
+  const [error, setError]                         = useState("");
+  const [success, setSuccess]                     = useState("");
   const [modal, setModal] = useState({
     open: false, action: "save", targetLabel: "", pendingPayload: null, pendingId: null, loading: false, error: "",
   });
@@ -215,7 +257,7 @@ const PaymentSettings = () => {
   const resetForm = () => {
     setEditingId(null); setIsRazorpayEnabled(false);
     setRazorpayKeyId(""); setRazorpaySecret(""); setAlertEmail("");
-    setShowRazorpaySecret(false); setError("");
+    setShowRazorpaySecret(false); setError(""); setSuccess("");
   };
 
   const handleEdit = (item) => {
@@ -234,97 +276,93 @@ const PaymentSettings = () => {
 
   const handleSubmit = () => {
     setError(""); setSuccess("");
-    if (!razorpayKeyId.trim())                           { setError("Razorpay Key ID is required"); return; }
-    if (!editingId && !razorpaySecret.trim())            { setError("Razorpay Secret Key is required"); return; }
-    if (!alertEmail.trim())                              { setError("Alert Email is required"); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alertEmail)) { setError("Please enter a valid email address"); return; }
-    const payload = { isRazorpayEnabled, razorpayKeyId, alertEmail, ...(razorpaySecret.trim() && { razorpaySecret }) };
-    openModal(editingId ? "update" : "save", payload, editingId, editingId ? `${razorpayKeyId.slice(0, 12)}••••` : "");
+    if (!razorpayKeyId.trim()) { setError("Razorpay Key ID is required."); return; }
+    if (!razorpaySecret.trim()) { setError("Razorpay Secret Key is required."); return; }
+    if (!alertEmail.trim()) { setError("Alert Email is required."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alertEmail)) { setError("Please enter a valid email address."); return; }
+    const payload = {
+      isRazorpayEnabled,
+      razorpayKeyId,
+      alertEmail,
+      ...(razorpaySecret.trim() && { razorpaySecret }),
+    };
+    openModal(
+      editingId ? "update" : "save",
+      payload,
+      editingId,
+      editingId ? `${razorpayKeyId.slice(0, 12)}••••` : "",
+    );
   };
 
   const handleDeleteClick = (item) =>
     openModal("delete", null, item.paymentSettingId, `${item.razorpayKeyId.slice(0, 12)}••••`);
 
   const handlePasswordConfirm = async (profilePassword) => {
-    if (!profilePassword.trim()) { setModal((m) => ({ ...m, error: "Profile password is required" })); return; }
+    if (!profilePassword.trim()) { setModal((m) => ({ ...m, error: "Profile password is required." })); return; }
     setModal((m) => ({ ...m, loading: true, error: "" }));
     const safeConfig = { headers: { "Content-Type": "application/json" }, skipAuthInterceptor: true };
     try {
       if (modal.action === "delete") {
         await axiosInstance.delete(`settings/payment/${modal.pendingId}`, { ...safeConfig, data: { profilePassword } });
-        setSuccess("Payment configuration deleted successfully");
+        setSuccess("Payment configuration deleted.");
       } else if (modal.action === "update") {
         await axiosInstance.put(`settings/payment/${modal.pendingId}`, { ...modal.pendingPayload, profilePassword }, safeConfig);
-        setSuccess("Payment settings updated successfully");
+        setSuccess("Payment settings updated successfully.");
       } else {
         await axiosInstance.post("settings/payment", { ...modal.pendingPayload, profilePassword }, safeConfig);
-        setSuccess("Payment settings saved successfully");
+        setSuccess("Payment settings saved successfully.");
       }
       closeModal(); resetForm(); fetchPaymentMethods();
-      setTimeout(() => setSuccess(""), 3000);
+      setTimeout(() => setSuccess(""), 4000);
     } catch (err) {
       const msg = err?.response?.data?.message || (
         modal.action === "delete"
-          ? "Failed to delete — check your password and try again"
+          ? "Deletion failed — check your password and try again."
           : modal.action === "update"
-            ? "Failed to update payment settings"
-            : "Failed to save payment settings"
+            ? "Update failed — please try again."
+            : "Save failed — please try again."
       );
       setModal((m) => ({ ...m, loading: false, error: msg }));
     }
   };
 
-  const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const formatDate = (d) =>
+    d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
   const enabledCount  = paymentMethods.filter((p) => p.isRazorpayEnabled).length;
   const disabledCount = paymentMethods.filter((p) => !p.isRazorpayEnabled).length;
 
-  /* ───────────────────── JSX ───────────────────── */
+  /* ──── JSX ──── */
   return (
-    <div
-      className="font-sans"
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(160deg, var(--primary-50) 0%, var(--color-primary-subtle) 40%, #f8faff 100%)",
-      }}
-    >
+    <div className="font-sans min-h-screen" style={{ background: "linear-gradient(150deg, var(--primary-50) 0%, #f5f7ff 50%, #f8f9fc 100%)" }}>
       <PasswordConfirmModal
         open={modal.open} action={modal.action} targetLabel={modal.targetLabel}
         onConfirm={handlePasswordConfirm} onCancel={closeModal}
         loading={modal.loading} error={modal.error}
       />
 
-      <PageHeader
-        title="Payment Settings"
-        subtitle="Configure your Razorpay payment gateway"
-      />
+      <PageHeader title="Payment Settings" subtitle="Configure your Razorpay payment gateway" />
 
-      {/* ── Main content ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
-        {/* ── Stats Row ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "Total Configs", value: paymentMethods.length,  color: "#1a1a2e",                  sub: "all configurations" },
-            { label: "Active",        value: enabledCount,            color: "var(--success-600)",        sub: "enabled now" },
-            { label: "Inactive",      value: disabledCount,           color: "var(--neutral-500)",        sub: "disabled" },
-            { label: "Latest Key",    value: paymentMethods[0]?.razorpayKeyId?.slice(0, 8) || "—", color: "var(--primary-700)", sub: "most recent", small: true },
-          ].map(({ label, value, color, sub, small }) => (
-            <div key={label} style={{
-              background: "#fff",
-              border: "1px solid var(--primary-100)",
-              borderRadius: 16,
-              padding: "1rem 1.125rem",
-              boxShadow: "0 1px 4px rgb(239 68 68 / 0.06), 0 6px 20px -6px rgb(239 68 68 / 0.08)",
-              position: "relative", overflow: "hidden",
-              transition: "box-shadow 0.2s, transform 0.2s",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgb(239 68 68 / 0.1), 0 12px 32px -8px rgb(239 68 68 / 0.14)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgb(239 68 68 / 0.06), 0 6px 20px -6px rgb(239 68 68 / 0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            { label: "Total",    value: paymentMethods.length,                                     note: "configurations" },
+            { label: "Active",   value: enabledCount,                                               note: "enabled",   accent: "text-emerald-600" },
+            { label: "Inactive", value: disabledCount,                                              note: "disabled",  accent: "text-neutral-400" },
+            { label: "Latest",   value: paymentMethods[0]?.razorpayKeyId?.slice(0, 8) || "—", note: "most recent", mono: true },
+          ].map(({ label, value, note, accent, mono }) => (
+            <div
+              key={label}
+              className="bg-white rounded-2xl border border-neutral-100 p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+              style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px -4px rgba(0,0,0,0.06)" }}
             >
-              <p style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#a8a8c0", marginBottom: 6 }}>{label}</p>
-              <p style={{ fontSize: small ? "0.95rem" : "1.75rem", fontWeight: 800, color, letterSpacing: "-0.03em", lineHeight: 1.1, fontFamily: "var(--font-mono, monospace)" }}>{value}</p>
-              <p style={{ fontSize: "0.7rem", color: "#a8a8c0", marginTop: 4, fontWeight: 500 }}>{sub}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{label}</p>
+              <p className={`font-extrabold leading-none tracking-tight mb-1 ${mono ? "text-base font-mono text-neutral-700" : "text-3xl text-neutral-900"} ${accent || ""}`}>
+                {value}
+              </p>
+              <p className="text-[11px] text-neutral-400">{note}</p>
             </div>
           ))}
         </div>
@@ -333,403 +371,296 @@ const PaymentSettings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
           {/* ── FORM CARD ── */}
-          <div className="lg:col-span-5" style={{
-            background: "#fff",
-            border: "1px solid var(--primary-200)",
-            borderRadius: 20,
-            boxShadow: "0 2px 8px rgb(239 68 68 / 0.06), 0 12px 40px -8px rgb(239 68 68 / 0.1)",
-            overflow: "hidden",
-          }}>
+          <div
+            className="lg:col-span-5 bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -8px rgba(0,0,0,0.08)" }}
+          >
             {/* Card header */}
-            <div style={{ padding: "1.125rem 1.375rem", borderBottom: "1px solid var(--primary-50)", background: "linear-gradient(to right, var(--primary-50), #fff)" }}>
-              <div className="flex items-center gap-3">
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10,
-                  background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))",
-                  boxShadow: "0 3px 10px rgb(239 68 68 / 0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  {editingId ? <FiEdit2 className="w-4 h-4 text-white" /> : <FiSettings className="w-4 h-4 text-white" />}
-                </div>
-                <div>
-                  <p className="font-bold text-neutral-900 leading-none" style={{ fontSize: "0.9375rem" }}>
-                    {editingId ? "Edit Configuration" : "New Configuration"}
-                  </p>
-                  <p style={{ fontSize: "0.75rem", color: "#a8a8c0", marginTop: 3 }}>
-                    {editingId ? "Update existing payment settings" : "Add Razorpay credentials"}
-                  </p>
-                </div>
+            <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))", boxShadow: "0 3px 10px rgb(239 68 68 / 0.25)" }}>
+                {editingId ? <FiEdit2 className="w-3.5 h-3.5 text-white" /> : <FiPlusCircle className="w-3.5 h-3.5 text-white" />}
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-neutral-900 text-sm leading-tight">
+                  {editingId ? "Edit Configuration" : "New Configuration"}
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  {editingId ? "Update your Razorpay credentials" : "Connect your Razorpay account"}
+                </p>
+              </div>
+              {editingId && (
+                <button
+                  onClick={resetForm}
+                  className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-500 hover:text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 rounded-lg px-2.5 py-1.5 transition-all"
+                >
+                  <FiX className="w-3 h-3" /> Cancel
+                </button>
+              )}
             </div>
 
-            <div style={{ padding: "1.375rem" }} className="space-y-5">
-
-              {/* Edit mode banner */}
-              {editingId && (
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  background: "linear-gradient(to right, var(--primary-50), var(--color-primary-subtle))",
-                  border: "1px solid var(--primary-200)",
-                  borderRadius: 12, padding: "0.625rem 0.875rem",
-                }}>
-                  <span className="flex items-center gap-2 text-primary-700" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
-                    <FiEdit2 className="w-3.5 h-3.5" /> Editing existing setting
-                  </span>
-                  <button onClick={resetForm} style={{
-                    display: "flex", alignItems: "center", gap: 4,
-                    fontSize: "0.75rem", fontWeight: 600,
-                    color: "var(--primary-700)",
-                    background: "var(--primary-100)",
-                    border: "1px solid var(--primary-200)",
-                    borderRadius: 7, padding: "0.25rem 0.625rem",
-                    cursor: "pointer", transition: "all 0.15s",
-                  }}>
-                    <FiX className="w-3 h-3" /> Cancel
-                  </button>
-                </div>
-              )}
+            <div className="p-5 space-y-5">
 
               {/* Toggle */}
-              <div style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                background: "linear-gradient(to right, var(--primary-50), #fffffe)",
-                border: "1px solid var(--primary-100)",
-                borderRadius: 14, padding: "0.875rem 1rem",
-              }}>
+              <div className="flex items-center justify-between p-4 rounded-xl bg-neutral-50 border border-neutral-100">
                 <div>
-                  <p className="font-semibold text-neutral-800" style={{ fontSize: "0.875rem" }}>Enable Razorpay</p>
-                  <p style={{ fontSize: "0.75rem", color: "#a8a8c0", marginTop: 2 }}>Activate Razorpay payment processing</p>
+                  <p className="text-sm font-semibold text-neutral-800">Enable Razorpay</p>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">Accept payments via Razorpay gateway</p>
                 </div>
                 <button
                   onClick={() => setIsRazorpayEnabled((v) => !v)}
+                  className="relative flex-shrink-0 w-11 h-6 rounded-full border-none cursor-pointer transition-all duration-250 focus:outline-none"
                   style={{
-                    position: "relative", width: 48, height: 26,
-                    borderRadius: 9999, border: "none", cursor: "pointer",
                     background: isRazorpayEnabled
                       ? "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))"
-                      : "#e4e4ec",
-                    boxShadow: isRazorpayEnabled
-                      ? "0 0 0 3px rgb(239 68 68 / 0.2), inset 0 1px 2px rgba(0,0,0,0.1)"
-                      : "inset 0 1px 3px rgba(0,0,0,0.1)",
-                    transition: "all 0.25s",
-                    flexShrink: 0,
+                      : "#d1d5db",
+                    boxShadow: isRazorpayEnabled ? "0 0 0 3px rgb(239 68 68 / 0.15)" : "none",
                   }}
                 >
-                  <span style={{
-                    position: "absolute", top: 3,
-                    left: isRazorpayEnabled ? "calc(100% - 23px)" : 3,
-                    width: 20, height: 20, borderRadius: "50%",
-                    background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                    transition: "left 0.25s cubic-bezier(0.34,1.56,0.64,1)",
-                  }} />
+                  <span
+                    className="absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white transition-all duration-250"
+                    style={{
+                      left: isRazorpayEnabled ? "calc(100% - 21px)" : "3px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                      transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1)",
+                    }}
+                  />
                 </button>
               </div>
 
-              {/* Input fields */}
-              {[
-                {
-                  label: "Razorpay Key ID", icon: FiKey,
-                  type: "text", placeholder: "rzp_live_xxxxxxxxxxxx",
-                  value: razorpayKeyId, onChange: (e) => setRazorpayKeyId(e.target.value),
-                  hint: null, showToggle: false,
-                },
-                {
-                  label: "Razorpay Secret Key",
-                  labelSuffix: editingId ? "(leave blank to keep existing)" : null,
-                  icon: FiLock,
-                  type: showRazorpaySecret ? "text" : "password",
-                  placeholder: editingId ? "Enter new secret to update" : "Enter secret key",
-                  value: razorpaySecret, onChange: (e) => setRazorpaySecret(e.target.value),
-                  hint: editingId ? "Enter new secret only if you want to change it" : "Your secret key will be encrypted",
-                  showToggle: true,
-                  toggleState: showRazorpaySecret,
-                  onToggle: () => setShowRazorpaySecret((v) => !v),
-                },
-                {
-                  label: "Alert Email", icon: FiMail,
-                  type: "email", placeholder: "admin@example.com",
-                  value: alertEmail, onChange: (e) => setAlertEmail(e.target.value),
-                  hint: "Receives payment notifications and alerts",
-                  showToggle: false,
-                },
-              ].map(({ label, labelSuffix, icon: Icon, type, placeholder, value, onChange, hint, showToggle, toggleState, onToggle }) => (
-                <div key={label} className="space-y-1.5">
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#7878a0" }}>
-                    {label}
-                    {labelSuffix && <span style={{ fontWeight: 500, fontSize: "0.65rem", color: "#a8a8c0", textTransform: "none", letterSpacing: 0 }}>{labelSuffix}</span>}
-                  </label>
-                  <div style={{ position: "relative" }}>
-                    <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#a8a8c0", pointerEvents: "none" }}>
-                      <Icon style={{ width: 15, height: 15 }} />
-                    </div>
-                    <input
-                      type={type} placeholder={placeholder} value={value} onChange={onChange}
-                      style={{
-                        width: "100%", height: 42, paddingLeft: 36, paddingRight: showToggle ? 40 : 12,
-                        border: "1.5px solid #e4e4ec", borderRadius: 10,
-                        background: "#f8f8fa", fontSize: "0.875rem",
-                        color: "#1a1a2e", outline: "none",
-                        transition: "all 0.15s",
-                        fontFamily: "var(--font-sans)",
-                        boxSizing: "border-box",
-                      }}
-                      onFocus={e => {
-                        e.target.style.borderColor = "var(--color-primary)";
-                        e.target.style.boxShadow = "0 0 0 3px rgb(239 68 68 / 0.12)";
-                        e.target.style.background = "#fff";
-                      }}
-                      onBlur={e => {
-                        e.target.style.borderColor = "#e4e4ec";
-                        e.target.style.boxShadow = "none";
-                        e.target.style.background = "#f8f8fa";
-                      }}
-                    />
-                    {showToggle && (
-                      <button type="button" onClick={onToggle} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#a8a8c0", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                        {toggleState ? <FiEyeOff style={{ width: 15, height: 15 }} /> : <FiEye style={{ width: 15, height: 15 }} />}
-                      </button>
-                    )}
-                  </div>
-                  {hint && <p style={{ fontSize: "0.7rem", color: "#a8a8c0", marginTop: 4 }}>{hint}</p>}
-                </div>
-              ))}
+              {/* Key ID */}
+              <Field
+                label="Razorpay Key ID"
+                icon={FiKey}
+                type="text"
+                placeholder="rzp_live_xxxxxxxxxxxx"
+                value={razorpayKeyId}
+                onChange={(e) => setRazorpayKeyId(e.target.value)}
+                required={true}
+              />
 
-              {/* Form error */}
+              {/* Secret Key — always required */}
+              <Field
+                label="Razorpay Secret Key"
+                icon={FiLock}
+                type={showRazorpaySecret ? "text" : "password"}
+                placeholder={editingId ? "Enter your secret key" : "Enter your secret key"}
+                value={razorpaySecret}
+                onChange={(e) => setRazorpaySecret(e.target.value)}
+                hint={editingId ? null : "Stored securely with encryption"}
+                showToggle
+                toggleState={showRazorpaySecret}
+                onToggle={() => setShowRazorpaySecret((v) => !v)}
+                required={true}
+              />
+
+              {/* Alert Email */}
+              <Field
+                label="Alert Email"
+                icon={FiMail}
+                type="email"
+                placeholder="admin@example.com"
+                value={alertEmail}
+                onChange={(e) => setAlertEmail(e.target.value)}
+                hint="Receives payment failure alerts and notifications"
+                required={true}
+              />
+
+              {/* Alerts */}
               {error && (
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0.625rem 0.875rem", borderRadius: 10, background: "#fff1f2", border: "1px solid #ffe4e6", color: "#be123c", fontSize: "0.8125rem" }}>
-                  <FiAlertCircle style={{ width: 15, height: 15, flexShrink: 0, marginTop: 1 }} />{error}
+                <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+                  <FiAlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  {error}
                 </div>
               )}
-
-              {/* Form success */}
               {success && (
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0.625rem 0.875rem", borderRadius: 10, background: "#ecfdf5", border: "1px solid #d1fae5", color: "#047857", fontSize: "0.8125rem" }}>
-                  <FiCheck style={{ width: 15, height: 15, flexShrink: 0, marginTop: 1 }} />{success}
+                <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm">
+                  <FiCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  {success}
                 </div>
               )}
 
               {/* Submit */}
               <button
                 onClick={handleSubmit}
+                className="w-full h-11 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.99]"
                 style={{
-                  width: "100%", height: 44, borderRadius: 12, border: "none",
                   background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))",
-                  color: "#fff", fontWeight: 700, fontSize: "0.875rem",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  cursor: "pointer",
-                  boxShadow: "0 2px 10px rgb(239 68 68 / 0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
-                  transition: "all 0.15s", position: "relative", overflow: "hidden",
+                  boxShadow: "0 2px 12px rgb(239 68 68 / 0.3)",
                 }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-active))";
-                  e.currentTarget.style.boxShadow = "0 4px 18px rgb(239 68 68 / 0.4)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))";
-                  e.currentTarget.style.boxShadow = "0 2px 10px rgb(239 68 68 / 0.3), inset 0 1px 0 rgba(255,255,255,0.15)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-                onMouseDown={e => { e.currentTarget.style.transform = "translateY(0) scale(0.99)"; }}
-                onMouseUp={e => { e.currentTarget.style.transform = "translateY(-1px) scale(1)"; }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 20px rgb(239 68 68 / 0.4)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 12px rgb(239 68 68 / 0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <FiSave style={{ width: 15, height: 15 }} />
-                {editingId ? "Update Settings" : "Save Settings"}
+                {editingId
+                  ? <><FiSave className="w-4 h-4" /> Update </>
+                  : <><FiPlusCircle className="w-4 h-4" /> Save Configuration</>}
               </button>
             </div>
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
-          <div className="lg:col-span-7">
-            <div style={{
-              background: "#fff",
-              border: "1px solid var(--primary-100)",
-              borderRadius: 20,
-              boxShadow: "0 2px 8px rgb(239 68 68 / 0.05), 0 12px 40px -8px rgb(239 68 68 / 0.09)",
-              overflow: "hidden",
-            }}>
+          {/* ── LIST CARD ── */}
+          <div
+            className="lg:col-span-7 bg-white rounded-2xl border border-neutral-100 overflow-hidden"
+            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 12px 32px -8px rgba(0,0,0,0.07)" }}
+          >
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+              <div>
+                <h2 className="font-bold text-neutral-900 text-sm">Payment Methods</h2>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  {paymentMethods.length === 0
+                    ? "No configurations yet"
+                    : `${paymentMethods.length} configuration${paymentMethods.length !== 1 ? "s" : ""}`}
+                </p>
+              </div>
+              <button
+                onClick={() => fetchPaymentMethods(true)}
+                disabled={refreshing}
+                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 rounded-lg px-3 py-1.5 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <span className={refreshing ? "animate-spin" : ""}>↻</span> Refresh
+              </button>
+            </div>
 
-              {/* Card header */}
-              <div style={{
-                padding: "1rem 1.375rem",
-                borderBottom: "1px solid var(--primary-50)",
-                background: "linear-gradient(to right, var(--primary-50), #fff)",
-                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
-              }}>
-                <div>
-                  <h2 className="font-bold text-neutral-900" style={{ fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>
-                    Payment Methods
-                  </h2>
-                  <p style={{ fontSize: "0.75rem", color: "#a8a8c0", marginTop: 2 }}>
-                    {paymentMethods.length === 0
-                      ? "No payment methods added yet"
-                      : `${paymentMethods.length} configuration${paymentMethods.length !== 1 ? "s" : ""} found`}
-                  </p>
+            {/* ── Desktop Table ── */}
+            <div className="hidden md:block overflow-x-auto">
+              {refreshing ? (
+                <div className="p-5 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-3 rounded-lg bg-neutral-100 animate-pulse" style={{ width: `${60 + i * 10}%` }} />
+                  ))}
                 </div>
-              </div>
-
-              {/* ── Desktop Table ── */}
-              <div className="hidden md:block">
-                {refreshing ? (
-                  <div style={{ padding: "1.5rem" }} className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} style={{ height: 14, borderRadius: 8, background: "linear-gradient(90deg, var(--primary-50), var(--primary-100), var(--primary-50))", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />
-                    ))}
+              ) : paymentMethods.length === 0 ? (
+                <div className="py-16 flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-neutral-100 border-2 border-dashed border-neutral-200 flex items-center justify-center">
+                    <FiCreditCard className="w-5 h-5 text-neutral-400" />
                   </div>
-                ) : paymentMethods.length === 0 ? (
-                  <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
-                    <div style={{
-                      width: 56, height: 56, borderRadius: "50%",
-                      border: "2px dashed var(--primary-200)",
-                      background: "var(--primary-50)",
-                      display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px",
-                    }}>
-                      <FiCreditCard style={{ width: 22, height: 22, color: "var(--primary-300)" }} />
-                    </div>
-                    <p style={{ fontSize: "0.875rem", color: "#7878a0", fontWeight: 600, marginBottom: 4 }}>No payment methods yet</p>
-                    <p style={{ fontSize: "0.75rem", color: "#a8a8c0" }}>Add your first configuration on the left</p>
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-neutral-500">No configurations</p>
+                    <p className="text-xs text-neutral-400 mt-0.5">Add your first configuration using the form</p>
                   </div>
-                ) : (
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
-                    <thead>
-                      <tr style={{
-                        background: "linear-gradient(to right, var(--primary-50), var(--color-primary-subtle))",
-                        borderBottom: "2px solid var(--primary-100)",
-                      }}>
-                        {["Status", "Key ID", "Email", "Updated", "Action"].map((h) => (
-                          <th key={h}
-                            className="first:pl-5 last:pr-5"
-                            style={{ padding: "0.75rem 1rem", textAlign: "left", fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--primary-700)", whiteSpace: "nowrap" }}>
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paymentMethods.map((item, i) => (
-                        <tr
-                          key={item.paymentSettingId}
-                          style={{ borderBottom: i < paymentMethods.length - 1 ? "1px solid var(--primary-50)" : "none", transition: "background 0.12s" }}
-                          onMouseEnter={e => e.currentTarget.style.background = "var(--primary-50)"}
-                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                </div>
+              ) : (
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-neutral-100 bg-neutral-50">
+                      {["Status", "Key ID", "Email", "Updated", ""].map((h) => (
+                        <th
+                          key={h}
+                          className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-neutral-400 first:pl-5 last:pr-5"
                         >
-                          <td style={{ padding: "0.9375rem 1rem" }} className="pl-5">
-                            <StatusBadge enabled={item.isRazorpayEnabled} />
-                          </td>
-                          <td style={{ padding: "0.9375rem 1rem" }}>
-                            <span style={{
-                              fontFamily: "monospace", fontSize: "0.75rem",
-                              background: "var(--primary-50)",
-                              padding: "0.25rem 0.5rem", borderRadius: 6,
-                              color: "#424260",
-                              border: "1px solid var(--primary-100)",
-                            }}>
-                              {item.razorpayKeyId.slice(0, 6)}••••
-                            </span>
-                          </td>
-                          <td style={{ padding: "0.9375rem 1rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "#424260" }}>
-                              {item.alertEmail.split("@")[0]}@…
-                            </span>
-                          </td>
-                          <td style={{ padding: "0.9375rem 1rem" }}>
-                            <span style={{ fontSize: "0.7rem", color: "#7878a0" }}>{formatDate(item.updatedAt)}</span>
-                          </td>
-                          <td style={{ padding: "0.9375rem 1rem" }} className="pr-5">
-                            <div style={{ display: "flex", gap: 6 }}>
-                              <button onClick={() => handleEdit(item)} style={{
-                                padding: "0.375rem 0.75rem", borderRadius: 8, fontSize: "0.75rem", fontWeight: 600,
-                                border: "1.5px solid var(--primary-200)",
-                                color: "var(--primary-700)",
-                                background: "linear-gradient(to bottom, #fff, var(--primary-50))",
-                                cursor: "pointer",
-                              }}>
-                                <FiEdit2 style={{ width: 12, height: 12 }} />
-                              </button>
-                              <button onClick={() => handleDeleteClick(item)} style={{
-                                padding: "0.375rem 0.75rem", borderRadius: 8, fontSize: "0.75rem", fontWeight: 600,
-                                border: "1.5px solid #ffe4e6", color: "#e11d48",
-                                background: "linear-gradient(to bottom, #fff, #fff1f2)", cursor: "pointer",
-                              }}>
-                                <FiTrash2 style={{ width: 12, height: 12 }} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
+                          {h}
+                        </th>
                       ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-
-              {/* ── Mobile Cards ── */}
-              <div className="block md:hidden">
-                {refreshing ? (
-                  <div style={{ padding: "1rem" }} className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} style={{ borderRadius: 14, border: "1px solid var(--primary-100)", padding: "1rem" }} className="space-y-2">
-                        <div style={{ height: 12, borderRadius: 6, background: "linear-gradient(90deg, var(--primary-50), var(--primary-100), var(--primary-50))", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite", width: "60%" }} />
-                      </div>
-                    ))}
-                  </div>
-                ) : paymentMethods.length === 0 ? (
-                  <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
-                    <p style={{ fontSize: "0.875rem", color: "#7878a0" }}>No payment methods yet</p>
-                  </div>
-                ) : (
-                  <div style={{ padding: "0.875rem" }} className="space-y-2">
-                    {paymentMethods.map((item) => (
-                      <div key={item.paymentSettingId} style={{
-                        borderRadius: 16,
-                        border: "1px solid var(--primary-100)",
-                        background: "#ffffff", padding: "1rem",
-                      }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paymentMethods.map((item, i) => (
+                      <tr
+                        key={item.paymentSettingId}
+                        className="border-b border-neutral-50 last:border-0 hover:bg-neutral-50 transition-colors duration-100"
+                      >
+                        <td className="px-4 py-3.5 pl-5">
                           <StatusBadge enabled={item.isRazorpayEnabled} />
-                          <div style={{ display: "flex", gap: 6 }}>
-                            <button onClick={() => handleEdit(item)} style={{
-                              padding: "0.375rem", borderRadius: 8,
-                              border: "1.5px solid var(--primary-200)",
-                              color: "var(--primary-700)",
-                              background: "var(--primary-50)",
-                            }}>
-                              <FiEdit2 style={{ width: 14, height: 14 }} />
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="font-mono text-xs bg-neutral-100 text-neutral-700 px-2.5 py-1 rounded-lg border border-neutral-200">
+                            {item.razorpayKeyId.slice(0, 6)}••••
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-xs text-neutral-500">{item.alertEmail.split("@")[0]}@…</span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-[11px] text-neutral-400">{formatDate(item.updatedAt)}</span>
+                        </td>
+                        <td className="px-4 py-3.5 pr-5">
+                          <div className="flex items-center gap-2 justify-end">
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200 hover:border-neutral-300 rounded-lg px-2.5 py-1.5 transition-all"
+                            >
+                              <FiEdit2 className="w-3 h-3" /> Edit
                             </button>
-                            <button onClick={() => handleDeleteClick(item)} style={{ padding: "0.375rem", borderRadius: 8, border: "1.5px solid #ffe4e6", color: "#e11d48", background: "#fff1f2" }}>
-                              <FiTrash2 style={{ width: 14, height: 14 }} />
+                            <button
+                              onClick={() => handleDeleteClick(item)}
+                              className="flex items-center gap-1.5 text-[11px] font-semibold text-red-500 hover:text-red-700 bg-white hover:bg-red-50 border border-red-100 hover:border-red-200 rounded-lg px-2.5 py-1.5 transition-all"
+                            >
+                              <FiTrash2 className="w-3 h-3" /> Delete
                             </button>
                           </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* ── Mobile Cards ── */}
+            <div className="block md:hidden">
+              {refreshing ? (
+                <div className="p-4 space-y-3">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="rounded-xl border border-neutral-100 p-4 space-y-2 animate-pulse">
+                      <div className="h-3 rounded bg-neutral-100 w-1/3" />
+                      <div className="h-3 rounded bg-neutral-100 w-2/3" />
+                    </div>
+                  ))}
+                </div>
+              ) : paymentMethods.length === 0 ? (
+                <div className="py-12 flex flex-col items-center gap-2">
+                  <FiCreditCard className="w-8 h-8 text-neutral-300" />
+                  <p className="text-sm text-neutral-400">No configurations yet</p>
+                </div>
+              ) : (
+                <div className="p-4 space-y-3">
+                  {paymentMethods.map((item) => (
+                    <div
+                      key={item.paymentSettingId}
+                      className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <StatusBadge enabled={item.isRazorpayEnabled} />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="flex items-center gap-1 text-[11px] font-semibold text-neutral-600 bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 transition-all hover:bg-neutral-50"
+                          >
+                            <FiEdit2 className="w-3 h-3" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(item)}
+                            className="flex items-center gap-1 text-[11px] font-semibold text-red-500 bg-white border border-red-100 rounded-lg px-2.5 py-1.5 transition-all hover:bg-red-50"
+                          >
+                            <FiTrash2 className="w-3 h-3" /> Delete
+                          </button>
                         </div>
-                        <div style={{ marginBottom: 8 }}>
-                          <span style={{ fontSize: "0.7rem", color: "#a8a8c0", display: "block", marginBottom: 2 }}>Key ID</span>
-                          <span style={{ fontFamily: "monospace", fontSize: "0.75rem", background: "var(--primary-50)", padding: "0.25rem 0.5rem", borderRadius: 6, border: "1px solid var(--primary-100)" }}>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Key ID</p>
+                          <span className="font-mono text-xs bg-white border border-neutral-200 text-neutral-700 px-2 py-0.5 rounded-lg">
                             {item.razorpayKeyId.slice(0, 6)}••••
                           </span>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "0.7rem", color: "#424260" }}>{item.alertEmail.split("@")[0]}@…</span>
-                          <span style={{ fontSize: "0.6rem", color: "#a8a8c0" }}>{formatDate(item.updatedAt)}</span>
+                        <div className="text-right">
+                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Email</p>
+                          <p className="text-xs text-neutral-600">{item.alertEmail.split("@")[0]}@…</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Updated</p>
+                          <p className="text-[11px] text-neutral-500">{formatDate(item.updatedAt)}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes shimmer {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

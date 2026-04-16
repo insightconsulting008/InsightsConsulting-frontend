@@ -38,7 +38,7 @@ const EnquiryPopup = ({ open, onClose, initialService = "" }) => {
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center text-gray-500 hover:text-red transition-all shadow"
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center text-gray-500 hover:text-primary transition-all shadow"
         >
           <RiCloseLargeFill size={13} />
         </button>

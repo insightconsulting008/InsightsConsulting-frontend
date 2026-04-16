@@ -5,7 +5,9 @@ import {
   Home, Briefcase, Users,
   FileText, UserCircle, BarChart3, Settings,
   Menu, X, ChevronLeft, ChevronRight, CreditCard, MessageSquare,
-  BookOpen
+  BookOpen, Target,   // ← added Target icon for UTM
+  ClipboardList,
+  ClipboardClock
 } from "lucide-react";
 import AddDepartmentModal from '../employee_repo/popup/AddDepartment';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -72,29 +74,24 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
     
     // Exact match for simple routes
     if (routePath === '/services-hub') {
-      // Services hub active only on exact /services-hub path
       return currentPath === routePath;
     }
     
     if (routePath === '/orders') {
-      // Orders active for /orders and any /orders/* paths
       return currentPath === routePath || currentPath.startsWith('/orders/');
     }
     
     if (routePath === '/reports') {
-      // Reports active for /reports and any /reports/* paths
       return currentPath === routePath || currentPath.startsWith('/reports/');
     }
 
     if (routePath === '/manage-blog') {
-      // Blog active for /manage-blog, /manage-blog/:slug and /add-blog
       return currentPath === '/manage-blog' ||
              currentPath === '/add-blog' ||
              currentPath.startsWith('/manage-blog/');
     }
 
     if (routePath === '/services') {
-      // Services active for /services-hub and all service-related paths
       return currentPath === '/services-hub' || 
              currentPath === '/services/add' ||
              currentPath === '/services/bundle/add' ||
@@ -109,8 +106,9 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
   const navItems = [
     { path: '/admin-dashboard', icon: Home, label: 'Dashboard', matchExact: true },
     { path: '/services', icon: Briefcase, label: 'Services', matchNested: true },
-    { path: '/orders', icon: FileText, label: 'Orders', matchNested: true },
+    { path: '/orders', icon: ClipboardList, label: 'Orders', matchNested: true },
     { path: '/employees', icon: UserCircle, label: 'Employees', matchExact: true },
+    { path: '/requests', icon: ClipboardClock, label: 'Requests', matchExact: true }, // ← new
     { path: '/amendment', icon: FileText, label: 'Amendment', matchExact: true },
     { path: '/users', icon: Users, label: 'Users Data', matchExact: true },
     { path: '/reports', icon: BarChart3, label: 'Reports', matchNested: true },
@@ -118,6 +116,7 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
     { path: '/email-config', icon: MessageSquare, label: 'Email Config', matchExact: true },
     { path: '/payment-history', icon: CreditCard, label: 'Payment History', matchExact: true },
     { path: '/settings', icon: Settings, label: 'Payment Settings', matchExact: true },
+    { path: '/utm', icon: Target, label: 'UTM', matchExact: true },      // ← new UTM link
     { path: '/profile', icon: UserCircle, label: 'Profile', matchExact: true },
   ];
 

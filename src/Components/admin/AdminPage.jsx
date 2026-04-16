@@ -46,6 +46,8 @@ import EmailDashboard from "./sms/EmailDashboard";
 import CreateBlog from "./blog/CreateBlog";
 import BlogList from "./blog/BlogList";
 import ViewEditBlog from "./blog/ViewEditBlog";
+import UTM from "./utm/UTM";
+import ServiceRequests from "../service-request/serviceRequest";
 
 const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
   <>
@@ -73,6 +75,8 @@ const AdminPage = ({ setRefreshDepartmentsTrigger }) => (
         <Route path="/amendment" element={<CreateAmendmentLink />} />
         <Route path="/users" element={<Users />} />
         <Route path="/payment-history" element={<PaymentHistory/>} />
+        <Route path="/utm" element={<UTM/>} />
+        <Route path="/requests" element={<ServiceRequests/>} />
 
         {/* Order Management */}
         <Route path="/orders" element={<OrderManagement />} />

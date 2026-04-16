@@ -76,17 +76,17 @@ export default function Blog() {
   return (
     <section className="relative overflow-hidden">
       {/* Heading */}
-      <div className="bg-[#FFFBEC] px-4 relative">
+      <div className="bg-yellow/10 px-4 relative">
         <div className="text-center py-16 space-y-6 mb-12 relative z-10">
-          <span className="text-xs bg-[#FFFBEC] text-red px-3 py-1 rounded-full">
+          <span className="text-xs bg-yellow/10 text-primary px-3 py-1 rounded-full">
             Our blog
           </span>
 
-          <h2 className="text-3xl lg:text-4xl font-bold text-[#42307D] mt-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-primary mt-4">
             Resources and insights
           </h2>
 
-          <p className="text-red mt-2">
+          <p className="text-primary mt-2">
             The latest industry news, interviews, technologies, and resources.
           </p>
 
@@ -133,7 +133,7 @@ export default function Blog() {
             <div className="min-h-[400px] flex items-center justify-center">
               <div className="text-center max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg">
                 <div className="mb-6">
-                  <svg className="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="mx-auto h-16 w-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
@@ -141,7 +141,7 @@ export default function Blog() {
                 <p className="text-gray-600 mb-6">{error}</p>
                 <button
                   onClick={() => fetchBlogs(searchQuery)}
-                  className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors inline-flex items-center gap-2"
+                  className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -169,14 +169,14 @@ export default function Blog() {
                 {searchQuery ? (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
                   >
                     Clear Search
                   </button>
                 ) : (
                   <button
                     onClick={() => fetchBlogs()}
-                    className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
+                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
                   >
                     Refresh Page
                   </button>
@@ -197,7 +197,7 @@ export default function Blog() {
                     className="h-56 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="p-5">
-                    <span className="text-xs text-red-500 font-medium">
+                    <span className="text-xs text-primary font-medium">
                       {blog.category || ""}
                     </span>
                     <h3 className="text-lg font-semibold text-gray-800 mt-2 flex items-start justify-between gap-2">

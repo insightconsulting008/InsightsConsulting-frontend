@@ -1428,8 +1428,7 @@ const mca = {
         {
           title: "Why Form 11 Filing is Critical",
           description: "Even if your LLP has:",
-          points: ["No transactions", "No income"],
-          note: "Filing is still compulsory.",
+          points: ["No transactions", "No income", "👉 Filing is still compulsory."],
           extraDescription: "Failure to comply leads to:",
           extraPoints: [
             "₹100 per day penalty (no maximum limit)",
@@ -2638,25 +2637,15 @@ const mca = {
           ],
         },
         {
-          title: "Strategic Insight",
-          description:
-            ["INC-20A is not just compliance—it’s your official business launch approval.","We ensure your company:"],
-          points: [
-            "Starts legally",
-            "Operates smoothly",
-            "Stays compliant from Day 1",
-          ],
-        },
-       
-
-        {
           title: "Companies Compliance Facilitation Scheme, 2026",
+          sectionGroup: "compliance_scheme",
           description:
             "The Companies Compliance Facilitation Scheme, 2026 is a temporary initiative that gives companies a limited window to regularize delayed filings (like annual returns and financial statements) by paying much lower additional fees than normally charged. It also offers easier options for inactive companies to either stay dormant or strike off their registration.",
           extraDescription: "Scheme Period: 15 April – 15 July 2026",
         },
         {
           title: "Fee Structure at a Glance",
+          sectionGroup: "compliance_scheme",
           table: [
             {
               typeOfFee: "Normal statutory filing fee",
@@ -2678,6 +2667,7 @@ const mca = {
         },
         {
           title: "Who is Excluded from the Scheme?",
+          sectionGroup: "compliance_scheme",
           points: [
             "Companies against which a final notice for striking off under Section 248 (or Section 560 of the Companies Act, 1956) has already been initiated by the Registrar.",
             "Companies that have already filed an application for striking off their name.",
@@ -2688,6 +2678,7 @@ const mca = {
         },
         {
           title: "Which Forms Are Covered?",
+          sectionGroup: "compliance_scheme",
           description:
             "The scheme covers all \"relevant e-forms\" for annual compliance under both the Companies Act, 2013 and the legacy Companies Act, 1956, including:",
           subSections: [
@@ -2719,6 +2710,16 @@ const mca = {
                 "Form 23B",
               ],
             },
+          ],
+        },
+        {
+          title: "Strategic Insight",
+          description:
+            ["INC-20A is not just compliance—it’s your official business launch approval.","We ensure your company:"],
+          points: [
+            "Starts legally",
+            "Operates smoothly",
+            "Stays compliant from Day 1",
           ],
         },
          {

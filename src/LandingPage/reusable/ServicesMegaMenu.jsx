@@ -36,7 +36,7 @@ export default function ServicesMegaMenu() {
   return (
     <div className="absolute -left-56 top-full mt-6 w-[580px] bg-white shadow-xl border border-gray-100 rounded-xl overflow-hidden">
       {/* Red accent line */}
-      <div className="h-0.5 bg-red-600 w-full" />
+      <div className="h-0.5 bg-primary w-full" />
 
       <div className="grid grid-cols-2 divide-x divide-gray-100">
         {/* Column 1 — Categories */}
@@ -52,7 +52,7 @@ export default function ServicesMegaMenu() {
                 onClick={() => setActiveCat(cat.categoryId)}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeCat === cat.categoryId
-                    ? "bg-red-50 text-red-600"
+                    ? "bg-secondary text-primary"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -69,9 +69,9 @@ export default function ServicesMegaMenu() {
             <div key={sub.subCategoryId} className="mb-4 last:mb-0">
               <button
                 onClick={() => handleSubcategoryClick(activeCat, sub)}
-                className="flex items-center gap-2 mb-2 text-sm font-bold text-gray-900 hover:text-red-600 transition-colors"
+                className="flex items-center gap-2 mb-2 text-sm font-bold text-gray-900 hover:text-primary transition-colors"
               >
-                <span className="w-1 h-4 bg-red-500 rounded-full flex-shrink-0" />
+                <span className="w-1 h-4 bg-primary rounded-full flex-shrink-0" />
                 {sub.subCategoryName}
               </button>
 
@@ -80,7 +80,7 @@ export default function ServicesMegaMenu() {
                   <li key={service.serviceId}>
                     <button
                       onClick={() => handleServiceClick(activeCat, sub, service)}
-                      className="block w-full text-left text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                      className="block w-full text-left text-sm text-gray-500 hover:text-primary hover:bg-secondary px-2 py-1 rounded transition-colors"
                     >
                       {service.name}
                     </button>

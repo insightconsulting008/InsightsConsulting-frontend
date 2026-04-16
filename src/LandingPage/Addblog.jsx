@@ -94,7 +94,7 @@ export default function Blogdesc() {
 
     doc.querySelectorAll("blockquote").forEach((el) => {
       el.className =
-        "border-l-4 border-red-500 pl-4 italic text-gray-700 my-8";
+        "border-l-4 border-primary pl-4 italic text-gray-700 my-8";
     });
 
     doc.querySelectorAll("ul").forEach((el) => {
@@ -116,7 +116,7 @@ export default function Blogdesc() {
       <div className="grid md:grid-cols-2 gap-10 items-center relative">
         <div className="relative">
           <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-            <span className="bg-red-100 text-red-500 px-3 py-1 rounded-full text-xs">
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs">
               {blog.category || ""}
             </span>
             {blog.readTime && (
@@ -163,7 +163,7 @@ export default function Blogdesc() {
       <div className="grid md:grid-cols-4 gap-10 mt-14">
         {/* TOC — collapsible on mobile */}
         <aside className="md:col-span-1 md:sticky md:top-24 md:h-fit">
-          <h3 className="text-red-500 font-semibold mb-4">
+          <h3 className="text-primary font-semibold mb-4">
             Table of contents
           </h3>
 
@@ -174,7 +174,7 @@ export default function Blogdesc() {
                   href={`#${item.id}`}
                   className={`transition ${
                     activeId === item.id
-                      ? "text-red-500 font-semibold border-l-2 border-red-500 pl-2"
+                      ? "text-primary font-semibold border-l-2 border-primary pl-2"
                       : "text-gray-600 hover:text-black"
                   }`}
                 >

@@ -529,7 +529,7 @@ const incometax={
         {
           "title": "Applicable ITR Form",
           "points": ["ITR-6"],
-          "note": "Applicable for companies (other than those claiming exemption under Section 11)"
+          "note": "Other than those claiming exemption under Section 11"
         },
         {
           "title": "Why Professional Filing Matters",
@@ -764,6 +764,7 @@ const incometax={
         },
         {
           "title": "Who Should File ITR-U?",
+          "sectionGroup": "itr-u-pair",
           "points": [
             "Missed filing ITR within due date",
             "Reported lower income earlier",
@@ -772,6 +773,27 @@ const incometax={
             "Want to voluntarily correct errors"
           ],
           "note": "Ideal for proactive compliance and risk reduction"
+        },
+        {
+          "title": "Important Points",
+          "sectionGroup": "itr-u-pair",
+          "subSections": [
+            {
+              "title": "Usage Limitation",
+              "points": [
+                "ITR-U can be filed only for additional income reporting"
+              ]
+            },
+            {
+              "title": "Cannot be used to",
+              "points": [
+                "Claim refunds",
+                "Reduce tax liability",
+                "Increase losses"
+              ]
+            }
+          ],
+          "note": "Proper evaluation is critical before filing"
         },
         {
           "title": "Time Limit",
@@ -826,24 +848,6 @@ const incometax={
             "Ensuring complete and correct disclosure",
             "Advisory to prevent future compliance issues"
           ]
-        },
-        {
-          "title": "Important Points",
-          "subSections": [
-            {
-              "title": "Usage Limitation",
-              "description": "ITR-U can be filed only for additional income reporting"
-            },
-            {
-              "title": "Cannot be used to",
-              "points": [
-                "Claim refunds",
-                "Reduce tax liability",
-                "Increase losses"
-              ]
-            }
-          ],
-          "note": "Proper evaluation is critical before filing"
         },
         {
           "title": "Common Mistakes We Help You Avoid",
