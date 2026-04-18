@@ -72,8 +72,8 @@ const Contact = () => {
     {
       icon: <Mail size={20} />,
       label: "Email Us",
-      value: "revathyb@insightconsulting.info",
-      href: "mailto:revathyb@insightconsulting.info",
+      value: "support@insightconsulting.info",
+      href: "mailto:support@insightconsulting.info",
     },
     {
       icon: <Phone size={20} />,
@@ -135,7 +135,7 @@ const Contact = () => {
 
           {/* Email Card */}
           <a
-            href="mailto:revathyb@insightconsulting.info"
+            href="mailto:support@insightconsulting.info"
             className="bg-white border border-gray-100 rounded-2xl p-5 flex justify-between items-center hover:shadow-md transition"
           >
             <div>
@@ -143,7 +143,7 @@ const Contact = () => {
                 Email Us Directly
               </p>
               <p className="text-base font-semibold text-gray-900 mt-1">
-                revathyb@insightconsulting.info
+                support@insightconsulting.info
               </p>
             </div>
 

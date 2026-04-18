@@ -781,7 +781,7 @@ const gst={
         "title": "⚙️ Our End-to-End Process",
         "steps": [
           "📥 Data collection & validation",
-          "🔍 Reconciliation (Sales vs Returns vs Books)",
+          "🔍 GSTR 1 vs Books Vs 2B Reconciliation",
           "📊 ITC eligibility review",
           "📝 Return preparation",
           "🔐 Filing on GST portal",

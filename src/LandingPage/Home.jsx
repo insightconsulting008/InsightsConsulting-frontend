@@ -174,7 +174,7 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: "10+", label: "Compliance Experience" },
+    { value: "30+", label: "Compliance Experience" },
     { value: "1,000+", label: "Businesses Served" },
     { value: "5,000+", label: "Services Delivered" },
     { value: "100%", label: "Compliance Track" },
@@ -253,7 +253,7 @@ export default function Home() {
             direction="left"
             scrollamount="7"
             className="w-full 
-      bg-gradient-to-r from-[#F4B43A] via-[#F09A2A] to-[#C9510A] 
+      bg-primary
       text-white py-5 
       text-base lg:text-xl 
       tracking-wide"
@@ -812,11 +812,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          {/* Sub text */}
-          <p className="text-gray-500 text-sm mt-10">
-            Join 4,000+ companies already growing
-          </p>
 
           {/* Logos */}
         </div>

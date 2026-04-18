@@ -485,42 +485,7 @@ const ServiceInfoSection = () => {
                 </div>
               )}
 
-              {/* Trust row */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <div className="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 bg-white shadow-sm">
-                  <img
-                    src="https://www.google.com/favicon.ico"
-                    alt="Google"
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm font-medium text-gray-900">
-                    4.8 Rating
-                  </span>
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={11} fill="currentColor" />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    {["men/32", "women/44", "men/45"].map((p, i) => (
-                      <img
-                        key={i}
-                        src={`https://randomuser.me/api/portraits/${p}.jpg`}
-                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
-                        alt=""
-                      />
-                    ))}
-                    <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                      +
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-900 font-medium">
-                    24,739 Happy Clients
-                  </span>
-                </div>
-              </div>
+             
             </div>
 
             {/* RIGHT — enquiry form (sticky on desktop) */}

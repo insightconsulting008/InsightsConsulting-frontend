@@ -8,18 +8,42 @@ import axiosInstance from "@src/providers/axiosInstance";
   Safely build flat list of all services – skip any missing subcategories, 
   services arrays, or invalid service objects.
 */
+const today = new Date();
+const schemeEndDate = new Date("2026-07-15");
+
+// This service will be included ONLY if today < schemeEndDate
 const SCHEME_SERVICE = {
   serviceId: "scheme-2026",
   name: "Companies Compliance Facilitation Scheme, 2026",
 };
 
-const ALL_SERVICES = [
-  SCHEME_SERVICE, // ✅ added on top
+// ✅ New service to be added under "GST Return Filing Services in India"
+const GSTR_2B_SERVICE = {
+  serviceId: "gstr-2b-recon",
+  name: "GSTR 2B Reconciliation",
+};
+
+// Build base flat list – conditionally include SCHEME_SERVICE
+let baseServices = [
+  ...(today < schemeEndDate ? [SCHEME_SERVICE] : []),
   ...(servicesData || [])
     .flatMap((cat) => cat?.subcategories ?? [])
     .flatMap((sub) => sub?.services ?? [])
     .filter((service) => service && typeof service.name === "string"),
 ];
+
+// ✅ Insert GSTR_2B_SERVICE right after "GST Return Filing Services in India"
+const TARGET_SERVICE_NAME = "GST Return Filing Services in India";
+const targetIndex = baseServices.findIndex(
+  (s) => s.name === TARGET_SERVICE_NAME
+);
+
+const ALL_SERVICES = [...baseServices];
+if (targetIndex !== -1) {
+  ALL_SERVICES.splice(targetIndex + 1, 0, GSTR_2B_SERVICE);
+} else {
+  ALL_SERVICES.push(GSTR_2B_SERVICE);
+}
 
 const Enquiryform = ({ initialService = "" }) => {
   const [formData, setFormData] = useState({

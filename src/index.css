@@ -8,15 +8,14 @@ html {
 }
 
 /* ════════════════════════════════════════════════════════
-   LANDING PAGE — Premium Theme
+   LANDING PAGE — Solid Red-Orange Theme (#F13C20)
 ════════════════════════════════════════════════════════ */
 
-/* ── 1. FORCE FONTS ───────────────────────────────────── */
+/* ── 1. FONTS ───────────────────────────────────────── */
 .landing-page,
 .landing-page * {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif !important;
+  font-family: 'DM Sans', system-ui, sans-serif !important;
   -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
 }
 
 .landing-page h1,
@@ -24,109 +23,72 @@ html {
 .landing-page h3,
 .landing-page h4,
 .landing-page h5,
-.landing-page h6,
-.landing-page .font-bold,
-.landing-page .font-extrabold,
-.landing-page .font-semibold,
-.landing-page .font-medium {
+.landing-page h6 {
   font-family: 'Space Grotesk', system-ui, sans-serif !important;
-  letter-spacing: -0.025em !important;
+  letter-spacing: -0.02em !important;
 }
 
-.landing-page h1 { font-weight: 700 !important; line-height: 1.1 !important; }
-.landing-page h2 { font-weight: 700 !important; line-height: 1.15 !important; }
-.landing-page h3 { font-weight: 600 !important; line-height: 1.2 !important; }
-.landing-page h4 { font-weight: 600 !important; }
-
-/* ── 2. TEXT COLOR SYSTEM ─────────────────────────────── */
-.landing-page .text-gray-950 { color: #020617 !important; }
-.landing-page .text-gray-900 { color: #0F172A !important; }
-.landing-page .text-gray-800 { color: #1E293B !important; }
-.landing-page .text-gray-700 { color: #334155 !important; }
-.landing-page .text-gray-600 { color: #475569 !important; }
-.landing-page .text-gray-500 { color: #64748B !important; }
-.landing-page .text-gray-400 { color: #94A3B8 !important; }
-.landing-page .text-gray-300 { color: #CBD5F5 !important; }
-.landing-page .text-gray-200 { color: #E2E8F0 !important; }
-.landing-page .text-gray-100 { color: #F1F5F9 !important; }
-
-/* ── 3. BACKGROUND + BORDER SYSTEM ───────────────────── */
-.landing-page .bg-gray-50  { background-color: #F8FAFC !important; }
-.landing-page .bg-gray-100 { background-color: #F1F5F9 !important; }
-.landing-page .bg-gray-200 { background-color: #E2E8F0 !important; }
-
-.landing-page .border-gray-100 { border-color: #F1F5F9 !important; }
-.landing-page .border-gray-200 { border-color: #E2E8F0 !important; }
-
-/* ── 4. PRIMARY COLOR SYSTEM ─────────────────────────── */
+/* ── 2. PRIMARY COLOR SYSTEM ───────────────────────── */
 .landing-page {
-  --color-primary:        #F09A2A;
-  --color-primary-hover:  #C9510A;
-  --color-primary-active: #A84300;
-  --color-primary-subtle: #FFF7ED;
-  --color-primary-muted:  #FFEDD5;
-  --color-primary-border: #FDBA74;
-  --color-primary-text:   #9A3412;
+  --color-primary:        #F13C20;
+  --color-primary-hover:  #D92F16;
+  --color-primary-active: #B92610;
+  --color-primary-subtle: #FFF1ED;
+  --color-primary-muted:  #FFDAD4;
+  --color-primary-border: #FCA5A5;
+  --color-primary-text:   #7F1D1D;
 }
 
-/* ── PRIMARY GRADIENT (UPDATED) ───────────────────────── */
+/* ── SOLID PRIMARY BACKGROUND ───────────────────────── */
 .landing-page .bg-primary {
-  background: linear-gradient(135deg, #F4B43A, #F09A2A, #C9510A) !important;
+  background-color: #F13C20 !important;
 }
 
-.landing-page .text-primary { color: #F09A2A !important; }
-.landing-page .border-primary { border-color: #F09A2A !important; }
-.landing-page .ring-primary { --tw-ring-color: #F09A2A !important; }
+/* ── UTILITIES ─────────────────────────────────────── */
+.landing-page .text-primary { color: #F13C20 !important; }
+.landing-page .border-primary { border-color: #F13C20 !important; }
+.landing-page .ring-primary { --tw-ring-color: #F13C20 !important; }
 
 .landing-page .hover\:bg-primary:hover {
-  background: linear-gradient(135deg, #F09A2A, #C9510A) !important;
+  background-color: #D92F16 !important;
 }
 
-.landing-page .hover\:text-primary:hover { color: #F09A2A !important; }
-
-.landing-page .bg-primary\/90 { background-color: rgb(240 154 42 / 0.9) !important; }
-.landing-page .bg-primary\/20 { background-color: rgb(240 154 42 / 0.2) !important; }
-.landing-page .bg-primary\/10 { background-color: rgb(240 154 42 / 0.1) !important; }
-
-.landing-page .text-primary\/80 { color: rgb(240 154 42 / 0.8) !important; }
-
-.landing-page .focus\:ring-primary:focus {
-  --tw-ring-color: rgb(240 154 42 / 0.4) !important;
+.landing-page .hover\:text-primary:hover {
+  color: #F13C20 !important;
 }
 
-/* ── 5. TYPOGRAPHY POLISH ───────────────────────────── */
-.landing-page p,
-.landing-page li {
-  line-height: 1.78 !important;
-  letter-spacing: 0.01em !important;
+.landing-page .bg-primary\/90 { background-color: rgb(241 60 32 / 0.9) !important; }
+.landing-page .bg-primary\/20 { background-color: rgb(241 60 32 / 0.2) !important; }
+.landing-page .bg-primary\/10 { background-color: rgb(241 60 32 / 0.1) !important; }
+
+/* ── TYPOGRAPHY ───────────────────────────────────── */
+.landing-page p {
+  line-height: 1.7 !important;
 }
 
-.landing-page a {
-  font-family: 'DM Sans', system-ui, sans-serif !important;
-}
-
-/* Minimum readable font sizes */
-.landing-page .text-sm  { font-size: 14px !important; line-height: 1.6 !important; }
-.landing-page .text-xs  { font-size: 12px !important; }
-.landing-page .text-base { font-size: 16px !important; }
-
-.landing-page .text-gray-700,
-.landing-page .text-gray-600 {
-  font-size: 15px;
-}
-
-/* ── 6. COMPONENTS ───────────────────────────────────── */
+/* ── COMPONENTS ───────────────────────────────────── */
 @layer components {
   .btn-primary {
-    @apply text-white px-4 py-2;
-    background: linear-gradient(135deg, #F4B43A, #F09A2A, #C9510A);
+    @apply text-white px-4 py-2 rounded-xl;
+    background-color: #F13C20;
+    transition: all 0.25s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #D92F16;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(241, 60, 32, 0.3);
+  }
+
+  .btn-primary:active {
+    background-color: #B92610;
   }
 
   .btn-secondary {
-    @apply border px-4 py-2;
-    border-color: #F09A2A;
-    background-color: #FFF7ED;
-    color: #9A3412;
+    @apply border px-4 py-2 rounded-xl;
+    border-color: #F13C20;
+    background-color: #FFF1ED;
+    color: #7F1D1D;
   }
 
   .border {

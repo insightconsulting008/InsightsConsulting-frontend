@@ -7,19 +7,19 @@ const Footerctn = () => {
   return (
     <div>
       <section className="w-full pt-[72px] pb-[56px] bg-[linear-gradient(180deg,#F8FAFF_0%,#EEF4FF_100%)]">
-        <div className="max-w-7xl mx-auto px-4 lg:px-12">
+        <div className="container mx-auto px-4 lg:px-12">
 
           <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
 
             {/* Text */}
-            <div className="flex flex-col gap-4 text-center lg:text-left max-w-xl">
+            <div className="flex flex-col gap-4 text-center lg:text-left">
               <h2 className="text-bodydark text-[26px] lg:text-[34px] leading-tight font-semibold tracking-[-0.02em]">
-                Partner with Insight Consulting
+                Partner with Insight Consulting - where CLARITY meets GROWTH.
               </h2>
-
+{/* 
               <p className="text-muted text-[16px] lg:text-[18px] leading-relaxed">
                 Where clarity meets growth — simplify your compliance journey with expert guidance.
-              </p>
+              </p> */}
             </div>
 
             {/* Button */}
