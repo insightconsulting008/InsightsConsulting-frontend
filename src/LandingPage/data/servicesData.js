@@ -832,7 +832,7 @@ function normalizeCfoService(rawData) {
   const tailSections = [{
     cfoInfographic: true,
     imageSrc: 'https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Business%20benefits%20and%20features%20infographic.png',
-    closingTagline: 'Where Clarity meets Growth',
+    closingTagline: 'where Clarity meets Growth',
   }];
 
   return {

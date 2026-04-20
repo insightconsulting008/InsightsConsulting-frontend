@@ -14,7 +14,7 @@ const Footer = () => {
     {
       title: "Legal",
       links: [
-        { label: "Terms & Conditions", path: "/terms&conditions" },
+        { label: "Confidentiality", path: "/terms&conditions" },
         { label: "Privacy Policy", path: "/terms&conditions" },
         // { label: "Refund Policy", path: "/terms&conditions" },
       ],
@@ -119,34 +119,49 @@ const Footer = () => {
             </div>
           </div>
 
+      
           {/* Map Column */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-gray-800 text-sm font-semibold uppercase tracking-wide">
-              📍 Location
-            </h4>
-            <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.0133458219507!2d80.21429157532077!3d13.03482198728642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52678c9bb373a9%3A0x2252a6e0c1c5ee07!2sInsight%20Consulting%20-%20Chennai%20Chartered%20Accountant%20%7C%20Company%20Registration%20%7C%20Tax%20Filing%20%7C%20Business%20Advisory%20And%20Consulting!5e0!3m2!1sen!2sin!4v1776411443555!5m2!1sen!2sin"
-                width="100%"
-                height="180"
-                style={{ border: 0 }}
-                loading="lazy"
-                className="w-full"
-                title="Google Map of Insight Consulting Chennai"
-              ></iframe>
-            </div>
-            <a
-              href="https://maps.google.com?q=Insight+Consulting+Chennai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1 w-fit"
-            >
-              Open in Google Maps
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          </div>
+<div className="flex flex-col gap-4">
+  <h4 className="text-gray-800 text-sm font-semibold uppercase tracking-wide">
+    📍 Location
+  </h4>
+
+  <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.184153781989!2d80.1957386!3d13.0875126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265f17e762bbb%3A0xa91a1073eeb6a55d!2sAccuTant%20FinTax%20Academy%20-%20Business%20Accounting%20and%20Taxation%20Course%20%7C%20Accounting%20Course%20%7C%20Placements%20%7C%20Audit%20%26%20Tax%20Consultant!5e0!3m2!1sen!2sin!4v1776670300789!5m2!1sen!2sin"
+      width="100%"
+      height="180"
+      style={{ border: 0 }}
+      loading="lazy"
+      className="w-full"
+      title="Google Map of AccuTant FinTax Academy"
+      allowFullScreen
+      referrerPolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+
+  <a
+    href="https://maps.google.com?q=AccuTant+FinTax+Academy"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1 w-fit"
+  >
+    Open in Google Maps
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+      />
+    </svg>
+  </a>
+</div>
 
           {/* Links Columns (Quick Links + Legal) */}
           <div className="grid grid-cols-2 gap-8">

@@ -339,7 +339,7 @@ const Contact = () => {
               From compliance to strategy — strengthen your finance function end-to-end
             </h2>
             <p className="text-textlight text-[15px] md:text-[16px] max-w-2xl">
-              Our experts ensure a smooth, accurate, and hassle-free process —{" "}
+              Our experts ensure a smooth, accurate, and hassle-free process {" "} <br />
               <span className="font-semibold text-2xl text-dark">where CLARITY meets GROWTH.</span>
             </p>
 
