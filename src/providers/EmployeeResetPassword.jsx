@@ -199,7 +199,7 @@ function EmployeeResetPassword() {
     setLoading(true)
     setError('')
     try {
-      await axiosInstance.post("/staff/reset-password", { token, newPassword: form.password })
+      await axiosInstance.post("/auth/staff/reset-password", { token, newPassword: form.password })
       setSuccess(true)
     } catch (err) {
       if (err.response) {

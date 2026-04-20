@@ -8,7 +8,7 @@ html {
 }
 
 /* ════════════════════════════════════════════════════════
-   LANDING PAGE — Midnight Blue Premium Theme
+   LANDING PAGE — Premium Theme
 ════════════════════════════════════════════════════════ */
 
 /* ── 1. FORCE FONTS ───────────────────────────────────── */
@@ -60,49 +60,38 @@ html {
 
 /* ── 4. PRIMARY COLOR SYSTEM ─────────────────────────── */
 .landing-page {
-  --color-primary:        #1D4ED8;
-  --color-primary-hover:  #1E40AF;
-  --color-primary-active: #1E3A8A;
-  --color-primary-subtle: #EFF6FF;
-  --color-primary-muted:  #DBEAFE;
-  --color-primary-border: #93C5FD;
-  --color-primary-text:   #1E3A8A;
-
-  --primary-50:  #EFF6FF;
-  --primary-100: #DBEAFE;
-  --primary-200: #BFDBFE;
-  --primary-300: #93C5FD;
-  --primary-400: #60A5FA;
-  --primary-500: #3B82F6;
-  --primary-600: #1D4ED8;
-  --primary-700: #1E40AF;
-  --primary-800: #1E3A8A;
-  --primary-900: #172554;
+  --color-primary:        #F09A2A;
+  --color-primary-hover:  #C9510A;
+  --color-primary-active: #A84300;
+  --color-primary-subtle: #FFF7ED;
+  --color-primary-muted:  #FFEDD5;
+  --color-primary-border: #FDBA74;
+  --color-primary-text:   #9A3412;
 }
 
-/* ── FORCE PRIMARY (gradient upgrade) ─────────────────── */
+/* ── PRIMARY GRADIENT (UPDATED) ───────────────────────── */
 .landing-page .bg-primary {
-  background: linear-gradient(135deg, #1D4ED8, #38BDF8) !important;
+  background: linear-gradient(135deg, #F4B43A, #F09A2A, #C9510A) !important;
 }
 
-.landing-page .text-primary { color: #1D4ED8 !important; }
-.landing-page .border-primary { border-color: #1D4ED8 !important; }
-.landing-page .ring-primary { --tw-ring-color: #1D4ED8 !important; }
+.landing-page .text-primary { color: #F09A2A !important; }
+.landing-page .border-primary { border-color: #F09A2A !important; }
+.landing-page .ring-primary { --tw-ring-color: #F09A2A !important; }
 
 .landing-page .hover\:bg-primary:hover {
-  background: linear-gradient(135deg, #1E40AF, #0EA5E9) !important;
+  background: linear-gradient(135deg, #F09A2A, #C9510A) !important;
 }
 
-.landing-page .hover\:text-primary:hover { color: #1D4ED8 !important; }
+.landing-page .hover\:text-primary:hover { color: #F09A2A !important; }
 
-.landing-page .bg-primary\/90 { background-color: rgb(29 78 216 / 0.9) !important; }
-.landing-page .bg-primary\/20 { background-color: rgb(29 78 216 / 0.2) !important; }
-.landing-page .bg-primary\/10 { background-color: rgb(29 78 216 / 0.1) !important; }
+.landing-page .bg-primary\/90 { background-color: rgb(240 154 42 / 0.9) !important; }
+.landing-page .bg-primary\/20 { background-color: rgb(240 154 42 / 0.2) !important; }
+.landing-page .bg-primary\/10 { background-color: rgb(240 154 42 / 0.1) !important; }
 
-.landing-page .text-primary\/80 { color: rgb(29 78 216 / 0.8) !important; }
+.landing-page .text-primary\/80 { color: rgb(240 154 42 / 0.8) !important; }
 
 .landing-page .focus\:ring-primary:focus {
-  --tw-ring-color: rgb(29 78 216 / 0.4) !important;
+  --tw-ring-color: rgb(240 154 42 / 0.4) !important;
 }
 
 /* ── 5. TYPOGRAPHY POLISH ───────────────────────────── */
@@ -121,59 +110,23 @@ html {
 .landing-page .text-xs  { font-size: 12px !important; }
 .landing-page .text-base { font-size: 16px !important; }
 
-/* Service page body text readability boost */
 .landing-page .text-gray-700,
 .landing-page .text-gray-600 {
   font-size: 15px;
 }
 
-.landing-page .tracking-widest { letter-spacing: 0.1em !important; }
-.landing-page .tracking-wider { letter-spacing: 0.07em !important; }
-
-/* ── 6. THEME TOKENS ─────────────────────────────────── */
-@theme {
-  --color-primary:   #1D4ED8;
-  --color-secondary: #F8FAFC;
-  --color-accent:    #38BDF8;
-
-  --color-textdark:   #020617;
-  --color-textlight:  #475569;
-  --color-textbright: #FFFFFF;
-
-  --color-muted:   #4B5563;
-  --color-subtle:  #94A3B8;
-
-  --color-bright:   #FFFFFF;
-  --color-dark:     #020617;
-  --color-bodydark: #020617;
-
-  --color-surface:   #FFFFFF;
-  --color-surface-2: #F1F5F9;
-  --color-surface-3: #E2E8F0;
-
-  --color-border:      #E2E8F0;
-  --color-border-soft: #F1F5F9;
-
-  --color-highlight: #93C5FD;
-
-  --color-yellow:  #F59E0B;
-  --color-success: #16A34A;
-  --color-error:   #DC2626;
-  --color-info:    #0EA5E9;
-}
-
-/* ── 7. COMPONENTS ───────────────────────────────────── */
+/* ── 6. COMPONENTS ───────────────────────────────────── */
 @layer components {
   .btn-primary {
     @apply text-white px-4 py-2;
-    background: linear-gradient(135deg, #1D4ED8, #38BDF8);
+    background: linear-gradient(135deg, #F4B43A, #F09A2A, #C9510A);
   }
 
   .btn-secondary {
     @apply border px-4 py-2;
-    border-color: #1D4ED8;
-    background-color: #EFF6FF;
-    color: #1E3A8A;
+    border-color: #F09A2A;
+    background-color: #FFF7ED;
+    color: #9A3412;
   }
 
   .border {

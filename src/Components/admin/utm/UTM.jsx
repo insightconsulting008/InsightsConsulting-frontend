@@ -28,10 +28,10 @@ function SourceBadge({ source }) {
     s === "google"
       ? "bg-blue-50 text-blue-700 border-blue-100"
       : s === "facebook" || s === "instagram"
-        ? "bg-orange-50 text-orange-700 border-orange-100"
-        : s === "email"
-          ? "bg-green-50 text-green-700 border-green-100"
-          : "bg-gray-100 text-gray-600 border-gray-200";
+      ? "bg-orange-50 text-orange-700 border-orange-100"
+      : s === "email"
+      ? "bg-green-50 text-green-700 border-green-100"
+      : "bg-gray-100 text-gray-600 border-gray-200";
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style}`}
@@ -85,17 +85,12 @@ function ConfirmDeleteModal({ campaign, onClose, onConfirm, loading }) {
           </div>
           <div>
             <h2 className="text-sm font-bold text-gray-800">Delete Campaign</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
-              This action cannot be undone.
-            </p>
+            <p className="text-xs text-gray-400 mt-0.5">This action cannot be undone.</p>
           </div>
         </div>
         <p className="text-sm text-gray-600 mb-5">
           Are you sure you want to delete{" "}
-          <span className="font-semibold text-gray-800">
-            "{campaign.campaignName}"
-          </span>
-          ?
+          <span className="font-semibold text-gray-800">"{campaign.campaignName}"</span>?
         </p>
         <div className="flex gap-3">
           <button
@@ -141,7 +136,7 @@ function EditModal({ campaign, onClose, showToast, onUpdated }) {
     }
     setLoading(true);
     try {
-      await axiosInstance.put(`/api/admin/utm/${campaign.utmCampaignId}`, form);
+      await axiosInstance.put(`/admin/utm/${campaign.utmCampaignId}`, form);
       showToast("Campaign updated successfully!", "success");
       onUpdated();
       onClose();
@@ -188,79 +183,36 @@ function EditModal({ campaign, onClose, showToast, onUpdated }) {
         {/* Form */}
         <div className="px-6 py-5 space-y-4">
           <div>
-            <label className={labelCls}>
-              Base URL <span className="text-red-500">*</span>
-            </label>
-            <input
-              className={inputCls}
-              value={form.baseUrl}
-              onChange={(e) => set("baseUrl")(e.target.value)}
-              placeholder="https://yoursite.com/page"
-            />
+            <label className={labelCls}>Base URL <span className="text-red-500">*</span></label>
+            <input className={inputCls} value={form.baseUrl} onChange={(e) => set("baseUrl")(e.target.value)} placeholder="https://yoursite.com/page" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>
-                Source <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={inputCls}
-                value={form.source}
-                onChange={(e) => set("source")(e.target.value)}
-                placeholder="google"
-              />
+              <label className={labelCls}>Source <span className="text-red-500">*</span></label>
+              <input className={inputCls} value={form.source} onChange={(e) => set("source")(e.target.value)} placeholder="google" />
             </div>
             <div>
-              <label className={labelCls}>
-                Medium <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={inputCls}
-                value={form.medium}
-                onChange={(e) => set("medium")(e.target.value)}
-                placeholder="cpc"
-              />
+              <label className={labelCls}>Medium <span className="text-red-500">*</span></label>
+              <input className={inputCls} value={form.medium} onChange={(e) => set("medium")(e.target.value)} placeholder="cpc" />
             </div>
           </div>
           <div>
-            <label className={labelCls}>
-              Campaign Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              className={inputCls}
-              value={form.campaignName}
-              onChange={(e) => set("campaignName")(e.target.value)}
-              placeholder="spring-sale-2025"
-            />
+            <label className={labelCls}>Campaign Name <span className="text-red-500">*</span></label>
+            <input className={inputCls} value={form.campaignName} onChange={(e) => set("campaignName")(e.target.value)} placeholder="spring-sale-2025" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Content</label>
-              <input
-                className={inputCls}
-                value={form.content}
-                onChange={(e) => set("content")(e.target.value)}
-                placeholder="banner-top"
-              />
+              <input className={inputCls} value={form.content} onChange={(e) => set("content")(e.target.value)} placeholder="banner-top" />
             </div>
             <div>
               <label className={labelCls}>Term</label>
-              <input
-                className={inputCls}
-                value={form.term}
-                onChange={(e) => set("term")(e.target.value)}
-                placeholder="keyword-target"
-              />
+              <input className={inputCls} value={form.term} onChange={(e) => set("term")(e.target.value)} placeholder="keyword-target" />
             </div>
           </div>
           <div>
             <label className={labelCls}>Ref Code</label>
-            <input
-              className={inputCls}
-              value={form.refCode}
-              onChange={(e) => set("refCode")(e.target.value)}
-              placeholder="REF123"
-            />
+            <input className={inputCls} value={form.refCode} onChange={(e) => set("refCode")(e.target.value)} placeholder="REF123" />
           </div>
         </div>
 
@@ -300,17 +252,9 @@ function DetailModal({ campaign, onClose, showToast }) {
     { label: "Source", value: campaign.source },
     { label: "Medium", value: campaign.medium },
     { label: "Campaign Name", value: campaign.campaignName },
-    {
-      label: "Content",
-      value: campaign.content || "—",
-      muted: !campaign.content,
-    },
+    { label: "Content", value: campaign.content || "—", muted: !campaign.content },
     { label: "Term", value: campaign.term || "—", muted: !campaign.term },
-    {
-      label: "Ref Code",
-      value: campaign.refCode || "—",
-      muted: !campaign.refCode,
-    },
+    { label: "Ref Code", value: campaign.refCode || "—", muted: !campaign.refCode },
   ];
 
   return (
@@ -408,19 +352,11 @@ function CreateForm({ showToast, onCreated }) {
     }
     setLoading(true);
     try {
-      const { data } = await axiosInstance.post("/api/admin/utm/create", form);
+      const { data } = await axiosInstance.post("/admin/utm/create", form);
       setResult(data);
       showToast("Campaign created successfully!", "success");
       onCreated();
-      setForm({
-        baseUrl: "",
-        source: "",
-        medium: "",
-        campaignName: "",
-        content: "",
-        term: "",
-        refCode: "",
-      });
+      setForm({ baseUrl: "", source: "", medium: "", campaignName: "", content: "", term: "", refCode: "" });
     } catch (err) {
       showToast(err?.response?.data?.error || "Something went wrong", "error");
     } finally {
@@ -438,50 +374,22 @@ function CreateForm({ showToast, onCreated }) {
       <div className="flex-1 min-w-0">
         <div className="space-y-4">
           <div>
-            <label className={labelCls}>
-              Base URL <span className="text-red-500">*</span>
-            </label>
-            <input
-              className={inputCls}
-              placeholder="https://yoursite.com/page"
-              value={form.baseUrl}
-              onChange={(e) => set("baseUrl")(e.target.value)}
-            />
+            <label className={labelCls}>Base URL <span className="text-red-500">*</span></label>
+            <input className={inputCls} placeholder="https://yoursite.com/page" value={form.baseUrl} onChange={(e) => set("baseUrl")(e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>
-                Source <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={inputCls}
-                placeholder="google"
-                value={form.source}
-                onChange={(e) => set("source")(e.target.value)}
-              />
+              <label className={labelCls}>Source <span className="text-red-500">*</span></label>
+              <input className={inputCls} placeholder="google" value={form.source} onChange={(e) => set("source")(e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>
-                Medium <span className="text-red-500">*</span>
-              </label>
-              <input
-                className={inputCls}
-                placeholder="cpc"
-                value={form.medium}
-                onChange={(e) => set("medium")(e.target.value)}
-              />
+              <label className={labelCls}>Medium <span className="text-red-500">*</span></label>
+              <input className={inputCls} placeholder="cpc" value={form.medium} onChange={(e) => set("medium")(e.target.value)} />
             </div>
           </div>
           <div>
-            <label className={labelCls}>
-              Campaign Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              className={inputCls}
-              placeholder="spring-sale-2025"
-              value={form.campaignName}
-              onChange={(e) => set("campaignName")(e.target.value)}
-            />
+            <label className={labelCls}>Campaign Name <span className="text-red-500">*</span></label>
+            <input className={inputCls} placeholder="spring-sale-2025" value={form.campaignName} onChange={(e) => set("campaignName")(e.target.value)} />
           </div>
         </div>
       </div>
@@ -493,31 +401,16 @@ function CreateForm({ showToast, onCreated }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Content</label>
-              <input
-                className={inputCls}
-                placeholder="banner-top"
-                value={form.content}
-                onChange={(e) => set("content")(e.target.value)}
-              />
+              <input className={inputCls} placeholder="banner-top" value={form.content} onChange={(e) => set("content")(e.target.value)} />
             </div>
             <div>
               <label className={labelCls}>Term</label>
-              <input
-                className={inputCls}
-                placeholder="keyword-target"
-                value={form.term}
-                onChange={(e) => set("term")(e.target.value)}
-              />
+              <input className={inputCls} placeholder="keyword-target" value={form.term} onChange={(e) => set("term")(e.target.value)} />
             </div>
           </div>
           <div>
             <label className={labelCls}>Ref Code</label>
-            <input
-              className={inputCls}
-              placeholder="REF123"
-              value={form.refCode}
-              onChange={(e) => set("refCode")(e.target.value)}
-            />
+            <input className={inputCls} placeholder="REF123" value={form.refCode} onChange={(e) => set("refCode")(e.target.value)} />
           </div>
         </div>
 
@@ -532,12 +425,8 @@ function CreateForm({ showToast, onCreated }) {
         {result && (
           <div className="mt-4 rounded-xl bg-green-50 border border-green-100 p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
-                ✓
-              </span>
-              <span className="text-sm font-semibold text-gray-700">
-                Campaign Generated
-              </span>
+              <span className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">✓</span>
+              <span className="text-sm font-semibold text-gray-700">Campaign Generated</span>
             </div>
             <p className="font-mono text-xs text-gray-600 break-all leading-relaxed bg-white border border-gray-100 rounded-lg p-3 mb-2">
               {result.fullUrl}
@@ -581,10 +470,7 @@ function CampaignTable({ showToast, refreshKey }) {
     return () => clearTimeout(t);
   }, [search]);
 
-  const fetchAll = async (
-    currentPage = page,
-    currentSearch = debouncedSearch,
-  ) => {
+  const fetchAll = async (currentPage = page, currentSearch = debouncedSearch) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -592,7 +478,7 @@ function CampaignTable({ showToast, refreshKey }) {
         limit: LIMIT,
         ...(currentSearch ? { search: currentSearch } : {}),
       });
-      const { data } = await axiosInstance.get(`/api/admin/utm/all?${params}`);
+      const { data } = await axiosInstance.get(`/admin/utm/all?${params}`);
       setCampaigns(data.data || []);
       setPagination(data.pagination || null);
     } catch {
@@ -611,17 +497,12 @@ function CampaignTable({ showToast, refreshKey }) {
     if (!deleteTarget) return;
     setDeleteLoading(true);
     try {
-      await axiosInstance.delete(
-        `/api/admin/utm/${deleteTarget.utmCampaignId}`,
-      );
+      await axiosInstance.delete(`/admin/utm/${deleteTarget.utmCampaignId}`);
       showToast("Campaign deleted successfully!", "success");
       setDeleteTarget(null);
       fetchAll();
     } catch (err) {
-      showToast(
-        err?.response?.data?.error || "Failed to delete campaign",
-        "error",
-      );
+      showToast(err?.response?.data?.error || "Failed to delete campaign", "error");
     } finally {
       setDeleteLoading(false);
     }
@@ -634,9 +515,7 @@ function CampaignTable({ showToast, refreshKey }) {
       {/* Toolbar */}
       <div className="flex gap-3 mb-4">
         <div className="relative flex-1">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 text-sm pointer-events-none select-none">
-            ⌕
-          </span>
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 text-sm pointer-events-none select-none">⌕</span>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -674,18 +553,8 @@ function CampaignTable({ showToast, refreshKey }) {
             </colgroup>
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                {[
-                  "Campaign Name",
-                  "Source",
-                  "Medium",
-                  "Ref Code",
-                  "Full URL",
-                  "Actions",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-widest whitespace-nowrap"
-                  >
+                {["Campaign Name", "Source", "Medium", "Ref Code", "Full URL", "Actions"].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-widest whitespace-nowrap">
                     {h}
                   </th>
                 ))}
@@ -693,20 +562,14 @@ function CampaignTable({ showToast, refreshKey }) {
             </thead>
             <tbody>
               {loading ? (
-                Array(LIMIT)
-                  .fill(0)
-                  .map((_, i) => <SkeletonRow key={i} />)
+                Array(LIMIT).fill(0).map((_, i) => <SkeletonRow key={i} />)
               ) : campaigns.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-16 text-center">
                     <div className="text-4xl mb-3">📭</div>
-                    <p className="text-sm font-semibold text-red-400">
-                      No campaigns found
-                    </p>
+                    <p className="text-sm font-semibold text-red-400">No campaigns found</p>
                     <p className="text-xs text-gray-300 mt-1">
-                      {search
-                        ? "Try a different search"
-                        : "Create your first UTM campaign"}
+                      {search ? "Try a different search" : "Create your first UTM campaign"}
                     </p>
                   </td>
                 </tr>
@@ -718,34 +581,20 @@ function CampaignTable({ showToast, refreshKey }) {
                     className="border-b border-gray-50 hover:bg-red-50/30 cursor-pointer transition-colors group"
                   >
                     <td className="px-4 py-3.5 overflow-hidden">
-                      <span className="font-medium text-sm text-gray-800 truncate block">
-                        {c.campaignName}
-                      </span>
+                      <span className="font-medium text-sm text-gray-800 truncate block">{c.campaignName}</span>
                     </td>
+                    <td className="px-4 py-3.5"><SourceBadge source={c.source} /></td>
+                    <td className="px-4 py-3.5"><MediumBadge medium={c.medium} /></td>
                     <td className="px-4 py-3.5">
-                      <SourceBadge source={c.source} />
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <MediumBadge medium={c.medium} />
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <span
-                        className={`font-mono text-xs ${c.refCode ? "text-gray-500" : "text-gray-200"}`}
-                      >
+                      <span className={`font-mono text-xs ${c.refCode ? "text-gray-500" : "text-gray-200"}`}>
                         {c.refCode || "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="font-mono text-xs text-gray-300 truncate min-w-0">
-                          {c.fullUrl}
-                        </span>
+                        <span className="font-mono text-xs text-gray-300 truncate min-w-0">{c.fullUrl}</span>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(c.fullUrl);
-                            showToast("Copied!", "success");
-                          }}
+                          onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.fullUrl); showToast("Copied!", "success"); }}
                           className="opacity-0 group-hover:opacity-100 flex-shrink-0 px-2.5 py-1 rounded-lg border border-red-200 text-red-500 text-xs font-semibold hover:bg-red-50 transition-all"
                         >
                           Copy
@@ -755,20 +604,14 @@ function CampaignTable({ showToast, refreshKey }) {
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-1.5">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditTarget(c);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); setEditTarget(c); }}
                           className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 transition-all text-xs"
                           title="Edit"
                         >
                           ✎
                         </button>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteTarget(c);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
                           className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all text-xs"
                           title="Delete"
                         >
@@ -795,16 +638,10 @@ function CampaignTable({ showToast, refreshKey }) {
                   Showing{" "}
                   <span className="font-semibold text-gray-600">
                     {(pagination.page - 1) * pagination.limit + 1}–
-                    {Math.min(
-                      pagination.page * pagination.limit,
-                      pagination.total,
-                    )}
+                    {Math.min(pagination.page * pagination.limit, pagination.total)}
                   </span>{" "}
                   of{" "}
-                  <span className="font-semibold text-gray-600">
-                    {pagination.total}
-                  </span>{" "}
-                  campaigns
+                  <span className="font-semibold text-gray-600">{pagination.total}</span> campaigns
                 </>
               )}
             </p>
@@ -823,10 +660,7 @@ function CampaignTable({ showToast, refreshKey }) {
 
                 {/* Page numbers */}
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (p) =>
-                      p === 1 || p === totalPages || Math.abs(p - page) <= 1,
-                  )
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                   .reduce((acc, p, idx, arr) => {
                     if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
                     acc.push(p);
@@ -834,10 +668,7 @@ function CampaignTable({ showToast, refreshKey }) {
                   }, [])
                   .map((item, idx) =>
                     item === "..." ? (
-                      <span
-                        key={`ellipsis-${idx}`}
-                        className="w-8 h-8 flex items-center justify-center text-xs text-gray-300"
-                      >
+                      <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-xs text-gray-300">
                         …
                       </span>
                     ) : (
@@ -845,15 +676,14 @@ function CampaignTable({ showToast, refreshKey }) {
                         key={item}
                         onClick={() => setPage(item)}
                         className={`w-8 h-8 rounded-lg border text-xs font-semibold transition-colors
-                          ${
-                            page === item
-                              ? "bg-red-500 border-red-500 text-white"
-                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-100"
+                          ${page === item
+                            ? "bg-red-500 border-red-500 text-white"
+                            : "bg-white border-gray-200 text-gray-600 hover:bg-gray-100"
                           }`}
                       >
                         {item}
                       </button>
-                    ),
+                    )
                   )}
 
                 {/* Next */}
@@ -871,21 +701,8 @@ function CampaignTable({ showToast, refreshKey }) {
       </div>
 
       {/* Modals */}
-      {selected && (
-        <DetailModal
-          campaign={selected}
-          onClose={() => setSelected(null)}
-          showToast={showToast}
-        />
-      )}
-      {editTarget && (
-        <EditModal
-          campaign={editTarget}
-          onClose={() => setEditTarget(null)}
-          showToast={showToast}
-          onUpdated={() => fetchAll(page, debouncedSearch)}
-        />
-      )}
+      {selected && <DetailModal campaign={selected} onClose={() => setSelected(null)} showToast={showToast} />}
+      {editTarget && <EditModal campaign={editTarget} onClose={() => setEditTarget(null)} showToast={showToast} onUpdated={() => fetchAll(page, debouncedSearch)} />}
       {deleteTarget && (
         <ConfirmDeleteModal
           campaign={deleteTarget}
@@ -899,7 +716,7 @@ function CampaignTable({ showToast, refreshKey }) {
 }
 
 /* ─── App ────────────────────────────────────────────────────────────────── */
-export default function UTM() {
+export default function UTMManager() {
   const [tab, setTab] = useState("all");
   const [toast, setToast] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -927,29 +744,17 @@ export default function UTM() {
               <span className="text-white text-xs font-bold">U</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-gray-800 leading-none">
-                UTM Manager
-              </h1>
+              <h1 className="text-sm font-bold text-gray-800 leading-none">UTM Manager</h1>
               <p className="text-xs text-gray-400 mt-0.5">Admin Panel</p>
             </div>
           </div>
 
           <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-            <button
-              className={tabCls("all")}
-              onClick={() => {
-                setTab("all");
-                setRefreshKey((k) => k + 1);
-              }}
-            >
+          <button className={tabCls("all")} onClick={() => { setTab("all"); setRefreshKey((k) => k + 1); }}>
               Campaigns
             </button>
-            <button
-              className={tabCls("create")}
-              onClick={() => setTab("create")}
-            >
-              Create
-            </button>
+            <button className={tabCls("create")} onClick={() => setTab("create")}>Create</button>
+            
           </div>
         </div>
       </header>
@@ -958,27 +763,16 @@ export default function UTM() {
         {tab === "create" ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
             <div className="mb-6">
-              <h2 className="text-base font-bold text-gray-800">
-                Create Campaign
-              </h2>
-              <p className="text-sm text-gray-400 mt-1">
-                Build and generate a new UTM tracking link.
-              </p>
+              <h2 className="text-base font-bold text-gray-800">Create Campaign</h2>
+              <p className="text-sm text-gray-400 mt-1">Build and generate a new UTM tracking link.</p>
             </div>
-            <CreateForm
-              showToast={showToast}
-              onCreated={() => setRefreshKey((k) => k + 1)}
-            />
+            <CreateForm showToast={showToast} onCreated={() => setRefreshKey((k) => k + 1)} />
           </div>
         ) : (
           <>
             <div className="mb-5">
-              <h2 className="text-base font-bold text-gray-800">
-                All Campaigns
-              </h2>
-              <p className="text-sm text-gray-400 mt-1">
-                Browse, search and manage your UTM campaigns.
-              </p>
+              <h2 className="text-base font-bold text-gray-800">All Campaigns</h2>
+              <p className="text-sm text-gray-400 mt-1">Browse, search and manage your UTM campaigns.</p>
             </div>
             <CampaignTable showToast={showToast} refreshKey={refreshKey} />
           </>

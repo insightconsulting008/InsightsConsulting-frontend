@@ -368,7 +368,7 @@ export default function ServiceInfo() {
 const handleAddCategory = async () => {
   if (!newCategoryName.trim()) return;
   try {
-    const response = await axiosInstance.post(`/category`, {
+    const response = await axiosInstance.post(`/admin/category`, {
       categoryName: newCategoryName
     });
     
@@ -385,7 +385,7 @@ const handleAddCategory = async () => {
 const handleEditCategory = async (categoryId) => {
   if (!newCategoryName.trim()) return;
   try {
-    const response = await axiosInstance.put(`/category/${categoryId}`, {
+    const response = await axiosInstance.put(`/admin/category/${categoryId}`, {
       categoryName: newCategoryName
     });
     
@@ -405,7 +405,7 @@ const handleDeleteCategory = async (categoryId) => {
   if (!window.confirm("Are you sure you want to delete this category?"))
     return;
   try {
-    await axiosInstance.delete(`/category/${categoryId}`);
+    await axiosInstance.delete(`/admin/category/${categoryId}`);
     
     fetchCategories();
     fetchSubcategories();
@@ -425,7 +425,7 @@ const handleDeleteCategory = async (categoryId) => {
 const handleAddSubcategory = async () => {
   if (!newSubcategoryName.trim() || !basicInfo.categoryId) return;
   try {
-    const response = await axiosInstance.post(`/subcategory`, {
+    const response = await axiosInstance.post(`/admin/subcategory`, {
       categoryId: basicInfo.categoryId,
       subCategoryName: newSubcategoryName
     });
@@ -443,7 +443,7 @@ const handleAddSubcategory = async () => {
 const handleEditSubcategory = async (subCategoryId) => {
   if (!newSubcategoryName.trim()) return;
   try {
-    const response = await axiosInstance.put(`/subcategory/${subCategoryId}`, {
+    const response = await axiosInstance.put(`/admin/subcategory/${subCategoryId}`, {
       subCategoryName: newSubcategoryName,
       categoryId: basicInfo.categoryId
     });
@@ -464,7 +464,7 @@ const handleDeleteSubcategory = async (subCategoryId) => {
   if (!window.confirm("Are you sure you want to delete this subcategory?"))
     return;
   try {
-    await axiosInstance.delete(`/subcategory/${subCategoryId}`);
+    await axiosInstance.delete(`/admin/subcategory/${subCategoryId}`);
     
     fetchSubcategories();
     setShowSubcategoryDropdown(null);

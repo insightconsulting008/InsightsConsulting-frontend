@@ -435,7 +435,7 @@ export default function MyService() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/my-services/${userId}`);
+      const res = await axiosInstance.get(`/user/my-service/${userId}`);
       if (res.data.success) {
         const s = res.data.data;
         setMyServices(s);
@@ -514,7 +514,7 @@ export default function MyService() {
     setSubmitSuccess(false);
     
     try {
-      const res = await axiosInstance.get(`/service/${s.service.serviceId}`);
+      const res = await axiosInstance.get(`/user/service/${s.service.serviceId}`);
       if (res.data.success) {
         setServiceDetails(res.data.service);
         const init = {};
@@ -595,7 +595,7 @@ export default function MyService() {
       });
       
       const res = await axiosInstance.post(
-        `/application/start/apply/${selectedServiceForInput.myServiceId}`, 
+        `/user/applications/start/apply/${selectedServiceForInput.myServiceId}`, 
         fd, 
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

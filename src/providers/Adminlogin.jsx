@@ -146,7 +146,7 @@ function ForgotPasswordModal({ onClose }) {
     setError('')
 
     try {
-      await axiosInstance.post('/staff/forgot-password', { email })
+      await axiosInstance.post('/auth/staff/forgot-password', { email })
       setSuccess(true)
     } catch (err) {
       if (err.response) {
@@ -330,7 +330,7 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      const res = await axiosInstance.post("/staff/login", form, {
+      const res = await axiosInstance.post("/auth/staff/login", form, {
         withCredentials: true
       })
       
@@ -357,7 +357,7 @@ export default function AdminLogin() {
     } catch (err) {
       if (err.response) {
         switch (err.response.status) {
-          case 401:
+          case 400:
             setError("Invalid email or password")
             break
           case 404:

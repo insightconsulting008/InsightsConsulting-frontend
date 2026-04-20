@@ -20,7 +20,7 @@ export default function ViewService() {
   const fetchServiceDetails = async () => {
     try {
       setLoading(true);
-      const r = await axiosInstance.get(`/service/${serviceId}`);
+      const r = await axiosInstance.get(`/admin/service/${serviceId}`);
       if (r.data.success) setService(r.data.service);
       else setError('Service not found');
     } catch (err) {
@@ -306,7 +306,7 @@ export default function ViewService() {
                 <button
                   onClick={() => {
                     if (window.confirm(`Delete "${service.name}"?`)) {
-                      axiosInstance.delete(`/service/${serviceId}`)
+                      axiosInstance.delete(`/admin/service/${serviceId}`)
                         .then(() => navigate('/service-hub'))
                         .catch(err => alert(err.response?.data?.message || 'Error deleting service'));
                     }

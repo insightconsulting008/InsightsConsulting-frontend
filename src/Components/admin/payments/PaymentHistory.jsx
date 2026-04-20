@@ -66,7 +66,7 @@ const PaymentHistory = () => {
           ...(filters.startDate && { startDate: filters.startDate }),
           ...(filters.endDate && { endDate: filters.endDate })
         };
-        const { data } = await axiosInstance.get('/payments', params);
+        const { data } = await axiosInstance.get('/admin/payments', params);
         setResponse(data);
       } catch (err) {
         console.error('Error fetching payments:', err);

@@ -69,8 +69,8 @@ export default function GetService() {
 
   /* ── FETCH DATA ON MOUNT ── */
   useEffect(() => {
-    axiosInstance.get("/category").then(res => setCategories(res.data.categories)).catch(console.error);
-    axiosInstance.get("/subcategory").then(res => setSubCategories(res.data.subcategories)).catch(console.error);
+    axiosInstance.get("/user/category").then(res => setCategories(res.data.categories)).catch(console.error);
+    axiosInstance.get("/user/subcategory").then(res => setSubCategories(res.data.subcategories)).catch(console.error);
   }, []);
 
   /* ── RE-FETCH SERVICES WHEN SEARCH / PAGE / LIMIT CHANGES ── */
@@ -96,7 +96,7 @@ export default function GetService() {
     try {
       const params = new URLSearchParams({ limit, page });
       if (search) params.append("search", search);
-      const res = await axiosInstance.get(`/service?${params.toString()}`);
+      const res = await axiosInstance.get(`/user/service?${params.toString()}`);
       const data = res.data.services ?? [];
       const total = res.data.pagination?.totalRecords ?? data.length;
       setServices(data);
@@ -116,7 +116,7 @@ export default function GetService() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       const query = params.toString() ? `?${params.toString()}` : "";
-      const res = await axiosInstance.get(`/bundle${query}`);
+      const res = await axiosInstance.get(`/user/bundle${query}`);
       const data = res.data.bundles ?? [];
       setBundles(data);
       setServiceStats(prev => ({ ...prev, bundles: data.length }));
@@ -212,7 +212,7 @@ export default function GetService() {
   const openService = async (serviceId) => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/service/${serviceId}`);
+      const res = await axiosInstance.get(`/user/service/${serviceId}`);
       setSelectedService(res.data.service);
       setSelectedBundle(null);
     } catch (e) {
@@ -225,7 +225,7 @@ export default function GetService() {
   const openBundle = async (bundleId) => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/bundle/${bundleId}/details`);
+      const res = await axiosInstance.get(`/user/bundle/${bundleId}/details`);
       setSelectedBundle(res.data.bundle);
       setSelectedService(null);
     } catch (e) {
@@ -248,7 +248,7 @@ export default function GetService() {
       if (selectedService) payload.serviceId = selectedService.serviceId;
       else if (selectedBundle) payload.bundleId = selectedBundle.bundleId;
 
-      const response = await axiosInstance.post("/buy/service", payload);
+      const response = await axiosInstance.post("/user/my-service/buy", payload);
 
       if (!response.data.paymentRequired) {
         setPurchasedItem(selectedService || selectedBundle);

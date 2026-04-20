@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import axios from "axios";
 import axiosInstance from "@src/providers/axiosInstance";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -187,16 +186,22 @@ const UserPicker = ({ selectedUser, onSelect }) => {
     debRef.current = setTimeout(() => { setDebQ(query); setPage(1); }, 320);
   }, [query]);
 
-  useEffect(() => {
-    if (!open) return;
-    setLoading(true);
-    const p = new URLSearchParams({ page, limit: 50 });
-    if (debQ) p.set("search", debQ);
-    axios.get(`https://insightsconsult-backend.onrender.com/users?${p}`)
-      .then((r) => { setUsers(r.data.users || []); setPagination(r.data.pagination || null); })
-      .catch(() => setUsers([]))
-      .finally(() => setLoading(false));
-  }, [open, debQ, page]);
+ useEffect(() => {
+  if (!open) return;
+  setLoading(true);
+
+  const p = new URLSearchParams({ page, limit: 50 });
+  if (debQ) p.set("search", debQ);
+
+  axiosInstance.get(`/staff/payments/users?${p}`)
+    .then((r) => { 
+      setUsers(Array.isArray(r.data) ? r.data : r.data?.users || []);
+      setPagination(r.data?.pagination || null);
+    })
+    .catch(() => setUsers([]))
+    .finally(() => setLoading(false));
+
+}, [open, debQ, page]);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
@@ -383,7 +388,7 @@ const CreateLinkModal = ({ onClose, onSuccess }) => {
     const submittedAmount = Number(form.amount);
     const submittedNote   = form.note;
     try {
-      const r = await axios.post("https://insightsconsult-backend.onrender.com/create/amendment-link", {
+      const r = await axiosInstance.post("/staff/payments/create/amendment-link", {
         employeeId: EMPLOYEE_ID,
         userId: selectedUser === "other" ? null : selectedUser?.userId,
         note: submittedNote,
@@ -783,7 +788,7 @@ export default function CreateAmendmentLink() {
     setTLoading(true);
     const params = new URLSearchParams({ page: payPage, limit: 10 });
     if (tableDebouncedQ) params.set("search", tableDebouncedQ);
-    axios.get(`https://insightsconsult-backend.onrender.com/payments/${EMPLOYEE_ID}?${params}`)
+    axiosInstance.get(`/staff/payments/${EMPLOYEE_ID}?${params}`)
       .then((r) => { setPayments(r.data.data || []); setPayPagination(r.data.pagination || null); })
       .catch(() => setPayments([]))
       .finally(() => setTLoading(false));

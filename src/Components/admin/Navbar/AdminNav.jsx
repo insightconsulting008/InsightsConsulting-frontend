@@ -38,7 +38,7 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get('/staff/profile');
+        const res = await axiosInstance.get('/staff/settings/profile');
         if (res.data.success) {
           setProfile(res.data.data);
         }
@@ -149,7 +149,7 @@ const AdminNav = ({ setRefreshDepartmentsTrigger }) => {
     setLoadingDepts(true);
     setDeptError(null);
     try {
-      const res = await axiosInstance.get('/department', { params: { page, limit } });
+      const res = await axiosInstance.get('/admin/department', { params: { page, limit } });
       const payload = res?.data ?? {};
       let list = [];
       if (Array.isArray(payload)) list = payload;

@@ -167,12 +167,12 @@ export default function AdminDashboard() {
 
     const [statsRes, empRes, deptRes, appRes, payRes, usersRes, serviceRes] = await Promise.all([
       safe(() => axiosInstance.get('/dashboard/stats')),
-      safe(() => axiosInstance.get('/employee', { params: { page: 1, limit: 5 } })),
-      safe(() => axiosInstance.get('/department', { params: { page: 1, limit: 100 } })),
-      safe(() => axiosInstance.get('/applications')),
-      safe(() => axiosInstance.get('/payments', { params: { page: 1, limit: 5 } })),
-      safe(() => axiosInstance.get('/users', { params: { page: 1, limit: 100 } })),
-      safe(() => axiosInstance.get('/service', { params: { page: 1, limit: 100 } })),
+      safe(() => axiosInstance.get('/admin/employee', { params: { page: 1, limit: 5 } })),
+      safe(() => axiosInstance.get('/admin/department', { params: { page: 1, limit: 100 } })),
+      safe(() => axiosInstance.get('/admin/applications')),
+      safe(() => axiosInstance.get('/admin/payments', { params: { page: 1, limit: 5 } })),
+      safe(() => axiosInstance.get('/admin/users', { params: { page: 1, limit: 100 } })),
+      safe(() => axiosInstance.get('/admin/service', { params: { page: 1, limit: 100 } })),
     ]);
 
     if (statsRes?.data?.data || statsRes?.data) setStats(statsRes.data?.data ?? statsRes.data);

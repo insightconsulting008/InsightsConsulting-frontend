@@ -8,6 +8,7 @@ import { MdErrorOutline } from "react-icons/md";
 import Cropper from "react-easy-crop";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../page-header/PageHeader";
+import axiosInstance from "@src/providers/axiosInstance";
 
 const BASE_URL = "https://insightsconsult-backend.onrender.com";
 
@@ -333,22 +334,33 @@ export default function CreateBlogPage() {
     });
     form.append("content", JSON.stringify(contentPayload));
 
-    try {
-      const res = await fetch(`${BASE_URL}/blogs`, { method: "POST", body: form });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || data.message || "Failed to create blog");
-      }
-      setSuccess("Blog created successfully!");
-      setShowSuccessPopup(true);
-      setTitle(""); setAuthor(""); setDescription(""); setPublished(false);
-      if (thumbnailPreview?.startsWith("blob:")) URL.revokeObjectURL(thumbnailPreview);
-      setThumbnailPreview(null); thumbnailRef.current = null;
-      blocks.forEach((b) => { if (b.preview?.startsWith("blob:")) URL.revokeObjectURL(b.preview); });
-      blockFilesRef.current = {}; setBlocks([]);
-    } catch (err) {
-      setError(err.message); setShowErrorPopup(true);
-    }
+   try {
+  const res = await axiosInstance.post("/admin/blogs", form);
+
+  // success (same flow)
+  setSuccess("Blog created successfully!");
+  setShowSuccessPopup(true);
+
+  setTitle("");
+  setAuthor("");
+  setDescription("");
+  setPublished(false);
+
+  if (thumbnailPreview?.startsWith("blob:")) URL.revokeObjectURL(thumbnailPreview);
+  setThumbnailPreview(null);
+  thumbnailRef.current = null;
+
+  blocks.forEach((b) => {
+    if (b.preview?.startsWith("blob:")) URL.revokeObjectURL(b.preview);
+  });
+
+  blockFilesRef.current = {};
+  setBlocks([]);
+
+} catch (err) {
+  setError(err.response?.data?.error || err.response?.data?.message || err.message);
+  setShowErrorPopup(true);
+}
     setLoading(false);
   };
 

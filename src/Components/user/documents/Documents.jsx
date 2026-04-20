@@ -238,7 +238,7 @@ function DetailView({ folder, onBack }) {
   /* fetch */
   useEffect(() => {
     setLoading(true)
-    let url = `/${folder.key}/documents/user/${USER_ID}?page=${page}&limit=${limit}`
+    let url = `/user/${folder.key}/documents/user/${USER_ID}?page=${page}&limit=${limit}`
     if (month !== null) url += `&month=${month}&year=${year}`
     axiosInstance.get(url)
       .then(r  => { setDocs(r.data.documents); setTotal(r.data.total ?? r.data.totalCount) })
@@ -372,7 +372,7 @@ export default function Documents() {
   useEffect(() => {
     const load = async (key) => {
       try {
-        const r = await axiosInstance.get(`/${key}/documents/user/${USER_ID}?page=1&limit=1`)
+        const r = await axiosInstance.get(`/user/${key}/documents/user/${USER_ID}?page=1&limit=1`)
         setCounts(c => ({ ...c, [key]: r.data.total ?? r.data.totalCount }))
       } catch {
         setCounts(c => ({ ...c, [key]: MOCK[key].total }))

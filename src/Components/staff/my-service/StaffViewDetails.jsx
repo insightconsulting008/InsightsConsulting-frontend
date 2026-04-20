@@ -476,7 +476,7 @@ const RequestDocumentModal = ({
         if (applicationTrackStepId) requestData.applicationTrackStepId = applicationTrackStepId;
         else if (periodStepId) requestData.periodStepId = periodStepId;
 
-        const res = await axiosInstance.post('/staff/document', requestData);
+        const res = await axiosInstance.post('/staff/documents', requestData);
         if (!res.data.success) throw new Error(res.data.message || 'Failed to create request.');
 
       } else {
@@ -491,7 +491,7 @@ const RequestDocumentModal = ({
           else if (periodStepId) formData.append('periodStepId', periodStepId);
           formData.append('file', selectedFile);
 
-          const res = await axiosInstance.post('/staff/document', formData, {
+          const res = await axiosInstance.post('/staff/documents', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
           if (!res.data.success) throw new Error(res.data.message || 'Failed to issue document.');
@@ -508,7 +508,7 @@ const RequestDocumentModal = ({
           if (applicationTrackStepId) requestData.applicationTrackStepId = applicationTrackStepId;
           else if (periodStepId) requestData.periodStepId = periodStepId;
 
-          const res = await axiosInstance.post('/staff/document', requestData);
+          const res = await axiosInstance.post('/staff/documents', requestData);
           if (!res.data.success) throw new Error(res.data.message || 'Failed to issue document.');
         }
       }
@@ -863,7 +863,7 @@ const DocumentReviewModal = ({ document: doc, onClose, onSuccess, defaultStatus 
         status: reviewStatus,
         ...(reviewStatus === 'REJECTED' && reviewRemark.trim() ? { remark: reviewRemark.trim() } : {}),
       };
-      const response = await axiosInstance.put(`/staff/review-document/${doc.documentId}`, requestBody);
+      const response = await axiosInstance.put(`/staff/documents/${doc.documentId}/review-document`, requestBody); 
       if (response.data.success) {
         const action = reviewStatus === 'VERIFIED' ? 'verified' : 'rejected';
         toast(`Document successfully ${action}!`, reviewStatus === 'VERIFIED' ? 'success' : 'error');
@@ -1081,7 +1081,7 @@ const DocumentManagementSection = ({ applicationId, onCountChange }) => {
     setLoading(true);
     setActionMessage({ type: '', text: '' });
     try {
-      const res = await axiosInstance.get(`/application/${applicationId}/documents`);
+      const res = await axiosInstance.get(`/staff/documents/application/${applicationId}`); 
       if (res.data.success) {
         const docs = res.data.documents || [];
         setDocuments(docs);
@@ -1602,7 +1602,7 @@ const StepUpdateModal = ({ step, isPeriodStep, onClose, onSuccess }) => {
         remarks: updateStatus === 'COMPLETED' ? null : remarks.trim() || null,
         status: updateStatus,
       };
-      const response = await axiosInstance.put('/staff/update/step', updateData);
+      const response = await axiosInstance.put('/staff/steps/update/step', updateData);
       if (response.data.success) {
         toast('Step status updated successfully!');
         onSuccess();
@@ -1739,7 +1739,7 @@ export default function ViewDetails() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get(`staff/${employeeId}/application/${applicationId}`);
+      const response = await axiosInstance.get(`/staff/applications/${employeeId}/detail/${applicationId}`);
       if (response.data.success) setApplication(response.data.application);
       else setError('Failed to load application details');
     } catch (err) {

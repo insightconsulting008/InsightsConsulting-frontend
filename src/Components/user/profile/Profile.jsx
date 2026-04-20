@@ -197,7 +197,7 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         setLoading(true)
-        const response = await axiosInstance.get('/user/profile')
+        const response = await axiosInstance.get('/user/settings/profile')
         
         if (response.data.success) {
           setProfile(response.data.data)
@@ -250,7 +250,7 @@ export default function Profile() {
     setPasswordSuccess('')
 
     try {
-      const response = await axiosInstance.put('/user/change-password', {
+      const response = await axiosInstance.put('/user/settings/change-password', {
         oldPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword
       })
@@ -300,7 +300,7 @@ export default function Profile() {
     formData.append('photoUrl', selectedFile)
     
     try {
-      const response = await axiosInstance.put('/user/update-photo', formData,)
+      const response = await axiosInstance.put('/user/settings/update-photo', formData,)
       
       if (response.data.success) {
         setPhotoSuccess('✓ Photo updated successfully!')

@@ -308,7 +308,7 @@ export default function EmailDashboard() {
   const fetchEvents = useCallback(async () => {
     setEventsLoading(true);
     try {
-      const response = await axiosInstance.get(`/email/event`);
+      const response = await axiosInstance.get(`/admin/email/event`);
       if (response.data.success) setEvents(response.data.data);
     } catch (err) {
       if (err.response) error(err.response.data.message || "Failed to load events");
@@ -343,7 +343,7 @@ export default function EmailDashboard() {
   setModalLoading(true);
   setModalError("");
   try {
-    const response = await axiosInstance.post(`/email/config`, {
+    const response = await axiosInstance.post(`/admin/email/config`, {
       ...cfg, provider, employeeId, profilePassword,
     });
     if (response.data.success) {
@@ -380,7 +380,7 @@ export default function EmailDashboard() {
   const handleTestEmail = async () => {
     setTestLoading(true);
     try {
-      const response = await axiosInstance.post(`/email/test`, { email: testEmail });
+      const response = await axiosInstance.post(`/admin/email/test`, { email: testEmail });
       response.data.success
         ? success("Test email sent!")
         : error(response.data.message || "Failed to send");

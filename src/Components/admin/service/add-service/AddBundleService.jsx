@@ -102,7 +102,7 @@ export default function AddBundleService() {
     setLoading(true);
     try {
       const res = await axiosInstance.get(
-        `/service?limit=9&page=${page}${search ? `&search=${encodeURIComponent(search)}` : ''}`
+        `/admin/service?limit=9&page=${page}${search ? `&search=${encodeURIComponent(search)}` : ''}`
       );
       const list = res.data.services ?? [];
       const pag = res.data.pagination ?? {};
@@ -286,7 +286,7 @@ export default function AddBundleService() {
       }
 
       // Send as multipart/form-data
-      const res = await axiosInstance.post('/bundle', formData);
+      const res = await axiosInstance.post('/admin/bundle', formData);
 
       if (res.data.success) {
         setSuccess('Bundle created successfully!');

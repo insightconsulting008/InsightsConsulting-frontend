@@ -67,7 +67,7 @@ export default function DetailReport() {
   useEffect(() => {
     if (!applicationId) return;
     setLoading(true); setError(null);
-    axiosInstance.get(`/application-history/${applicationId}`)
+    axiosInstance.get(`/admin/application-history/${applicationId}`)
       .then(res => {
         if (res.data.success) setData(res.data.application);
         else setError(res.data.message || "Application not found.");

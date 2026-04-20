@@ -188,7 +188,7 @@ export default function GetBundleList({ bundles = [], loading, onRefresh }) {
   const handleDelete = async () => {
     if (!deleteItem) return;
     try {
-      await axiosInstance.delete(`/bundle/${deleteItem.id}`, {
+      await axiosInstance.delete(`/admin/bundle/${deleteItem.id}`, {
         data: { bundleId: deleteItem.id, confirmName: deleteItem.name },
       });
       showToast('Bundle deleted successfully');

@@ -49,7 +49,7 @@ const Contact = () => {
     setSuccess(false);
 
     try {
-      await axios.post("https://insightsconsult-backend.onrender.com/contact", formData);
+      await axios.post("https://insightsconsult-backend.onrender.com/api/forms/contact", formData);
       setSuccess(true);
       setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "" });
       setTimeout(() => setSuccess(false), 3000);
@@ -78,8 +78,8 @@ const Contact = () => {
     {
       icon: <Phone size={20} />,
       label: "Mobile",
-      value: "+91 95000 12551",
-      href: "tel:+919500012551",
+      value: "+91 73390 09906",
+      href: "tel:+917339009906",
     },
   ];
 
@@ -336,11 +336,11 @@ const Contact = () => {
 
           <div className="relative z-10 max-w-5xl flex flex-col gap-6 justify-center items-center">
             <h2 className="text-[24px] md:text-[32px] font-semibold text-dark leading-tight">
-              Get Your Registrations &amp; Compliance Handled by Professionals
+              From compliance to strategy — strengthen your finance function end-to-end
             </h2>
             <p className="text-textlight text-[15px] md:text-[16px] max-w-2xl">
-              Avoid delays, errors, and regulatory stress. Our experts ensure a smooth, accurate, and hassle-free process —{" "}
-              <span className="font-semibold text-2xl text-dark">WHERE CLARITY MEETS GROWTH.</span>
+              Our experts ensure a smooth, accurate, and hassle-free process —{" "}
+              <span className="font-semibold text-2xl text-dark">where CLARITY meets GROWTH.</span>
             </p>
 
             <div className="md:bg-white rounded-full md:p-2 flex items-center justify-center lg:justify-between shadow-xl border border-white w-auto lg:max-w-xl">

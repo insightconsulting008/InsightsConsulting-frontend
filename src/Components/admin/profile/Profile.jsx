@@ -198,7 +198,7 @@ export default function Profile() {
     const load = async () => {
       try {
         setLoading(true)
-        const res = await axiosInstance.get('/staff/profile')
+        const res = await axiosInstance.get('/staff/settings/profile')
         if (res.data.success) setProfile(res.data.data)
         else setError('Failed to fetch profile')
       } catch (err) {
@@ -233,7 +233,7 @@ export default function Profile() {
     if (!validatePassword()) return
     setChangingPassword(true)
     try {
-      const res = await axiosInstance.put('/staff/change-password', {
+      const res = await axiosInstance.put('/staff/settings/change-password', {
         oldPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword
       })
@@ -267,7 +267,7 @@ export default function Profile() {
     const formData = new FormData()
     formData.append('photoUrl', selectedFile)
     try {
-      const res = await axiosInstance.put('/staff/update-photo', formData)
+      const res = await axiosInstance.put('/staff/settings/update-photo', formData)
       if (res.data.success) {
         setPhotoSuccess('✓ Photo updated successfully!')
         setProfile(p => ({ ...p, photoUrl: res.data.data.photoUrl }))

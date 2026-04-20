@@ -41,7 +41,7 @@ export default function MyService() {
       setError(null);
       const params = new URLSearchParams({ page: pg, limit: LIMIT });
       if (q) params.set('search', q);
-      const res = await axiosInstance.get(`staff/${employeeId}/applications?${params}`);
+      const res = await axiosInstance.get(`/staff/applications/${employeeId}?${params}`);
       if (res.data.success) {
         setApplications(res.data.applications ?? []);
         setPagination({

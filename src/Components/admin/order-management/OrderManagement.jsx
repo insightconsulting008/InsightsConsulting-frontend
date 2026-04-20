@@ -115,7 +115,7 @@ export default function OrderManagement() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get('/applications');
+      const response = await axiosInstance.get('/admin/applications');
       if (response.data.success) {
         setApplications(response.data.applications);
       }
@@ -150,7 +150,7 @@ export default function OrderManagement() {
       }
       
       const response = await axiosInstance.get(
-        `/admin/employees/assignable${queryParams}`
+        `/admin/applications/employees/assignable${queryParams}`
       );
       
       if (response.data.success) {

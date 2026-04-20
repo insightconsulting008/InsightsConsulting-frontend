@@ -185,7 +185,7 @@ export default function UserRegister() {
       ...formData,
       ...utmData,
     };
-      const response = await axiosInstance.post("/user/register", payload, {
+      const response = await axiosInstance.post("/auth/user/register", payload, {
       withCredentials: true,
     });
 
@@ -233,7 +233,7 @@ export default function UserRegister() {
       ...utmData,
     };
 
-    const res = await axiosInstance.post("/user/google-auth", payload);
+    const res = await axiosInstance.post("/google/google-auth", payload);
 
     // Clear after successful Google registration
     localStorage.removeItem('utmData');

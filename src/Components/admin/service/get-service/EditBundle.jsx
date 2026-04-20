@@ -490,7 +490,7 @@ export default function EditBundle() {
     setFetchingBundle(true);
     setFetchError(null);
     try {
-      const res = await axiosInstance.get(`/bundle/${bundleId}/details`);
+      const res = await axiosInstance.get(`/admin/bundle/${bundleId}/details`);
       const b = res.data.bundle ?? res.data;
       setBundle({
         ...b,
@@ -514,7 +514,7 @@ export default function EditBundle() {
     setLoadingSvcs(true);
     try {
       const res = await axiosInstance.get(
-        `/service?limit=9&page=${page}${search ? `&search=${encodeURIComponent(search)}` : ""}`,
+        `/admin/service?limit=9&page=${page}${search ? `&search=${encodeURIComponent(search)}` : ""}`,
       );
       const list = res.data.services ?? [];
       const pag = res.data.pagination ?? {};
@@ -655,7 +655,7 @@ export default function EditBundle() {
       formData.append("photoUrl", existingPhotoUrl);
     }
 
-    const res = await axiosInstance.put(`/bundle/${bundleId}`, formData);
+    const res = await axiosInstance.put(`/admin/bundle/${bundleId}`, formData);
     if (!res.data.success)
       throw new Error(res.data.error ?? res.data.message ?? "Update failed");
     return res;

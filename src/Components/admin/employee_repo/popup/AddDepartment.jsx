@@ -1,8 +1,8 @@
 // AddDepartmentModal.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { X, Plus, Check } from 'lucide-react';
 import { BiSolidPencil } from 'react-icons/bi';
+import axiosInstance from '@src/providers/axiosInstance';
 
 const SuccessPopup = ({ isOpen, onClose, onAddEmployee, departmentName, departmentCode, mode = 'add' }) => {
   if (!isOpen) return null;
@@ -106,8 +106,8 @@ const AddDepartmentModal = ({ open, onClose, onSubmit, onUpdate, initialData = n
         const idToUse = initialData.departmentId || initialData._id || initialData.id;
         if (!idToUse) throw new Error('Could not determine department id for update.');
 
-        const url = `https://insightsconsult-backend.onrender.com/department/${idToUse}`;
-        const res = await axios.put(url, payload, { headers: { 'Content-Type': 'application/json' } });
+        const url = `/admin/department/${idToUse}`;
+        const res = await axiosInstance.put(url, payload, { headers: { 'Content-Type': 'application/json' } });
         const normalized = normalizeApiCreated(res?.data, { ...payload, departmentId: idToUse });
 
         setCreatedDepartment({ name: normalized.name, code: normalized.departmentCode });
@@ -117,7 +117,7 @@ const AddDepartmentModal = ({ open, onClose, onSubmit, onUpdate, initialData = n
           try { onUpdate(normalized); } catch (err) { console.warn('onUpdate callback threw:', err); }
         }
       } else {
-        const res = await axios.post('https://insightsconsult-backend.onrender.com/department', payload, {
+        const res = await axiosInstance.post('/admin/department', payload, {
           headers: { 'Content-Type': 'application/json' },
         });
         const normalized = normalizeApiCreated(res?.data, payload);

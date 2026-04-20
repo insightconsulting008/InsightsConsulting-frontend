@@ -92,7 +92,7 @@ export default function Users() {
     try {
       const params = new URLSearchParams({ page, limit, order })
       if (debouncedQ.trim()) params.set('search', debouncedQ.trim())
-      const res = await axiosInstance.get(`/users?${params}`)
+      const res = await axiosInstance.get(`/admin/users?${params}`)
       setUsers(res.data.users || [])
       setMeta({
         total: res.data.pagination?.total ?? 0,

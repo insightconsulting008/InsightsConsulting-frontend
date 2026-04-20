@@ -28,7 +28,7 @@ const BlogCardSkeleton = () => (
   </div>
 );
 
-const BASE_URL = "https://insightsconsult-backend.onrender.com/blogs";
+const BASE_URL = "https://insightsconsult-backend.onrender.com/api/blogs";
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);

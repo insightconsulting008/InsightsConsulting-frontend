@@ -190,8 +190,8 @@ export default function StaffDashboard() {
     else           setLoading(true);
 
     const [profileRes, tasksRes] = await Promise.allSettled([
-      axiosInstance.get("/staff/profile"),
-      axiosInstance.get(`/staff/${staffId}/applications`), // ✅ fixed endpoint
+      axiosInstance.get("/staff/settings/profile"),
+      axiosInstance.get(`/staff/applications/${staffId}`), // ✅ fixed endpoint
     ]);
 
     if (profileRes.status === "fulfilled") {
@@ -204,6 +204,21 @@ export default function StaffDashboard() {
     setLoading(false);
     setRefreshing(false);
   }, [staffId]); // ✅ add staffId to dependency array
+
+  const greeting = (() => {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+  return "Good Night";
+})();
+const dateStr = new Date().toLocaleDateString("en-US", {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
 
   useEffect(() => { load(); }, [load]);
   // rest of component unchanged...
@@ -225,6 +240,7 @@ export default function StaffDashboard() {
     .slice(0, 5);
 
   const monthlyData = (() => {
+    const now = new Date(); 
     const buckets = {};
     for (let i = 5; i >= 0; i--) {
       const d   = new Date(now.getFullYear(), now.getMonth() - i, 1);

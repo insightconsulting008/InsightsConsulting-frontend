@@ -249,7 +249,7 @@ export default function ViewOrder() {
     try {
       setActivityLoading(true); setActivityError('');
       const res = await axiosInstance.get(
-        `https://insightsconsult-backend.onrender.com/application-history/${applicationId}`
+        `https://insightsconsult-backend.onrender.com/admin/application-history/${applicationId}`
       );
       if (res.data.success) setActivityData(res.data.application);
       else setActivityError('Failed to load activity log');
