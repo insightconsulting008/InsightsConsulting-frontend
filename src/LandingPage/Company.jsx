@@ -1,9 +1,3 @@
-import { TbUsers } from "react-icons/tb";
-import { FaRegHeart } from "react-icons/fa";
-import { AiOutlineRise } from "react-icons/ai";
-import { BsEmojiSmile } from "react-icons/bs";
-import { FaRegFlag } from "react-icons/fa";
-import { RiFlashlightLine } from "react-icons/ri";
 import Footerctn from "./reusable/Footerctn";
 
 const About = () => {
@@ -40,6 +34,18 @@ const About = () => {
       desc: "With over 30 years of leadership experience across FMCG, manufacturing, consumer durables, media, and hospitality sectors, Bhalaaji works closely with founders and management teams on finance transformation, operating-model strengthening, and building scalable finance environments that support structured growth and better decision-making.",
       image:
         "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/balaji.png",
+      color: "from-emerald-50 to-teal-50",
+      badgeColor: "bg-emerald-100 text-emerald-700",
+      borderColor: "border-emerald-100",
+    },
+    {
+      name: "Bala",
+      role: "B. Com, ACA, Applied Finance – IIM Kolkata",
+      experience: "20+ Years",
+      expertise: "FMCG & Manufacturing",
+      desc: "Bala brings 20 years of powerhouse experience, including PAN-India leadership roles across Credit Administration, Risk & Policy Management, and Underwriting. He has contributed to top-tier driving growth, compliance, and high-quality credit portfolios on a national scale..  Bala blends analytical precision with strategic financial acumen in building scalable finance processes enabling better decisions, driving risk assurance and compliance and supporting organizations in navigating evolving regulatory requirement.",
+      image:
+        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/WhatsApp%20Image%202026-04-21%20at%204.07.57%20PM.jpeg",
       color: "from-emerald-50 to-teal-50",
       badgeColor: "bg-emerald-100 text-emerald-700",
       borderColor: "border-emerald-100",
@@ -302,10 +308,10 @@ const About = () => {
           <div className="w-full flex flex-col items-center gap-5 text-center lg:max-w-[900px] lg:mx-auto">
           
             <h1 className="text-3xl text-dark leading-[1.2] lg:text-[52px] lg:leading-[1.15] font-semibold tracking-[-0.03em]">
-              Where Clarity Meets Growth
+              where Clarity meets Growth
             </h1>
             {/* Hero paragraph — increased from 17px to 19px */}
-            <p className="text-[19px] leading-[30px] font-normal text-muted max-w-full">
+            <p className="text-base md:text-[19px] leading-[30px] font-normal text-muted max-w-full">
               Insight Consulting is a professional services firm bringing
               together professionals from diverse backgrounds to deliver
               impactful outcomes that reflect our commitment to excellence,
@@ -337,7 +343,7 @@ const About = () => {
                 "Whether solving complex challenges or simplifying layered business environments, we approach every engagement with clarity, structure, and purpose. By taking a holistic view of each client's ecosystem, we deliver solutions that resolve immediate priorities while strengthening the foundation for sustainable long-term growth and value creation.",
                 "We work alongside our clients not just as service providers, but as long-term strategic partners — strengthening governance, enabling better decisions, and building finance functions that support sustainable scale and enterprise value creation.",
               ].map((para, i) => (
-                <p key={i} className="text-muted text-[18px] leading-[1.85]">
+                <p key={i} className="text-muted text-base md:text-[18px] leading-[1.85]">
                   {para}
                 </p>
               ))}
