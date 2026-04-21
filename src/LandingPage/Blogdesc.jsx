@@ -19,7 +19,7 @@ export default function Blogdesc() {
         setLoading(true);
         setError(null);
         const res = await axiosInstance.get(
-          `/blogs/${slug}`
+          `/api/blogs/${slug}`
         );
         setBlog(res.data);
       } catch (err) {

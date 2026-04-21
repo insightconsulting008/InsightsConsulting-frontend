@@ -34,7 +34,7 @@ const StaffNav = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get('/staff/profile');
+        const res = await axiosInstance.get('/staff/settings/profile');
         if (res.data.success) {
           setProfile(res.data.data);
         }

@@ -1,7 +1,7 @@
 import axios from "axios";
  
 const axiosInstance = axios.create({
-  baseURL: "https://insightsconsult-backend-production.up.railway.app",
+  baseURL: "https://insightsconsult-backend-production.up.railway.app/api",
   withCredentials: true, // 🔑 send cookies automatically
 });
  
@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
       try {
         // refresh token is in cookie, no need to send in body
         const response = await axios.post(
-          "https://insightsconsult-backend-production.up.railway.app/auth/refresh",
+          "https://insightsconsult-backend-production.up.railway.app/api/auth/refresh",
           {},
           { withCredentials: true }
         );

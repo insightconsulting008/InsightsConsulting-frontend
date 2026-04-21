@@ -301,7 +301,7 @@ export default function PaymentTransaction() {
       if (typeFilter)      params.set('type',   typeFilter);
       if (statusFilter)    params.set('status', statusFilter);
 
-      const res = await axiosInstance.get(`/payments/user/${userId}?${params}`);
+      const res = await axiosInstance.get(`/user/payments/${userId}?${params}`); 
       if (res.data.success) {
         setPayments(res.data.data || []);
         setPagination(res.data.pagination || { total: 0, totalPages: 1, limit: 10 });

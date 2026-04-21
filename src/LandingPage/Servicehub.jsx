@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { 
   FiGrid, FiSearch, FiChevronDown, FiChevronUp, FiX, 
   FiArrowLeft, FiArrowRight, FiCheck, FiArrowUpRight 
@@ -7,6 +6,7 @@ import {
 import { IoWarning, IoCheckmark } from "react-icons/io5";
 import { AiOutlineSelect } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "@src/providers/axiosInstance";
 
 const LIMIT = 6;
 
@@ -99,7 +99,7 @@ export default function RecommendedServices() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get("https://insightsconsult-backend.onrender.com/api/categories");
+        const { data } = await axiosInstance.get("/categories");
         const cats = data?.data || data?.categories || data || [];
         setCategories(Array.isArray(cats) ? cats : []);
         
@@ -107,8 +107,8 @@ export default function RecommendedServices() {
         const subsMap = {};
         await Promise.all(cats.map(async (cat) => {
           try {
-            const { data } = await axios.get(
-              `https://insightsconsult-backend.onrender.com/api/categories/${cat.categoryId}/subcategories`
+            const { data } = await axiosInstance.get(
+              `/categories/${cat.categoryId}/subcategories`
             );
             subsMap[cat.categoryId] = Array.isArray(data?.data || data?.subcategories || data) 
               ? (data.data || data.subcategories || data) : [];
@@ -129,8 +129,8 @@ export default function RecommendedServices() {
     if (!selectedCatId) return;
     const fetchSubcategories = async () => {
       try {
-        const { data } = await axios.get(
-          `https://insightsconsult-backend.onrender.com/api/categories/${selectedCatId}/subcategories`
+        const { data } = await axiosInstance.get(
+          `/categories/${selectedCatId}/subcategories`
         );
         setSubcategories(Array.isArray(data?.data || data?.subcategories || data) 
           ? (data.data || data.subcategories || data) : []);
@@ -153,15 +153,15 @@ export default function RecommendedServices() {
         let total = 0;
 
         if (selectedSubId) {
-          const { data } = await axios.get(
-            `https://insightsconsult-backend.onrender.com/api/subcategories/${selectedSubId}/services`,
+          const { data } = await axiosInstance.get(
+            `/subcategories/${selectedSubId}/services`,
             { params: { page: currentPage, limit: LIMIT, orderBy: "createdAt", order: "desc" } }
           );
           servicesData = data?.data || [];
           pages = data?.pagination?.totalPages || 1;
           total = data?.pagination?.totalRecords || servicesData.length;
         } else if (selectedCatId) {
-          const { data } = await axios.get("https://insightsconsult-backend.onrender.com/service", {
+          const { data } = await axiosInstance.get("/service", {
             params: { page: currentPage, limit: LIMIT * 3, orderBy: "createdAt", order: "desc" }
           });
           if (data?.success) {
@@ -172,7 +172,7 @@ export default function RecommendedServices() {
             pages = Math.ceil(servicesData.length / LIMIT);
           }
         } else {
-          const { data } = await axios.get("https://insightsconsult-backend.onrender.com/service", {
+          const { data } = await axiosInstance.get("/service", {
             params: { page: currentPage, limit: LIMIT, orderBy: "createdAt", order: "desc" }
           });
           if (data?.success) {
@@ -210,7 +210,7 @@ export default function RecommendedServices() {
     setOpenDropdownId(openDropdownId === catId ? null : catId);
     if (!catSubcategories[catId]) {
       setLoadingSubs(prev => ({ ...prev, [catId]: true }));
-      axios.get(`https://insightsconsult-backend.onrender.com/api/categories/${catId}/subcategories`)
+      axiosInstance.get(`/categories/${catId}/subcategories`)
         .then(({ data }) => {
           const subs = Array.isArray(data?.data || data?.subcategories || data) 
             ? (data.data || data.subcategories || data) : [];

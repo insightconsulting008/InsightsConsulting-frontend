@@ -166,10 +166,10 @@ export default function UserDashboard() {
     else           setLoading(true);
 
     const [profileRes, servicesRes, myDocsRes, coDocsRes] = await Promise.allSettled([
-      axiosInstance.get("/user/profile"),
-      axiosInstance.get(`/my-services/${userId}`),
-      axiosInstance.get(`/mydocuments/documents/user/${userId}?page=1&limit=1`),
-      axiosInstance.get(`/mycompany/documents/user/${userId}?page=1&limit=1`),
+      axiosInstance.get("/user/settings/profile"),
+      axiosInstance.get(`/user/my-service/${userId}`),
+      axiosInstance.get(`/user/mydocuments/documents/user/${userId}?page=1&limit=1`),
+      axiosInstance.get(`/user/mycompany/documents/user/${userId}?page=1&limit=1`),
     ]);
 
     if (profileRes.status === "fulfilled") {

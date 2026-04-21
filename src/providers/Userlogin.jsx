@@ -145,7 +145,7 @@ function ForgotPasswordModal({ onClose }) {
     setError('')
 
     try {
-      await axiosInstance.post('/user/forgot-password', { email })
+      await axiosInstance.post('/auth/user/forgot-password', { email })
       setSuccess(true)
     } catch (err) {
       if (err.response) {
@@ -328,10 +328,10 @@ export default function UserLogin() {
     setLoading(true)
 
     try {
-      const res = await axiosInstance.post("/user/login", form, {
+      const res = await axiosInstance.post("/auth/user/login", form, {
         withCredentials: true
       })
-      
+      console.log(res)
       const { accessToken, role, userId } = res.data
 
       if (role === "USER") {
@@ -345,9 +345,10 @@ export default function UserLogin() {
         setError("Access denied. Use the admin login portal.")
       }
     } catch (err) {
+      console.log(err)
       if (err.response) {
         switch (err.response.status) {
-          case 401:
+          case 400:
             setError("Invalid email or password")
             break
           case 404:
@@ -371,11 +372,12 @@ export default function UserLogin() {
 
   // ─── Google Auth Handlers ──────────────────────────────────────────
   const handleGoogleSuccess = async (credentialResponse) => {
+    console.log(credentialResponse)
     setError("")
     setGoogleLoading(true)
     try {
       const res = await axiosInstance.post(
-        "/user/google-auth",
+        "/google/google-auth",
         { token: credentialResponse.credential }
       )
 

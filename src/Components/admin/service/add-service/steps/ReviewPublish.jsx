@@ -392,10 +392,10 @@ export default function ReviewPublish() {
         photoUrl: basicInfo.photoFile?.name,
         points: points && points.length > 0 ? points : [],
       };
-      console.log("📦 POST /service — Final Payload:", payloadPreview);
+      console.log("📦 POST /admin/service — Final Payload:", payloadPreview);
 
       /* ── POST /service ── */
-      const res = await axiosInstance.post(`/service`, fd, {
+      const res = await axiosInstance.post(`/admin/service`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       const json = res.data;
@@ -445,7 +445,7 @@ export default function ReviewPublish() {
 
         try {
           const r = await axiosInstance.post(
-            `/service/${serviceId}/input-fields`,
+            `/admin/service/${serviceId}/input-fields`,
             { fields },
           );
           const d = r.data;
@@ -459,7 +459,7 @@ export default function ReviewPublish() {
       if (trackSteps.length > 0) {
         try {
           const r = await axiosInstance.post(
-            `/service/${serviceId}/track-steps`,
+            `/admin/service/${serviceId}/track-steps`,
             {
               steps: trackSteps.map((s) => ({
                 title: s.title,

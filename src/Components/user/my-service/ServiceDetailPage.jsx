@@ -760,7 +760,7 @@ export default function ServiceDetailPage() {
   const fetchDetail = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/my-service/${id}/details`);
+      const res = await axiosInstance.get(`user/my-service/${id}/details`);
       if (res.data.success) setData(res.data.data);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }

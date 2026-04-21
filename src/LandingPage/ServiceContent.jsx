@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { CheckCircle2, Building2, Heart, Tag, Sparkles } from "lucide-react";
 
 const TABLE_HEADER_ICONS = {
-  '12A':     <Building2 size={13} className="text-primary flex-shrink-0" />,
-  '80G':     <Heart size={13} className="text-primary flex-shrink-0" />,
-  'Benefit': <Tag size={13} className="text-gray-500 flex-shrink-0" />,
-  'Criteria': <Tag size={13} className="text-gray-500 flex-shrink-0" />,
+  "12A": <Building2 size={13} className="text-primary flex-shrink-0" />,
+  "80G": <Heart size={13} className="text-primary flex-shrink-0" />,
+  Benefit: <Tag size={13} className="text-gray-500 flex-shrink-0" />,
+  Criteria: <Tag size={13} className="text-gray-500 flex-shrink-0" />,
 };
 import { findService } from "./data/servicesData";
 import EnquiryPopup from "./reusable/Popup";
@@ -15,10 +15,10 @@ import EnquiryPopup from "./reusable/Popup";
    STRIP LEADING EMOJI
 ───────────────────────────────────────────────────────── */
 const stripLeadingEmoji = (text) => {
-  if (!text || typeof text !== 'string') return text;
+  if (!text || typeof text !== "string") return text;
   return text
-    .replace(/^(?:\p{Extended_Pictographic}[\uFE0F\u20E3]?\u200D?)+\s*/gu, '')
-    .replace(/\*/g, '')
+    .replace(/^(?:\p{Extended_Pictographic}[\uFE0F\u20E3]?\u200D?)+\s*/gu, "")
+    .replace(/\*/g, "")
     .trim();
 };
 
@@ -28,7 +28,9 @@ const stripLeadingEmoji = (text) => {
 const SectionLabel = ({ label }) => (
   <div className="inline-flex items-center gap-2.5 mb-5 bg-primary/[0.08] border border-primary rounded-full px-4 py-2">
     <span className="w-2 h-2 rounded-full bg-primary inline-block" />
-    <span className="text-[11px] font-bold tracking-widest uppercase text-primary">{label}</span>
+    <span className="text-[11px] font-bold tracking-widest uppercase text-primary">
+      {label}
+    </span>
   </div>
 );
 
@@ -48,12 +50,50 @@ const CardHeading = ({ text }) => (
    GROUPED-ITEMS PARSER
 ───────────────────────────────────────────────────────── */
 const HEADER_STARTS = [
-  '✅','⚠️','📌','🔐','🧾','💰','📈','🏛️','📉','🔓','👤','🛡️','⏳',
-  '🤝','📑','🔍','📝','🏢','🔄','🏦','📬','📞','📊','👥','🌟','⚡',
-  '🎯','🔔','🌐','📋','💡','🏆','🔑','🧩','🌍','🆔','🔹','⚖️','📦',
+  "✅",
+  "⚠️",
+  "📌",
+  "🔐",
+  "🧾",
+  "💰",
+  "📈",
+  "🏛️",
+  "📉",
+  "🔓",
+  "👤",
+  "🛡️",
+  "⏳",
+  "🤝",
+  "📑",
+  "🔍",
+  "📝",
+  "🏢",
+  "🔄",
+  "🏦",
+  "📬",
+  "📞",
+  "📊",
+  "👥",
+  "🌟",
+  "⚡",
+  "🎯",
+  "🔔",
+  "🌐",
+  "📋",
+  "💡",
+  "🏆",
+  "🔑",
+  "🧩",
+  "🌍",
+  "🆔",
+  "🔹",
+  "⚖️",
+  "📦",
 ];
 const isHeader = (text) =>
-  text && !text.startsWith('👉') && HEADER_STARTS.some((p) => text.startsWith(p));
+  text &&
+  !text.startsWith("👉") &&
+  HEADER_STARTS.some((p) => text.startsWith(p));
 
 const parseGroups = (items) => {
   if (!items?.length) return null;
@@ -64,12 +104,23 @@ const parseGroups = (items) => {
     if (isHeader(item)) {
       if (current) groups.push(current);
       current = { header: item, description: null, items: [], notes: [] };
-    } else if (item.startsWith('👉')) {
+    } else if (item.startsWith("👉")) {
       if (current) current.notes.push(item);
-      else groups.push({ header: null, description: null, items: [], notes: [item] });
+      else
+        groups.push({
+          header: null,
+          description: null,
+          items: [],
+          notes: [item],
+        });
     } else {
-      if (!current) current = { header: null, description: null, items: [], notes: [] };
-      if (!current.description && current.items.length === 0 && item.length > 30)
+      if (!current)
+        current = { header: null, description: null, items: [], notes: [] };
+      if (
+        !current.description &&
+        current.items.length === 0 &&
+        item.length > 30
+      )
         current.description = item;
       else current.items.push(item);
     }
@@ -79,7 +130,11 @@ const parseGroups = (items) => {
 };
 
 const colClass = (count) =>
-  count === 1 ? 'grid-cols-1' : count === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3';
+  count === 1
+    ? "grid-cols-1"
+    : count === 2
+      ? "sm:grid-cols-2"
+      : "sm:grid-cols-2 lg:grid-cols-3";
 
 /* ─────────────────────────────────────────────────────────
    NOTE / CALLOUT BOX
@@ -115,16 +170,22 @@ const ItemCard = ({ group }) => (
     {group.items.length > 0 && (
       <div className="space-y-2.5 mt-0.5">
         {group.items.map((it, i) =>
-          it.endsWith(':') ? (
-            <p key={i} className="text-[11px] font-bold tracking-wider uppercase text-gray-900 mt-3 mb-0.5">
+          it.endsWith(":") ? (
+            <p
+              key={i}
+              className="text-[11px] font-bold tracking-wider uppercase text-gray-900 mt-3 mb-0.5"
+            >
               {stripLeadingEmoji(it)}
             </p>
           ) : (
-            <div key={i} className="flex items-start gap-2.5 text-gray-900 text-[14px] lg:text-[15px] leading-relaxed">
+            <div
+              key={i}
+              className="flex items-start gap-2.5 text-gray-900 text-[14px] lg:text-[15px] leading-relaxed"
+            >
               <span className="mt-[8px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               {stripLeadingEmoji(it)}
             </div>
-          )
+          ),
         )}
       </div>
     )}
@@ -149,16 +210,22 @@ const DarkItemCard = ({ group }) => (
     {group.items.length > 0 && (
       <div className="space-y-2 mt-0.5">
         {group.items.map((it, i) =>
-          it.endsWith(':') ? (
-            <p key={i} className="text-gray-500 text-[10px] font-bold tracking-wider uppercase mt-2.5 mb-0.5">
+          it.endsWith(":") ? (
+            <p
+              key={i}
+              className="text-gray-500 text-[10px] font-bold tracking-wider uppercase mt-2.5 mb-0.5"
+            >
               {stripLeadingEmoji(it)}
             </p>
           ) : (
-            <div key={i} className="flex items-start gap-2 text-gray-700 text-sm lg:text-[14px] leading-relaxed">
+            <div
+              key={i}
+              className="flex items-start gap-2 text-gray-700 text-sm lg:text-[14px] leading-relaxed"
+            >
               <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               {stripLeadingEmoji(it)}
             </div>
-          )
+          ),
         )}
       </div>
     )}
@@ -173,7 +240,18 @@ const GroupedSectionBox = ({ sections }) => {
   return (
     <div className="bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
       {sections.map((sec, idx) => {
-        const { heading, paragraphs, items, table, subSections, nestedItems, closingParagraphs, extraItems, footerNote, note } = sec;
+        const {
+          heading,
+          paragraphs,
+          items,
+          table,
+          subSections,
+          nestedItems,
+          closingParagraphs,
+          extraItems,
+          footerNote,
+          note,
+        } = sec;
         const groups = parseGroups(items);
         return (
           <div key={idx}>
@@ -182,7 +260,10 @@ const GroupedSectionBox = ({ sections }) => {
             {paragraphs?.length > 0 && (
               <div className="space-y-3 mb-4">
                 {paragraphs.map((p, i) => (
-                  <p key={i} className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+                  <p
+                    key={i}
+                    className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                  >
                     {stripLeadingEmoji(p)}
                   </p>
                 ))}
@@ -190,17 +271,24 @@ const GroupedSectionBox = ({ sections }) => {
             )}
             {groups ? (
               <div className={`grid ${colClass(groups.length)} gap-4 mb-4`}>
-                {groups.map((g, i) => <ItemCard key={i} group={g} />)}
-              </div>
-            ) : items?.length > 0 && (
-              <ul className="space-y-3 mb-4">
-                {items.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                    <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                    {stripLeadingEmoji(item)}
-                  </li>
+                {groups.map((g, i) => (
+                  <ItemCard key={i} group={g} />
                 ))}
-              </ul>
+              </div>
+            ) : (
+              items?.length > 0 && (
+                <ul className="space-y-3 mb-4">
+                  {items.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                    >
+                      <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                      {stripLeadingEmoji(item)}
+                    </li>
+                  ))}
+                </ul>
+              )
             )}
             {table && (
               <div className="overflow-x-auto mt-2 mb-4">
@@ -208,7 +296,10 @@ const GroupedSectionBox = ({ sections }) => {
                   <thead>
                     <tr>
                       {table.headers.map((h, i) => (
-                        <th key={i} className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? 'text-center' : ''}`}>
+                        <th
+                          key={i}
+                          className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                        >
                           {stripLeadingEmoji(h)}
                         </th>
                       ))}
@@ -216,9 +307,17 @@ const GroupedSectionBox = ({ sections }) => {
                   </thead>
                   <tbody>
                     {table.rows.map((row, i) => (
-                      <tr key={i} className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}>
+                      <tr
+                        key={i}
+                        className={
+                          i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"
+                        }
+                      >
                         {(Array.isArray(row) ? row : []).map((cell, j) => (
-                          <td key={j} className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? 'text-center' : ''}`}>
+                          <td
+                            key={j}
+                            className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
+                          >
                             {j === 0 ? stripLeadingEmoji(cell) : cell}
                           </td>
                         ))}
@@ -229,9 +328,14 @@ const GroupedSectionBox = ({ sections }) => {
               </div>
             )}
             {subSections?.length > 0 && (
-              <div className={`grid ${colClass(subSections.length)} gap-4 mb-4`}>
+              <div
+                className={`grid ${colClass(subSections.length)} gap-4 mb-4`}
+              >
                 {subSections.map((sub, i) => (
-                  <div key={i} className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] backdrop-blur-[1px]">
+                  <div
+                    key={i}
+                    className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] backdrop-blur-[1px]"
+                  >
                     <p className="text-[16px] lg:text-[17px] font-bold text-gray-900 leading-snug mb-3">
                       {stripLeadingEmoji(sub.heading)}
                     </p>
@@ -243,7 +347,10 @@ const GroupedSectionBox = ({ sections }) => {
                     {sub.items?.length > 0 && (
                       <div className="space-y-2">
                         {sub.items.map((it, j) => (
-                          <div key={j} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base">
+                          <div
+                            key={j}
+                            className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base"
+                          >
                             <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
                             {stripLeadingEmoji(it)}
                           </div>
@@ -255,13 +362,23 @@ const GroupedSectionBox = ({ sections }) => {
               </div>
             )}
             {closingParagraphs?.map((p, i) => (
-              <p key={i} className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed mt-3">{p}</p>
+              <p
+                key={i}
+                className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed mt-3"
+              >
+                {p}
+              </p>
             ))}
             {extraItems?.length > 0 && (
               <ul className="space-y-2 mt-3 mb-4">
                 {extraItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                    <span className="flex-shrink-0 text-base leading-snug mt-[1px]">❌</span>
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                  >
+                    <span className="flex-shrink-0 text-base leading-snug mt-[1px]">
+                      ❌
+                    </span>
                     {stripLeadingEmoji(item)}
                   </li>
                 ))}
@@ -280,40 +397,68 @@ const GroupedSectionBox = ({ sections }) => {
 ───────────────────────────────────────────────────────── */
 const GenericSectionCard = ({ section }) => {
   if (!section) return null;
-  const { heading, paragraphs, items, note, footerNote, subSections, serviceItems, processSteps, table, comparisonTable, nestedItems, subheading, closingText, closingParagraphs, extraItems, whatIs, preHeading, helpItems, transitionText } = section;
+  const {
+    heading,
+    paragraphs,
+    items,
+    note,
+    footerNote,
+    subSections,
+    serviceItems,
+    processSteps,
+    table,
+    comparisonTable,
+    nestedItems,
+    subheading,
+    closingText,
+    closingParagraphs,
+    extraItems,
+    whatIs,
+    preHeading,
+    helpItems,
+    transitionText,
+  } = section;
   const groups = parseGroups(items);
 
   return (
     <div className="bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
-
       {preHeading && (
         <p className="text-[16px] lg:text-[17px] text-gray-900 leading-relaxed mb-4 pb-4 border-b border-gray-200">
           {Array.isArray(preHeading)
             ? preHeading.map((seg, i) =>
-                seg.bold
-                  ? <strong key={i} className="text-gray-900 font-bold">{seg.text}</strong>
-                  : <span key={i}>{seg.text}</span>
+                seg.bold ? (
+                  <strong key={i} className="text-gray-900 font-bold">
+                    {seg.text}
+                  </strong>
+                ) : (
+                  <span key={i}>{seg.text}</span>
+                ),
               )
             : preHeading}
         </p>
       )}
       {heading && <CardHeading text={heading} />}
 
-      {/* paragraphs — question sentences get a special callout style */}
       {paragraphs?.length > 0 && (
         <div className="space-y-3 mb-4">
           {paragraphs.map((p, i) =>
-            p.endsWith('?') ? (
-              <div key={i} className="bg-primary/5 border-l-4 border-primary/40 rounded-r-xl px-5 py-3 my-1">
+            p.endsWith("?") ? (
+              <div
+                key={i}
+                className="bg-primary/5 border-l-4 border-primary/40 rounded-r-xl px-5 py-3 my-1"
+              >
                 <p className="text-gray-900 text-[15px] lg:text-[17px] font-semibold leading-relaxed">
                   {stripLeadingEmoji(p)}
                 </p>
               </div>
             ) : (
-              <p key={i} className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+              <p
+                key={i}
+                className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+              >
                 {stripLeadingEmoji(p)}
               </p>
-            )
+            ),
           )}
         </div>
       )}
@@ -325,46 +470,52 @@ const GenericSectionCard = ({ section }) => {
         </p>
       )}
 
-      {/* items: grouped → cards / flat → bullets */}
       {groups ? (
         <>
           <div className={`grid ${colClass(groups.length)} gap-4 mb-4`}>
-            {groups.map((g, i) => <ItemCard key={i} group={g} />)}
+            {groups.map((g, i) => (
+              <ItemCard key={i} group={g} />
+            ))}
           </div>
-          {groups.flatMap(g => g.notes).map((note, i) => (
-            <div key={i} className="mt-3">
-              <NoteBox text={note} />
-            </div>
-          ))}
+          {groups
+            .flatMap((g) => g.notes)
+            .map((note, i) => (
+              <div key={i} className="mt-3">
+                <NoteBox text={note} />
+              </div>
+            ))}
         </>
-      ) : items?.length > 0 && (
-        <ul className="space-y-3 mb-4">
-          {items.map((item, i) => {
-            if (item.startsWith('👉')) {
-              const clean = stripLeadingEmoji(item);
-              /* ends with ':' → sub-label/intro title, not a callout note */
-              if (clean.endsWith(':')) {
-                return (
-                  <li key={i} className="list-none">
-                    <p className="text-[13px] font-bold tracking-wider uppercase text-gray-900 mt-1 mb-0.5">
-                      {clean.slice(0, -1)}
-                    </p>
-                  </li>
-                );
+      ) : (
+        items?.length > 0 && (
+          <ul className="space-y-3 mb-4">
+            {items.map((item, i) => {
+              if (item.startsWith("👉")) {
+                const clean = stripLeadingEmoji(item);
+                if (clean.endsWith(":")) {
+                  return (
+                    <li key={i} className="list-none">
+                      <p className="text-[13px] font-bold tracking-wider uppercase text-gray-900 mt-1 mb-0.5">
+                        {clean.slice(0, -1)}
+                      </p>
+                    </li>
+                  );
+                }
+                return <NoteBox key={i} text={item} />;
               }
-              return <NoteBox key={i} text={item} />;
-            }
-            return (
-              <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                {stripLeadingEmoji(item)}
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                >
+                  <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                  {stripLeadingEmoji(item)}
+                </li>
+              );
+            })}
+          </ul>
+        )
       )}
 
-      {/* nested items (e.g. NGO eligibility with sub-bullets) */}
       {nestedItems?.length > 0 && (
         <div className="space-y-2 mb-4">
           {nestedItems.map((item, i) =>
@@ -375,7 +526,10 @@ const GenericSectionCard = ({ section }) => {
                 </p>
                 <div className="pl-4 space-y-1.5">
                   {item.subItems.map((sub, j) => (
-                    <div key={j} className="flex items-start gap-2 text-gray-900 text-[14px] leading-relaxed">
+                    <div
+                      key={j}
+                      className="flex items-start gap-2 text-gray-900 text-[14px] leading-relaxed"
+                    >
                       <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                       {sub}
                     </div>
@@ -383,11 +537,14 @@ const GenericSectionCard = ({ section }) => {
                 </div>
               </div>
             ) : (
-              <div key={i} className="flex items-start gap-2.5 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+              <div
+                key={i}
+                className="flex items-start gap-2.5 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+              >
                 <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                 {stripLeadingEmoji(item.text)}
               </div>
-            )
+            ),
           )}
         </div>
       )}
@@ -406,7 +563,10 @@ const GenericSectionCard = ({ section }) => {
           {helpItems.points?.length > 0 && (
             <ul className="space-y-2.5 pl-1">
               {helpItems.points.map((pt, i) => (
-                <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+                <li
+                  key={i}
+                  className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                >
                   <span className="mt-[8px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                   {stripLeadingEmoji(pt)}
                 </li>
@@ -420,19 +580,25 @@ const GenericSectionCard = ({ section }) => {
       {closingParagraphs?.length > 0 && (
         <div className="mt-5 space-y-3">
           {closingParagraphs.map((p, i) =>
-            p.startsWith('👉') ? (
+            p.startsWith("👉") ? (
               <NoteBox key={i} text={p} />
-            ) : p.endsWith('?') ? (
-              <div key={i} className="bg-primary/5 border-l-4 border-primary/40 rounded-r-xl px-5 py-3">
+            ) : p.endsWith("?") ? (
+              <div
+                key={i}
+                className="bg-primary/5 border-l-4 border-primary/40 rounded-r-xl px-5 py-3"
+              >
                 <p className="text-gray-900 text-[15px] lg:text-[17px] font-semibold leading-relaxed">
                   {p}
                 </p>
               </div>
             ) : (
-              <p key={i} className="text-gray-900 text-[15px] lg:text-[17px] font-medium leading-relaxed">
+              <p
+                key={i}
+                className="text-gray-900 text-[15px] lg:text-[17px] font-medium leading-relaxed"
+              >
                 {p}
               </p>
-            )
+            ),
           )}
         </div>
       )}
@@ -450,7 +616,10 @@ const GenericSectionCard = ({ section }) => {
       {whatIs?.length > 0 && (
         <div className="grid sm:grid-cols-2 gap-5 mt-5">
           {whatIs.map((card, i) => (
-            <div key={i} className="bg-primary/[0.03] border border-primary rounded-2xl p-6 lg:p-7 flex flex-col gap-3 backdrop-blur-[1px]">
+            <div
+              key={i}
+              className="bg-primary/[0.03] border border-primary rounded-2xl p-6 lg:p-7 flex flex-col gap-3 backdrop-blur-[1px]"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-[3px] h-5 bg-primary rounded-full flex-shrink-0" />
                 <p className="text-[13px] lg:text-[14px] font-bold tracking-widest uppercase text-primary">
@@ -459,7 +628,12 @@ const GenericSectionCard = ({ section }) => {
               </div>
               <div className="space-y-3">
                 {card.paragraphs?.map((p, j) => (
-                  <p key={j} className="text-gray-900 text-[14px] lg:text-[16px] leading-relaxed">{p}</p>
+                  <p
+                    key={j}
+                    className="text-gray-900 text-[14px] lg:text-[16px] leading-relaxed"
+                  >
+                    {p}
+                  </p>
                 ))}
               </div>
             </div>
@@ -467,30 +641,35 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* extra items — consequence list with ❌ prefix */}
       {extraItems?.length > 0 && (
         <ul className="space-y-2 mt-3 mb-4">
           {extraItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-              <span className="flex-shrink-0 text-base leading-snug mt-[1px]">❌</span>
+            <li
+              key={i}
+              className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+            >
+              <span className="flex-shrink-0 text-base leading-snug mt-[1px]">
+                ❌
+              </span>
               {stripLeadingEmoji(item)}
             </li>
           ))}
         </ul>
       )}
 
-      {/* closing text — plain paragraph after items/nestedItems */}
       {closingText && (
         <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed mt-3 mb-4">
           {closingText}
         </p>
       )}
 
-      {/* sub-sections → card grid */}
       {subSections?.length > 0 && (
         <div className={`grid ${colClass(subSections.length)} gap-4 mb-4`}>
           {subSections.map((sub, i) => (
-            <div key={i} className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] backdrop-blur-[1px]">
+            <div
+              key={i}
+              className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] backdrop-blur-[1px]"
+            >
               <p className="text-[16px] lg:text-[17px] font-bold text-gray-900 leading-snug mb-3">
                 {stripLeadingEmoji(sub.heading)}
               </p>
@@ -510,7 +689,10 @@ const GenericSectionCard = ({ section }) => {
                         </div>
                         <div className="pl-5 space-y-1.5">
                           {item.subItems.map((si, k) => (
-                            <div key={k} className="flex items-start gap-2 text-gray-900 text-[14px] lg:text-[15px]">
+                            <div
+                              key={k}
+                              className="flex items-start gap-2 text-gray-900 text-[14px] lg:text-[15px]"
+                            >
                               <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                               {si}
                             </div>
@@ -518,11 +700,14 @@ const GenericSectionCard = ({ section }) => {
                         </div>
                       </div>
                     ) : (
-                      <div key={j} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base">
+                      <div
+                        key={j}
+                        className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base"
+                      >
                         <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
                         {stripLeadingEmoji(item.text)}
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               )}
@@ -536,21 +721,27 @@ const GenericSectionCard = ({ section }) => {
                         </p>
                         <div className="pl-3 space-y-1.5">
                           {it.subItems.map((si, k) => (
-                            <div key={k} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base">
+                            <div
+                              key={k}
+                              className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base"
+                            >
                               <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
                               {si}
                             </div>
                           ))}
                         </div>
                       </div>
-                    ) : it.startsWith('👉') ? (
+                    ) : it.startsWith("👉") ? (
                       <NoteBox key={j} text={it} />
                     ) : (
-                      <div key={j} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
+                      <div
+                        key={j}
+                        className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-[16px] leading-relaxed"
+                      >
                         <span className="mt-[8px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                         {stripLeadingEmoji(it)}
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               )}
@@ -564,11 +755,13 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* service items → card grid */}
       {serviceItems?.length > 0 && (
         <div className={`grid ${colClass(serviceItems.length)} gap-4 mb-4`}>
           {serviceItems.map((item, i) => (
-            <div key={i} className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] hover:border-primary transition-all duration-200 backdrop-blur-[1px]">
+            <div
+              key={i}
+              className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.06)] hover:border-primary transition-all duration-200 backdrop-blur-[1px]"
+            >
               <p className="text-[16px] lg:text-[17px] font-bold text-gray-900 leading-snug mb-2.5">
                 {stripLeadingEmoji(item.name)}
               </p>
@@ -582,12 +775,14 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* process steps → highlighted numbered cards */}
       {processSteps?.length > 0 && (
         <div className="mb-4">
           <ol className={`grid ${colClass(processSteps.length)} gap-4`}>
             {processSteps.map((step, i) => (
-              <li key={i} className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.07)] flex items-start gap-3 hover:border-primary transition-all duration-200 backdrop-blur-[1px]">
+              <li
+                key={i}
+                className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.07)] flex items-start gap-3 hover:border-primary transition-all duration-200 backdrop-blur-[1px]"
+              >
                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -607,15 +802,19 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* standard table */}
       {table && (
         <div className="overflow-x-auto mt-6 mb-4">
           <table className="w-auto text-left border-collapse">
             <thead>
               <tr>
                 {table.headers.map((h, i) => (
-                  <th key={i} className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? 'text-center' : ''}`}>
-                    <span className={`inline-flex items-center gap-1.5 ${i > 0 ? 'justify-center' : ''}`}>
+                  <th
+                    key={i}
+                    className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                  >
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${i > 0 ? "justify-center" : ""}`}
+                    >
                       {TABLE_HEADER_ICONS[h]}
                       {stripLeadingEmoji(h)}
                     </span>
@@ -625,9 +824,15 @@ const GenericSectionCard = ({ section }) => {
             </thead>
             <tbody>
               {table.rows.map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}>
+                <tr
+                  key={i}
+                  className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}
+                >
                   {(Array.isArray(row) ? row : []).map((cell, j) => (
-                    <td key={j} className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? 'text-center' : ''}`}>
+                    <td
+                      key={j}
+                      className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
+                    >
                       {j === 0 ? stripLeadingEmoji(cell) : cell}
                     </td>
                   ))}
@@ -638,15 +843,19 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* comparison table */}
       {comparisonTable && (
         <div className="overflow-x-auto mb-4">
           <table className="w-auto text-left border-collapse">
             <thead>
               <tr>
                 {comparisonTable.headers.map((h, i) => (
-                  <th key={i} className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? 'text-center' : ''}`}>
-                    <span className={`inline-flex items-center gap-1.5 ${i > 0 ? 'justify-center' : ''}`}>
+                  <th
+                    key={i}
+                    className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                  >
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${i > 0 ? "justify-center" : ""}`}
+                    >
                       {TABLE_HEADER_ICONS[h]}
                       {stripLeadingEmoji(h)}
                     </span>
@@ -656,9 +865,15 @@ const GenericSectionCard = ({ section }) => {
             </thead>
             <tbody>
               {comparisonTable.rows.map((row, i) => (
-                <tr key={i} className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}>
+                <tr
+                  key={i}
+                  className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}
+                >
                   {row.map((cell, j) => (
-                    <td key={j} className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j === 0 ? "font-semibold" : "text-center"}`}>
+                    <td
+                      key={j}
+                      className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j === 0 ? "font-semibold" : "text-center"}`}
+                    >
                       {j === 0 ? stripLeadingEmoji(cell) : cell}
                     </td>
                   ))}
@@ -669,26 +884,23 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {/* note — always rendered at the bottom, after all content */}
-      {note && (
-        note.startsWith('✔') ? (
+      {note &&
+        (note.startsWith("✔") ? (
           <div className="mt-5 inline-flex items-center gap-2 bg-primary/8 border border-primary text-primary text-[13px] font-semibold rounded-xl px-4 py-2.5 shadow-sm">
             {note}
           </div>
         ) : (
           <NoteBox text={note} />
-        )
-      )}
+        ))}
 
-      {footerNote && (
-        footerNote.startsWith('✔') ? (
+      {footerNote &&
+        (footerNote.startsWith("✔") ? (
           <div className="mt-3 inline-flex items-center gap-2 bg-primary/8 border border-primary text-primary text-[13px] font-semibold rounded-xl px-4 py-2.5 shadow-sm">
             {footerNote}
           </div>
         ) : (
           <NoteBox text={footerNote} />
-        )
-      )}
+        ))}
     </div>
   );
 };
@@ -698,12 +910,20 @@ const GenericSectionCard = ({ section }) => {
 ───────────────────────────────────────────────────────── */
 const GenericDarkCard = ({ section, serviceNote }) => {
   if (!section) return null;
-  const { heading, paragraphs, items, closingText, closingParagraphs, extraItems, subSections, note } = section;
+  const {
+    heading,
+    paragraphs,
+    items,
+    closingText,
+    closingParagraphs,
+    extraItems,
+    subSections,
+    note,
+  } = section;
   const groups = parseGroups(items);
 
   return (
     <div className="h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)]">
-
       {heading && (
         <div className="flex items-start gap-3 mb-4 lg:mb-6">
           <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
@@ -716,7 +936,10 @@ const GenericDarkCard = ({ section, serviceNote }) => {
       {paragraphs?.length > 0 && (
         <div className="space-y-3 mb-5">
           {paragraphs.map((p, i) => (
-            <p key={i} className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
+            <p
+              key={i}
+              className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed"
+            >
               {stripLeadingEmoji(p)}
             </p>
           ))}
@@ -724,26 +947,39 @@ const GenericDarkCard = ({ section, serviceNote }) => {
       )}
 
       {groups ? (
-        <div className={`grid ${items.filter(isHeader).length <= 2 ? 'grid-cols-1' : 'sm:grid-cols-2'} gap-3`}>
-          {groups.map((g, i) => <DarkItemCard key={i} group={g} />)}
+        <div
+          className={`grid ${items.filter(isHeader).length <= 2 ? "grid-cols-1" : "sm:grid-cols-2"} gap-3`}
+        >
+          {groups.map((g, i) => (
+            <DarkItemCard key={i} group={g} />
+          ))}
         </div>
-      ) : items?.length > 0 && (
-        <ul className="space-y-3">
-          {items.map((item, i) =>
-            item.startsWith('👉') || (item.startsWith('We ') && !item.endsWith(':')) ? (
-              <NoteBox key={i} text={item} />
-            ) : (
-              <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base">
-                <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                {stripLeadingEmoji(item)}
-              </li>
-            )
-          )}
-        </ul>
+      ) : (
+        items?.length > 0 && (
+          <ul className="space-y-3">
+            {items.map((item, i) =>
+              item.startsWith("👉") ||
+              (item.startsWith("We ") && !item.endsWith(":")) ? (
+                <NoteBox key={i} text={item} />
+              ) : (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
+                >
+                  <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                  {stripLeadingEmoji(item)}
+                </li>
+              ),
+            )}
+          </ul>
+        )
       )}
 
       {closingParagraphs?.map((p, i) => (
-        <p key={i} className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed mt-4">
+        <p
+          key={i}
+          className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed mt-4"
+        >
           {p}
         </p>
       ))}
@@ -751,8 +987,13 @@ const GenericDarkCard = ({ section, serviceNote }) => {
       {extraItems?.length > 0 && (
         <ul className="space-y-2 mt-3">
           {extraItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base">
-              <span className="flex-shrink-0 text-base leading-snug mt-[1px]">❌</span>
+            <li
+              key={i}
+              className="flex items-start gap-2 text-gray-900 text-[15px] lg:text-base"
+            >
+              <span className="flex-shrink-0 text-base leading-snug mt-[1px]">
+                ❌
+              </span>
               {stripLeadingEmoji(item)}
             </li>
           ))}
@@ -768,7 +1009,10 @@ const GenericDarkCard = ({ section, serviceNote }) => {
       {subSections?.length > 0 && (
         <div className={`grid ${colClass(subSections.length)} gap-3 mt-4`}>
           {subSections.map((sub, i) => (
-            <div key={i} className="bg-primary/[0.04] border-2 border-primary rounded-xl p-4 lg:p-5">
+            <div
+              key={i}
+              className="bg-primary/[0.04] border-2 border-primary rounded-xl p-4 lg:p-5"
+            >
               <p className="text-[14px] font-bold text-gray-900 leading-snug mb-2.5">
                 {stripLeadingEmoji(sub.heading)}
               </p>
@@ -780,7 +1024,10 @@ const GenericDarkCard = ({ section, serviceNote }) => {
               {sub.items?.length > 0 && (
                 <ul className="space-y-1.5">
                   {sub.items.map((it, j) => (
-                    <li key={j} className="flex items-start gap-2 text-gray-900 text-sm leading-relaxed">
+                    <li
+                      key={j}
+                      className="flex items-start gap-2 text-gray-900 text-sm leading-relaxed"
+                    >
                       <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                       {it}
                     </li>
@@ -794,7 +1041,6 @@ const GenericDarkCard = ({ section, serviceNote }) => {
 
       {note && <NoteBox text={note} />}
       {serviceNote && <NoteBox text={serviceNote} />}
-
     </div>
   );
 };
@@ -802,6 +1048,51 @@ const GenericDarkCard = ({ section, serviceNote }) => {
 /* ─────────────────────────────────────────────────────────
    ADVANTAGES SECTION (registration) – border, backdrop-blur
 ───────────────────────────────────────────────────────── */
+const ADVANTAGE_PALETTES = [
+  {
+    card: "bg-[#4F46E5]",
+    title: "text-white",
+    desc: "text-indigo-100",
+    bullet: "bg-white",
+    sub: "text-indigo-100",
+  },
+  {
+    card: "bg-[#0F9D8A]",
+    title: "text-white",
+    desc: "text-teal-100",
+    bullet: "bg-white",
+    sub: "text-teal-100",
+  },
+  {
+    card: "bg-[#E24B4A]",
+    title: "text-white",
+    desc: "text-red-100",
+    bullet: "bg-white",
+    sub: "text-red-100",
+  },
+  {
+    card: "bg-[#D97706]",
+    title: "text-white",
+    desc: "text-amber-100",
+    bullet: "bg-white",
+    sub: "text-amber-100",
+  },
+  {
+    card: "bg-[#7C3AED]",
+    title: "text-white",
+    desc: "text-violet-100",
+    bullet: "bg-white",
+    sub: "text-violet-100",
+  },
+  {
+    card: "bg-[#0369A1]",
+    title: "text-white",
+    desc: "text-sky-100",
+    bullet: "bg-white",
+    sub: "text-sky-100",
+  },
+];
+
 const AdvantagesSection = ({ advantages }) => {
   if (!advantages) return null;
   return (
@@ -811,7 +1102,10 @@ const AdvantagesSection = ({ advantages }) => {
       </h2>
       <div className="grid sm:grid-cols-2 gap-5">
         {advantages.items.map((item, i) => (
-          <div key={i} className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-8 shadow-[0_2px_16px_rgba(124,58,237,0.07)] hover:border-primary transition-all duration-200 backdrop-blur-[1px]">
+          <div
+            key={i}
+            className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-8 shadow-[0_2px_16px_rgba(124,58,237,0.07)] hover:border-primary transition-all duration-200 backdrop-blur-[1px]"
+          >
             <p className="text-[20px] lg:text-[22px] font-extrabold text-gray-900 leading-snug mb-3">
               {stripLeadingEmoji(item.title)}
             </p>
@@ -821,7 +1115,10 @@ const AdvantagesSection = ({ advantages }) => {
             {item.subPoints?.length > 0 && (
               <ul className="space-y-2">
                 {item.subPoints.map((sp, j) => (
-                  <li key={j} className="flex items-start gap-2 text-gray-900 text-sm lg:text-[14px]">
+                  <li
+                    key={j}
+                    className="flex items-start gap-2 text-gray-900 text-sm lg:text-[14px]"
+                  >
                     <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
                     {stripLeadingEmoji(sp)}
                   </li>
@@ -852,9 +1149,9 @@ const ImportantNoteSection = ({ importantNote }) => {
       {points?.length > 0 && (
         <ul className="space-y-2.5">
           {points.map((pt, i) => {
-            if (pt.startsWith('👉')) {
+            if (pt.startsWith("👉")) {
               const clean = stripLeadingEmoji(pt);
-              if (clean.endsWith(':')) {
+              if (clean.endsWith(":")) {
                 return (
                   <li key={i} className="list-none">
                     <p className="text-[13px] font-bold tracking-wider uppercase text-gray-900 mt-1 mb-0.5">
@@ -863,10 +1160,17 @@ const ImportantNoteSection = ({ importantNote }) => {
                   </li>
                 );
               }
-              return <li key={i} className="list-none"><NoteBox text={pt} /></li>;
+              return (
+                <li key={i} className="list-none">
+                  <NoteBox text={pt} />
+                </li>
+              );
             }
             return (
-              <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base">
+              <li
+                key={i}
+                className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
+              >
                 <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                 {stripLeadingEmoji(pt)}
               </li>
@@ -888,11 +1192,16 @@ const ProcessList = ({ steps, note }) => {
     <div className="bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
       <div className="flex items-start gap-3 mb-4 lg:mb-6">
         <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-        <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">Our End-to-End Process</h3>
+        <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+          Our End-to-End Process
+        </h3>
       </div>
       <ol className="space-y-3.5">
         {steps.map((step, i) => (
-          <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+          <li
+            key={i}
+            className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+          >
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
               {String(i + 1).padStart(2, "0")}
             </span>
@@ -921,491 +1230,582 @@ const ServiceContent = ({ hideCta = false }) => {
     );
   }
 
-  const isRegistration = service.dataType === 'registration';
+  const isRegistration = service.dataType === "registration";
 
   /* ── Separate "Documents" sections so they always render just before Insight ── */
   const isImportantNotesSection = (s) => {
-    const h = s?.heading?.toLowerCase() || '';
-    return h.includes('important points');
+    const h = s?.heading?.toLowerCase() || "";
+    return h.includes("important points");
   };
   const isSupportSection = (s) => {
-    const h = s?.heading?.toLowerCase() || '';
-    return h.includes('our support');
+    const h = s?.heading?.toLowerCase() || "";
+    return h.includes("our support");
   };
   const isDocSection = (s) => {
     if (s?.inlineDoc) return false;
-    const h = s?.heading?.toLowerCase() || '';
-    return h.includes('document') || h.includes('what we need') || isImportantNotesSection(s) || isSupportSection(s);
+    const h = s?.heading?.toLowerCase() || "";
+    return (
+      h.includes("document") ||
+      h.includes("what we need") ||
+      isImportantNotesSection(s) ||
+      isSupportSection(s)
+    );
   };
-  const mainContentSections = service.contentSections?.filter((s) => !isDocSection(s)) || [];
-  const docContentSections  = service.contentSections?.filter(isDocSection) || [];
+  const mainContentSections =
+    service.contentSections?.filter((s) => !isDocSection(s)) || [];
+  const docContentSections =
+    service.contentSections?.filter(isDocSection) || [];
 
-  /* ── Overview grid: compute which cards are visible, span last if alone ── */
   const overviewKeys = [
-    service.idealFor?.length > 0        && 'idealFor',
-    service.formsHandled                 && 'formsHandled',
-    service.establishment                && 'establishment',
+    service.idealFor?.length > 0 && "idealFor",
+    service.formsHandled && "formsHandled",
+    service.establishment && "establishment",
   ].filter(Boolean);
-  const overviewLast  = overviewKeys[overviewKeys.length - 1];
-  const overviewAlone = (key) => overviewKeys.length % 2 !== 0 && overviewLast === key ? 'lg:col-span-2' : '';
+  const overviewLast = overviewKeys[overviewKeys.length - 1];
+  const overviewAlone = (key) =>
+    overviewKeys.length % 2 !== 0 && overviewLast === key
+      ? "lg:col-span-2"
+      : "";
 
-  /* ── Insight grid: simulate 2-col flow to detect lone last card ── */
   const insightFlow = [
-    service.insightAdvantage            && { key: 'insightAdvantage', full: false },
-    service.postSupport?.length > 0     && { key: 'postSupport',      full: false },
-    service.commonMistakes?.length > 0  && { key: 'commonMistakes',   full: false },
-    service.growthInsight               && { key: 'growthInsight',    full: false },
-    ...(service.darkSections?.map((s, i) => ({ key: `dark_${i}`, full: !!s.fullWidth })) || []),
+    service.insightAdvantage && { key: "insightAdvantage", full: false },
+    service.postSupport?.length > 0 && { key: "postSupport", full: false },
+    service.commonMistakes?.length > 0 && {
+      key: "commonMistakes",
+      full: false,
+    },
+    service.growthInsight && { key: "growthInsight", full: false },
+    ...(service.darkSections?.map((s, i) => ({
+      key: `dark_${i}`,
+      full: !!s.fullWidth,
+    })) || []),
   ].filter(Boolean);
-  let _rowPos = 0, _loneKey = null;
+  let _rowPos = 0,
+    _loneKey = null;
   insightFlow.forEach(({ key, full }) => {
-    if (full) { _rowPos = 0; }
-    else { if (_rowPos === 0) _loneKey = key; _rowPos = (_rowPos + 1) % 2; }
+    if (full) {
+      _rowPos = 0;
+    } else {
+      if (_rowPos === 0) _loneKey = key;
+      _rowPos = (_rowPos + 1) % 2;
+    }
   });
   const insightAlone = _rowPos === 1 ? _loneKey : null;
-  const insightSpan  = (key) => insightAlone === key ? 'sm:col-span-2' : '';
+  const insightSpan = (key) => (insightAlone === key ? "sm:col-span-2" : "");
 
-  /* Registration documents (from requirements) */
   const regDocs = isRegistration ? service.requirements?.documents : null;
 
   return (
     <div
       className="relative"
       style={{
-        backgroundImage: "url('https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/a887b935f178ca98fda0052257faa5c0f46c4a37.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundAttachment: 'fixed',
-        backgroundRepeat: 'no-repeat',
+        backgroundImage:
+          "url('https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/a887b935f178ca98fda0052257faa5c0f46c4a37.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* gradient overlay: let image breathe at top, fade to clean white towards body */}
-      <div className="absolute inset-0" style={{background: 'linear-gradient(to bottom, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.93) 40%, rgba(255,255,255,0.97) 100%)'}} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.93) 40%, rgba(255,255,255,0.97) 100%)",
+        }}
+      />
 
       <div className="relative">
-      <div className="container mx-auto px-4 lg:px-12">
-
-        {/* ────────────────────────────────────────────────
+        <div className="container mx-auto px-4 lg:px-12">
+          {/* ────────────────────────────────────────────────
             OVERVIEW — Ideal For + Important Note (registration)
         ──────────────────────────────────────────────── */}
-        {(service.idealFor?.length > 0 || service.formsHandled || service.establishment) && (
-          <section id="overview" className="py-5 lg:py-14">
-            <div className={`grid gap-5 ${overviewKeys.length > 1 ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+          {(service.idealFor?.length > 0 ||
+            service.formsHandled ||
+            service.establishment) && (
+            <section id="overview" className="py-5 lg:py-14">
+              <div
+                className={`grid gap-5 ${overviewKeys.length > 1 ? "lg:grid-cols-2" : "grid-cols-1"}`}
+              >
+                {service.idealFor?.length > 0 && (
+                  <div
+                    className={`h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${overviewAlone("idealFor")} backdrop-blur-[1px]`}
+                  >
+                    <CardHeading
+                      text={service.idealForHeading || "Ideal For"}
+                    />
+                    <ul className="space-y-3">
+                      {service.idealFor.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
+                        >
+                          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          {stripLeadingEmoji(item)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              {service.idealFor?.length > 0 && (
-                <div className={`h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${overviewAlone('idealFor')} backdrop-blur-[1px]`}>
-                  <CardHeading text={service.idealForHeading || "Ideal For"} />
-                  <ul className="space-y-3">
-                    {service.idealFor.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base">
-                        <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                        {stripLeadingEmoji(item)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                {service.formsHandled && (
+                  <div
+                    className={`h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${overviewAlone("formsHandled")} backdrop-blur-[1px]`}
+                  >
+                    <CardHeading text={service.formsHandled.heading} />
+                    <ul className="space-y-3">
+                      {service.formsHandled.items.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                        >
+                          <span className="mt-[9px] flex-shrink-0 text-[11px] font-bold text-primary w-5">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          {stripLeadingEmoji(item)}
+                        </li>
+                      ))}
+                    </ul>
+                    {service.formsHandled.note && (
+                      <NoteBox text={service.formsHandled.note} />
+                    )}
+                  </div>
+                )}
 
-              {service.formsHandled && (
-                <div className={`h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${overviewAlone('formsHandled')} backdrop-blur-[1px]`}>
-                  <CardHeading text={service.formsHandled.heading} />
-                  <ul className="space-y-3">
-                    {service.formsHandled.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                        <span className="mt-[9px] flex-shrink-0 text-[11px] font-bold text-primary w-5">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        {stripLeadingEmoji(item)}
-                      </li>
-                    ))}
-                  </ul>
-                  {service.formsHandled.note && <NoteBox text={service.formsHandled.note} />}
-                </div>
-              )}
+                {service.establishment && (
+                  <div className={`h-full ${overviewAlone("establishment")}`}>
+                    <ImportantNoteSection
+                      importantNote={service.establishment}
+                    />
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
-              {service.establishment && (
-                <div className={`h-full ${overviewAlone('establishment')}`}>
-                  <ImportantNoteSection importantNote={service.establishment} />
-                </div>
-              )}
+          {/* Advantages (registration) */}
+          {isRegistration && service.advantages && (
+            <AdvantagesSection advantages={service.advantages} />
+          )}
 
-            </div>
-          </section>
-        )}
-
-        {/* Advantages (registration) */}
-        {isRegistration && service.advantages && (
-          <AdvantagesSection advantages={service.advantages} />
-        )}
-
-        {/* ────────────────────────────────────────────────
+          {/* ────────────────────────────────────────────────
             REQUIREMENTS — eligibility + documents together
             Both boxes side-by-side on desktop under one heading
         ──────────────────────────────────────────────── */}
-        {isRegistration && (service.requirements?.eligibility || regDocs?.length > 0 || service.importantNote) && (
-          <section id="requirements" className="py-5 lg:py-14">
-            <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
-              What You Need to Get Started
-            </h2>
+          {isRegistration &&
+            (service.requirements?.eligibility ||
+              regDocs?.length > 0 ||
+              service.importantNote) && (
+              <section id="requirements" className="py-5 lg:py-14">
+                <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
+                  What You Need to Get Started
+                </h2>
 
-            <div className={`grid gap-5 ${service.requirements?.eligibility && regDocs?.length > 0 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+                <div
+                  className={`grid gap-5 ${service.requirements?.eligibility && regDocs?.length > 0 ? "sm:grid-cols-2" : "grid-cols-1"}`}
+                >
+                  {service.requirements?.eligibility && (
+                    <div className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
+                      <CardHeading
+                        text={service.requirements.eligibility.heading}
+                      />
+                      <ul className="space-y-3">
+                        {service.requirements.eligibility.items.map(
+                          (item, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                            >
+                              <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
+                              {stripLeadingEmoji(item)}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  )}
 
-              {/* Eligibility */}
-              {service.requirements?.eligibility && (
-                <div className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
-                  <CardHeading text={service.requirements.eligibility.heading} />
-                  <ul className="space-y-3">
-                    {service.requirements.eligibility.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                        <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
-                        {stripLeadingEmoji(item)}
-                      </li>
-                    ))}
-                  </ul>
+                  {regDocs?.length > 0 && (
+                    <div className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
+                      <ul className="space-y-3">
+                        {regDocs.map((doc, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed"
+                          >
+                            <span className="flex-shrink-0 min-w-[28px] h-6 rounded-md bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center mt-[2px]">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                            {stripLeadingEmoji(doc)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* Documents Required */}
-              {regDocs?.length > 0 && (
-                <div className="h-full bg-white/40 border border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
-                  <ul className="space-y-3">
-                    {regDocs.map((doc, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
-                        <span className="flex-shrink-0 min-w-[28px] h-6 rounded-md bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center mt-[2px]">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        {stripLeadingEmoji(doc)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-            </div>
-
-            {/* ── Notes: Important Feature / Consideration ── */}
-            {service.importantNote?.points?.length > 0 && (
-              <div className="mt-5 space-y-1.5">
-                {isHeader(service.importantNote.points[0]) ? (
-                  <>
-                    <p className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-2">
-                      {stripLeadingEmoji(service.importantNote.points[0])}
-                    </p>
-                    {service.importantNote.points.slice(1).map((pt, i) => (
-                      <NoteBox key={i} text={pt} />
-                    ))}
-                  </>
-                ) : (
-                  service.importantNote.points.map((pt, i) => (
-                    <NoteBox key={i} text={pt} />
-                  ))
+                {/* ── Notes: Important Feature / Consideration ── */}
+                {service.importantNote?.points?.length > 0 && (
+                  <div className="mt-5 space-y-1.5">
+                    {isHeader(service.importantNote.points[0]) ? (
+                      <>
+                        <p className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-2">
+                          {stripLeadingEmoji(service.importantNote.points[0])}
+                        </p>
+                        {service.importantNote.points.slice(1).map((pt, i) => (
+                          <NoteBox key={i} text={pt} />
+                        ))}
+                      </>
+                    ) : (
+                      service.importantNote.points.map((pt, i) => (
+                        <NoteBox key={i} text={pt} />
+                      ))
+                    )}
+                  </div>
                 )}
-              </div>
+              </section>
             )}
 
-          </section>
-        )}
-
-        {/* ────────────────────────────────────────────────
-            GENERIC CONTENT SECTIONS  (non-document)
-        ──────────────────────────────────────────────── */}
-        {mainContentSections.length > 0 && (
-          <>
-            {mainContentSections.map((section, i) => (
-              <section key={i} className="py-4 lg:py-10">
-                {section.pairedSections?.length > 0
-                  ? (
+          {/* ── GENERIC CONTENT SECTIONS ── */}
+          {mainContentSections.length > 0 && (
+            <>
+              {mainContentSections.map((section, i) => (
+                <section key={i} className="py-4 lg:py-10">
+                  {section.pairedSections?.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       {section.pairedSections.map((s, j) => (
                         <GenericSectionCard key={j} section={s} />
                       ))}
                     </div>
-                  )
-                  : section.groupedSections?.length > 0
-                  ? <GroupedSectionBox sections={section.groupedSections} />
-                  : <GenericSectionCard section={section} />
-                }
-              </section>
-            ))}
-          </>
-        )}
-
-        {/* ────────────────────────────────────────────────
-            DOCUMENT SECTIONS from contentSections (non-registration)
-            — still renders just before Insight for GST/MCA/etc.
-        ──────────────────────────────────────────────── */}
-        {docContentSections.length > 0 && (() => {
-          const regularDocSections = docContentSections.filter((s) => !isImportantNotesSection(s) && !isSupportSection(s));
-          const importantNotesSections = docContentSections.filter(isImportantNotesSection);
-          const supportSections = docContentSections.filter(isSupportSection);
-          const docTitle = regularDocSections.length === 1 && regularDocSections[0].heading
-            ? stripLeadingEmoji(regularDocSections[0].heading)
-            : 'Documents Required';
-          return (
-          <section id="documents" className="py-5 lg:py-14">
-          
-            {regularDocSections.length > 0 && (
-              <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
-                {docTitle}
-              </h2>
-            )}
-            {regularDocSections.length > 0 && (
-              <div className={`grid gap-5 ${regularDocSections.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
-                {regularDocSections.map((section, i) => (
-                  <GenericSectionCard key={i} section={{ ...section, heading: null }} />
-                ))}
-              </div>
-            )}
-            {importantNotesSections.map((section, i) => (
-              <div key={`imp-${i}`} className="mt-6 space-y-1">
-                <p className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-3">
-                  {stripLeadingEmoji(section.heading)}
-                </p>
-                {section.subSections?.map((sub, j) => (
-                  <div key={j} className="mb-2">
-                    {(sub.heading || sub.title) && (
-                      <p className="text-[13px] font-semibold text-gray-900 mb-1">{sub.heading || sub.title}</p>
-                    )}
-                    {sub.description && <NoteBox text={sub.description} />}
-                    {sub.items?.map((pt, k) => <NoteBox key={k} text={pt} />)}
-                    {sub.nestedItems?.map((ni, k) => (
-                      <div key={k}>
-                        {ni.text && <NoteBox text={ni.text} />}
-                        {ni.subItems?.map((sp, m) => <NoteBox key={m} text={sp} />)}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-                {section.items?.map((pt, k) => <NoteBox key={k} text={pt} />)}
-                {(section.note || section.footerNote) && (
-                  <NoteBox text={section.note || section.footerNote} />
-                )}
-              </div>
-            ))}
-            {supportSections.map((section, i) => (
-              <div key={`sup-${i}`} className="mt-5">
-                <GenericSectionCard section={section} />
-              </div>
-            ))}
-          </section>
-          );
-        })()}
-
-      </div>
-
-      {/* ═══════════════════════════════════════════════════
-          INSIGHT CONSULTING ADVANTAGE — border-2 (no backdrop-blur on these cards)
-      ═══════════════════════════════════════════════════ */}
-      {(service.insightAdvantage || service.postSupport?.length > 0 || service.commonMistakes?.length > 0 || service.growthInsight || service.darkSections?.length > 0) && (
-        <section id="insight" className="bg-[rgba(240,154,42,0.06)] backdrop-blur-[1.5px] border-t-2 border-primary py-8 lg:py-16">
-          <div className="container mx-auto px-4 lg:px-12">
-            {!service.hideInsightTitle && (
-              <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-8 lg:mb-12 leading-tight">
-                The Insight Consulting Advantage
-              </h2>
-            )}
-
-            <div className="grid sm:grid-cols-2 gap-5">
-
-              {service.insightAdvantage && (
-                <div className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan('insightAdvantage')}`}>
-                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
-                    <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
-                      {stripLeadingEmoji(service.insightAdvantage.intro)}
-                    </h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {service.insightAdvantage.points.map((point, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base">
-                        <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                        {stripLeadingEmoji(point)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {service.postSupport?.length > 0 && (
-                <div className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan('postSupport')}`}>
-                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
-                    <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
-                      {stripLeadingEmoji(service.postSupportTitle) || "Post-Filing Support"}
-                    </h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {service.postSupport.map((item, i) => (
-                      <li key={i} className="flex items-start gap-4">
-                        <span className="flex-shrink-0 text-[11px] font-bold text-primary w-5 mt-0.5">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
-                          {stripLeadingEmoji(item)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {service.commonMistakes?.length > 0 && (
-                <div className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan('commonMistakes')}`}>
-                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
-                    <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
-                      Common Mistakes We Help You Avoid
-                    </h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {service.commonMistakes.map((mistake, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                        <span className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
-                          {stripLeadingEmoji(mistake)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {service.growthInsight && (
-                <div className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan('growthInsight')}`}>
-                  <div className="flex items-start gap-3 mb-4 lg:mb-6">
-                    <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
-                    <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
-                      {stripLeadingEmoji(service.growthInsight.heading)}
-                    </h3>
-                  </div>
-                  <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
-                    {stripLeadingEmoji(service.growthInsight.description)}
-                  </p>
-                  {service.growthInsight.weHelpYou?.length > 0 && (
-                    <>
-                      {(service.growthInsight.listPrefix ?? "We help you:") && (
-                        <p className="text-gray-900 text-sm font-semibold mt-5 mb-3">
-                          {service.growthInsight.listPrefix ?? "We help you:"}
-                        </p>
-                      )}
-                      <ul className="space-y-2">
-                        {service.growthInsight.weHelpYou.map((point, i) => (
-                          <li key={i} className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base">
-                            <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                            {stripLeadingEmoji(point)}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
+                  ) : section.groupedSections?.length > 0 ? (
+                    <GroupedSectionBox sections={section.groupedSections} />
+                  ) : (
+                    <GenericSectionCard section={section} />
                   )}
-                  {service.serviceNote && <NoteBox text={service.serviceNote} />}
-                </div>
-              )}
+                </section>
+              ))}
+            </>
+          )}
 
-              {service.darkSections?.map((section, i) => {
-                const isLast = i === service.darkSections.length - 1;
-                return (
-                  <div key={i} className={`h-full${section.fullWidth ? ' sm:col-span-2' : insightAlone === `dark_${i}` ? ' sm:col-span-2' : ''}`}>
-                    <GenericDarkCard
-                      section={section}
-                      serviceNote={isLast && !service.growthInsight ? service.serviceNote : undefined}
-                    />
-                  </div>
-                );
-              })}
-
-            </div>
-
-          </div>
-        </section>
-      )}
-
-      {/* ═══════════════════════════════════════════════════
-          TAIL SECTIONS — light sections that come after all dark sections
-          (e.g. scheme info, special notices placed after Insight block)
-      ═══════════════════════════════════════════════════ */}
-      {service.tailSections?.length > 0 && (
-        <div className="container mx-auto px-4 lg:px-12">
-          {service.tailSections.map((section, i) => (
-            <section key={i} className="py-4 lg:py-10">
-              {section.cfoInfographic ? (
-                /* ── CFO infographic + closing tagline ── */
-                <div className="flex flex-col items-center gap-8">
-                  <div className="w-full rounded-2xl overflow-hidden border border-primary shadow-[0_4px_32px_rgba(29,78,216,0.08)] backdrop-blur-[1px]">
-                    <img
-                      src={section.imageSrc}
-                      alt="CFO Benefits Infographic"
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                  {section.closingTagline && (
-                    <div className="text-center py-6">
-                      <p className="text-primary text-[24px] lg:text-[32px] font-bold tracking-tight italic">
-                        {section.closingTagline}
-                      </p>
+          {/* ── DOCUMENT SECTIONS ── */}
+          {docContentSections.length > 0 &&
+            (() => {
+              const regularDocSections = docContentSections.filter(
+                (s) => !isImportantNotesSection(s) && !isSupportSection(s),
+              );
+              const importantNotesSections = docContentSections.filter(
+                isImportantNotesSection,
+              );
+              const supportSections =
+                docContentSections.filter(isSupportSection);
+              const docTitle =
+                regularDocSections.length === 1 && regularDocSections[0].heading
+                  ? stripLeadingEmoji(regularDocSections[0].heading)
+                  : "Documents Required";
+              return (
+                <section id="documents" className="py-5 lg:py-14">
+                  {regularDocSections.length > 0 && (
+                    <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-6 lg:mb-10 leading-tight">
+                      {docTitle}
+                    </h2>
+                  )}
+                  {regularDocSections.length > 0 && (
+                    <div
+                      className={`grid gap-5 ${regularDocSections.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}
+                    >
+                      {regularDocSections.map((section, i) => (
+                        <GenericSectionCard
+                          key={i}
+                          section={{ ...section, heading: null }}
+                        />
+                      ))}
                     </div>
                   )}
-                </div>
-              ) : (
-                <GenericSectionCard section={section} />
-              )}
-            </section>
-          ))}
+                  {importantNotesSections.map((section, i) => (
+                    <div key={`imp-${i}`} className="mt-6 space-y-1">
+                      <p className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                        {stripLeadingEmoji(section.heading)}
+                      </p>
+                      {section.subSections?.map((sub, j) => (
+                        <div key={j} className="mb-2">
+                          {(sub.heading || sub.title) && (
+                            <p className="text-[13px] font-semibold text-gray-900 mb-1">
+                              {sub.heading || sub.title}
+                            </p>
+                          )}
+                          {sub.description && (
+                            <NoteBox text={sub.description} />
+                          )}
+                          {sub.items?.map((pt, k) => (
+                            <NoteBox key={k} text={pt} />
+                          ))}
+                          {sub.nestedItems?.map((ni, k) => (
+                            <div key={k}>
+                              {ni.text && <NoteBox text={ni.text} />}
+                              {ni.subItems?.map((sp, m) => (
+                                <NoteBox key={m} text={sp} />
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                      {section.items?.map((pt, k) => (
+                        <NoteBox key={k} text={pt} />
+                      ))}
+                      {(section.note || section.footerNote) && (
+                        <NoteBox text={section.note || section.footerNote} />
+                      )}
+                    </div>
+                  ))}
+                  {supportSections.map((section, i) => (
+                    <div key={`sup-${i}`} className="mt-5">
+                      <GenericSectionCard section={section} />
+                    </div>
+                  ))}
+                </section>
+              );
+            })()}
         </div>
-      )}
 
-      {/* ═══════════════════════════════════════════════════
-          FINAL CTA  (hidden when parent renders it separately)
+        {/* ═══════════════════════════════════════════════════
+          INSIGHT CONSULTING ADVANTAGE — border-2 (no backdrop-blur on these cards)
       ═══════════════════════════════════════════════════ */}
-      {!hideCta && service.cta && (
-  <section
-    className="relative overflow-hidden py-16 lg:py-20 bg-primary"
-  >
-    {/* decorative circles */}
-    <div className="pointer-events-none absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/10 blur-2xl" />
-    <div className="pointer-events-none absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
-    <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-white/5" />
-
-    {/* top shimmer line */}
-    <div className="absolute inset-x-0 top-0 h-px bg-white/30" />
-
-    <div className="relative container mx-auto px-4 lg:px-12 text-center">
-      <div className="max-w-3xl mx-auto">
-
-        {/* badge */}
-        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 mb-8">
-          <Sparkles size={12} className="text-white" />
-          <span className="text-white text-[11px] font-bold tracking-widest uppercase">
-            Ready to get started?
-          </span>
-        </div>
-
-        <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-4 drop-shadow-sm">
-          {stripLeadingEmoji(service.cta.headline || service.cta.tagline)}
-        </h2>
-
-        {service.cta.headline && service.cta.tagline && (
-          <p className="text-white/80 text-base lg:text-lg leading-relaxed mb-10">
-            {stripLeadingEmoji(service.cta.tagline)}
-          </p>
-        )}
-
-        {service.cta.buttonText && (
-          <button
-            onClick={() => setPopupOpen(true)}
-            className="inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-primary font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.22)] hover:-translate-y-0.5"
+        {(service.insightAdvantage ||
+          service.postSupport?.length > 0 ||
+          service.commonMistakes?.length > 0 ||
+          service.growthInsight ||
+          service.darkSections?.length > 0) && (
+          <section
+            id="insight"
+            className="bg-[rgba(240,154,42,0.06)] backdrop-blur-[1.5px] border-t-2 border-primary py-8 lg:py-16"
           >
-            {stripLeadingEmoji(service.cta.buttonText)}
-          </button>
+            <div className="container mx-auto px-4 lg:px-12">
+              {!service.hideInsightTitle && (
+                <h2 className="text-xl lg:text-[32px] font-bold text-gray-900 mb-8 lg:mb-12 leading-tight">
+                  The Insight Consulting Advantage
+                </h2>
+              )}
+
+              <div className="grid sm:grid-cols-2 gap-5">
+                {service.insightAdvantage && (
+                  <div
+                    className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan("insightAdvantage")}`}
+                  >
+                    <div className="flex items-start gap-3 mb-4 lg:mb-6">
+                      <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
+                      <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+                        {stripLeadingEmoji(service.insightAdvantage.intro)}
+                      </h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {service.insightAdvantage.points.map((point, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
+                        >
+                          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          {stripLeadingEmoji(point)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {service.postSupport?.length > 0 && (
+                  <div
+                    className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan("postSupport")}`}
+                  >
+                    <div className="flex items-start gap-3 mb-4 lg:mb-6">
+                      <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
+                      <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+                        {stripLeadingEmoji(service.postSupportTitle) ||
+                          "Post-Filing Support"}
+                      </h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {service.postSupport.map((item, i) => (
+                        <li key={i} className="flex items-start gap-4">
+                          <span className="flex-shrink-0 text-[11px] font-bold text-primary w-5 mt-0.5">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
+                            {stripLeadingEmoji(item)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {service.commonMistakes?.length > 0 && (
+                  <div
+                    className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan("commonMistakes")}`}
+                  >
+                    <div className="flex items-start gap-3 mb-4 lg:mb-6">
+                      <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
+                      <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+                        Common Mistakes We Help You Avoid
+                      </h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {service.commonMistakes.map((mistake, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          <span className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
+                            {stripLeadingEmoji(mistake)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {service.growthInsight && (
+                  <div
+                    className={`h-full bg-white/40 border-2 border-primary rounded-2xl p-5 lg:p-9 shadow-[0_2px_24px_rgba(124,58,237,0.07)] ${insightSpan("growthInsight")}`}
+                  >
+                    <div className="flex items-start gap-3 mb-4 lg:mb-6">
+                      <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
+                      <h3 className="text-[16px] lg:text-[20px] font-bold text-gray-900 leading-snug tracking-tight">
+                        {stripLeadingEmoji(service.growthInsight.heading)}
+                      </h3>
+                    </div>
+                    <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed">
+                      {stripLeadingEmoji(service.growthInsight.description)}
+                    </p>
+                    {service.growthInsight.weHelpYou?.length > 0 && (
+                      <>
+                        {(service.growthInsight.listPrefix ??
+                          "We help you:") && (
+                          <p className="text-gray-900 text-sm font-semibold mt-5 mb-3">
+                            {service.growthInsight.listPrefix ?? "We help you:"}
+                          </p>
+                        )}
+                        <ul className="space-y-2">
+                          {service.growthInsight.weHelpYou.map((point, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-3 text-gray-900 text-[15px] lg:text-base"
+                            >
+                              <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                              {stripLeadingEmoji(point)}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    {service.serviceNote && (
+                      <NoteBox text={service.serviceNote} />
+                    )}
+                  </div>
+                )}
+
+                {service.darkSections?.map((section, i) => {
+                  const isLast = i === service.darkSections.length - 1;
+                  return (
+                    <div
+                      key={i}
+                      className={`h-full${section.fullWidth ? " sm:col-span-2" : insightAlone === `dark_${i}` ? " sm:col-span-2" : ""}`}
+                    >
+                      <GenericDarkCard
+                        section={section}
+                        serviceNote={
+                          isLast && !service.growthInsight
+                            ? service.serviceNote
+                            : undefined
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
         )}
 
-      </div>
-    </div>
-  </section>
-)}
+        {/* ── TAIL SECTIONS ── */}
+        {service.tailSections?.length > 0 && (
+          <div className="container mx-auto px-4 lg:px-12">
+            {service.tailSections.map((section, i) => (
+              <section key={i} className="py-4 lg:py-10">
+                {section.cfoInfographic ? (
+                  /* ── CFO infographic + closing tagline ── */
+                  <div className="flex flex-col items-center gap-8">
+                    <div className="w-full rounded-2xl overflow-hidden border border-primary shadow-[0_4px_32px_rgba(29,78,216,0.08)] backdrop-blur-[1px]">
+                      <img
+                        src={section.imageSrc}
+                        alt="CFO Benefits Infographic"
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                    {section.closingTagline && (
+                      <div className="text-center py-6">
+                        <p className="text-[24px] lg:text-[32px] font-bold tracking-tight italic">
+                          {section.closingTagline}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <GenericSectionCard section={section} />
+                )}
+              </section>
+            ))}
+          </div>
+        )}
 
-      <EnquiryPopup open={popupOpen} onClose={() => setPopupOpen(false)} initialService={service?.name || ""} />
+        {/* ── CTA ── */}
+        {!hideCta && service.cta && (
+          <section className="relative overflow-hidden py-16 lg:py-20 bg-primary">
+            {/* decorative circles */}
+            <div className="pointer-events-none absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/10 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
+            <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-white/5" />
 
+            {/* top shimmer line */}
+            <div className="absolute inset-x-0 top-0 h-px bg-white/30" />
+
+            <div className="relative container mx-auto px-4 lg:px-12 text-center">
+              <div className="max-w-3xl mx-auto">
+                {/* badge */}
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 mb-8">
+                  <Sparkles size={12} className="text-white" />
+                  <span className="text-white text-[11px] font-bold tracking-widest uppercase">
+                    Ready to get started?
+                  </span>
+                </div>
+
+                <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-4 drop-shadow-sm">
+                  {stripLeadingEmoji(
+                    service.cta.headline || service.cta.tagline,
+                  )}
+                </h2>
+
+                {service.cta.headline && service.cta.tagline && (
+                  <p className="text-white/80 text-base lg:text-lg leading-relaxed mb-10">
+                    {stripLeadingEmoji(service.cta.tagline)}
+                  </p>
+                )}
+
+                {service.cta.buttonText && (
+                  <button
+                    onClick={() => setPopupOpen(true)}
+                    className="inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-primary font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.22)] hover:-translate-y-0.5"
+                  >
+                    {stripLeadingEmoji(service.cta.buttonText)}
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <EnquiryPopup
+          open={popupOpen}
+          onClose={() => setPopupOpen(false)}
+          initialService={service?.name || ""}
+        />
       </div>
     </div>
   );

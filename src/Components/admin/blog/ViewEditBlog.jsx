@@ -8,8 +8,9 @@ import {
 } from "react-icons/fa";
 import { BiImageAdd } from "react-icons/bi";
 import Cropper from "react-easy-crop";
+import axiosInstance from "@src/providers/axiosInstance";
 
-const BASE_URL = "https://insightsconsult-backend.onrender.com";
+
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
@@ -17,10 +18,10 @@ function generateId() {
 
 /* ── Crop Modal ─────────────────────────────────────────────── */
 function CropModal({ isOpen, onClose, imageSrc, onCropComplete, aspect = 12 / 8 }) {
-  const [crop, setCrop]                     = useState({ x: 0, y: 0 });
-  const [zoom, setZoom]                     = useState(1);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [cropLoading, setCropLoading]       = useState(false);
+  const [cropLoading, setCropLoading] = useState(false);
   const IMAGE_SIZE = { width: 1000, height: 600 };
 
   if (!isOpen) return null;
@@ -37,10 +38,10 @@ function CropModal({ isOpen, onClose, imageSrc, onCropComplete, aspect = 12 / 8 
     });
 
   const getCroppedImg = async (src, pixelCrop) => {
-    const image  = await createImage(src);
+    const image = await createImage(src);
     const canvas = document.createElement("canvas");
-    const ctx    = canvas.getContext("2d");
-    canvas.width  = IMAGE_SIZE.width;
+    const ctx = canvas.getContext("2d");
+    canvas.width = IMAGE_SIZE.width;
     canvas.height = IMAGE_SIZE.height;
     ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, IMAGE_SIZE.width, IMAGE_SIZE.height);
     return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.95));
@@ -55,7 +56,7 @@ function CropModal({ isOpen, onClose, imageSrc, onCropComplete, aspect = 12 / 8 
       onCropComplete(file);
       onClose();
     } catch (e) { console.error("Crop error:", e); }
-    finally     { setCropLoading(false); }
+    finally { setCropLoading(false); }
   };
 
   return (
@@ -225,8 +226,8 @@ const ErrorPopup = ({ isOpen, onClose, errorMessage }) => {
 
 /* ── Preview Panel ──────────────────────────────────────────── */
 function PreviewPanel({ title, author, description, thumbnailPreview, blocks, category, readTime, onBackToEdit }) {
-  const [activeId, setActiveId]         = useState(null);
-  const isClickScrolling                = useRef(false);
+  const [activeId, setActiveId] = useState(null);
+  const isClickScrolling = useRef(false);
 
   const headings = useMemo(() => {
     let idx = 0;
@@ -340,11 +341,10 @@ function PreviewPanel({ title, author, description, thumbnailPreview, blocks, ca
                         setActiveId(h.id);
                         setTimeout(() => { isClickScrolling.current = false; }, 500);
                       }}
-                      className={`block text-sm py-0.5 transition-all duration-150 ${
-                        activeId === h.id
+                      className={`block text-sm py-0.5 transition-all duration-150 ${activeId === h.id
                           ? "text-[var(--color-primary)] font-semibold -ml-[3px] border-l-2 border-[var(--color-primary)] pl-3"
                           : "text-gray-500 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
                       {h.text}
                     </a>
@@ -401,33 +401,33 @@ function PreviewPanel({ title, author, description, thumbnailPreview, blocks, ca
    MAIN — View / Edit Blog
 ══════════════════════════════════════════════════════════════ */
 export default function ViewEditBlog() {
-  const { slug }   = useParams();
-  const navigate   = useNavigate();
-  const [mode, setMode]             = useState("view");
-  const [blog, setBlog]             = useState(null);
-  const [loading, setLoading]       = useState(true);
-  const [saving, setSaving]         = useState(false);
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const [mode, setMode] = useState("view");
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showErrorPopup,   setShowErrorPopup]   = useState(false);
-  const [errorMessage,     setErrorMessage]     = useState("");
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [title, setTitle]             = useState("");
-  const [author, setAuthor]           = useState("");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory]       = useState("");
-  const [readTime, setReadTime]       = useState("");
-  const [published, setPublished]     = useState(false);
+  const [category, setCategory] = useState("");
+  const [readTime, setReadTime] = useState("");
+  const [published, setPublished] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const thumbnailRef  = useRef(null);
-  const [blocks, setBlocks]           = useState([]);
+  const thumbnailRef = useRef(null);
+  const [blocks, setBlocks] = useState([]);
   const blockFilesRef = useRef({});
-  const blogIdRef     = useRef(null);
+  const blogIdRef = useRef(null);
 
   const [showThumbnailCrop, setShowThumbnailCrop] = useState(false);
   const [tempThumbnailFile, setTempThumbnailFile] = useState(null);
-  const [showBlockCrop, setShowBlockCrop]         = useState(false);
-  const [currentBlockId, setCurrentBlockId]       = useState(null);
-  const [tempBlockFile, setTempBlockFile]         = useState(null);
+  const [showBlockCrop, setShowBlockCrop] = useState(false);
+  const [currentBlockId, setCurrentBlockId] = useState(null);
+  const [tempBlockFile, setTempBlockFile] = useState(null);
 
   const populateBlogState = (data) => {
     blogIdRef.current = data._id || data.id || data.blogId || null;
@@ -452,11 +452,10 @@ export default function ViewEditBlog() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/blogs/${slug}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        populateBlogState(await res.json());
+        const res = await axiosInstance.get(`/admin/blogs/${slug}`);
+        populateBlogState(res.data);
       } catch (e) { console.error("Fetch error:", e); }
-      finally     { setLoading(false); }
+      finally { setLoading(false); }
     };
     load();
   }, [slug]);
@@ -469,8 +468,8 @@ export default function ViewEditBlog() {
     setTempThumbnailFile(null);
   };
 
-  const addBlock        = (type) => setBlocks((p) => [...p, { id: generateId(), type, value: "", preview: null }]);
-  const updateBlockValue= (id, val) => setBlocks((p) => p.map((b) => (b.id === id ? { ...b, value: val } : b)));
+  const addBlock = (type) => setBlocks((p) => [...p, { id: generateId(), type, value: "", preview: null }]);
+  const updateBlockValue = (id, val) => setBlocks((p) => p.map((b) => (b.id === id ? { ...b, value: val } : b)));
   const updateBlockFile = (id, file) => { setCurrentBlockId(id); setTempBlockFile(file); setShowBlockCrop(true); };
   const handleBlockCropComplete = (file) => {
     blockFilesRef.current[currentBlockId] = file;
@@ -480,7 +479,7 @@ export default function ViewEditBlog() {
   };
   const moveBlock = (idx, dir) => {
     const arr = [...blocks];
-    const to  = dir === "up" ? idx - 1 : idx + 1;
+    const to = dir === "up" ? idx - 1 : idx + 1;
     if (to < 0 || to >= arr.length) return;
     [arr[idx], arr[to]] = [arr[to], arr[idx]];
     setBlocks(arr);
@@ -516,17 +515,22 @@ export default function ViewEditBlog() {
 
     setSaving(true);
     try {
-      const putRes = await fetch(`${BASE_URL}/blogs/${blogIdRef.current}`, { method: "PUT", body: form });
+      const putRes = await axiosInstance.put(`/admin/blogs/${blogIdRef.current}`, form);;
       if (!putRes.ok) throw new Error(`PUT failed: HTTP ${putRes.status}`);
-      const res = await fetch(`${BASE_URL}/blogs/${slug}`);
-      if (!res.ok)    throw new Error(`Re-fetch failed: HTTP ${res.status}`);
-      const updated = await res.json();
+     const res = await axiosInstance.get(`/admin/blogs/${slug}`);
+      if (!res.ok) throw new Error(`Re-fetch failed: HTTP ${res.status}`);
+     const updated = res.data;
       blockFilesRef.current = {}; thumbnailRef.current = null;
       populateBlogState(updated);
       setMode("view");
       setShowSuccessPopup(true);
-    } catch (e) { setErrorMessage("Update failed: " + e.message); setShowErrorPopup(true); }
-    finally      { setSaving(false); }
+    } catch (e) { 
+  setErrorMessage(
+    "Update failed: " +
+    (e.response?.data?.message || e.message)
+  );
+}
+    finally { setSaving(false); }
   };
 
   const inputClass =
@@ -576,7 +580,7 @@ export default function ViewEditBlog() {
           onBackToEdit={() => setMode("edit")}
         />
         {showSuccessPopup && <SuccessPopup isOpen onClose={() => setShowSuccessPopup(false)} message="Blog updated successfully!" />}
-        {showErrorPopup   && <ErrorPopup   isOpen onClose={() => { setShowErrorPopup(false); setErrorMessage(""); }} errorMessage={errorMessage} />}
+        {showErrorPopup && <ErrorPopup isOpen onClose={() => { setShowErrorPopup(false); setErrorMessage(""); }} errorMessage={errorMessage} />}
       </>
     );
   }
@@ -598,9 +602,8 @@ export default function ViewEditBlog() {
             </button>
 
             {/* Mode indicator */}
-            <span className={`hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
-              mode === "view" ? "bg-[var(--neutral-100)] text-gray-600" : "bg-amber-50 text-amber-700 border border-amber-200"
-            }`}>
+            <span className={`hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${mode === "view" ? "bg-[var(--neutral-100)] text-gray-600" : "bg-amber-50 text-amber-700 border border-amber-200"
+              }`}>
               {mode === "view" ? "View Mode" : "✏️ Editing"}
             </span>
 
@@ -707,9 +710,9 @@ export default function ViewEditBlog() {
                     </div>
                     <div className="flex items-center gap-2">
                       {[
-                        { label: "Heading",   type: "heading",   icon: <FaHeading className="w-3 h-3" />   },
+                        { label: "Heading", type: "heading", icon: <FaHeading className="w-3 h-3" /> },
                         { label: "Paragraph", type: "paragraph", icon: <FaParagraph className="w-3 h-3" /> },
-                        { label: "Image",     type: "image",     icon: <FaImage className="w-3 h-3" />     },
+                        { label: "Image", type: "image", icon: <FaImage className="w-3 h-3" /> },
                       ].map(({ label, type, icon }) => (
                         <button
                           key={type} type="button" onClick={() => addBlock(type)}
@@ -736,7 +739,7 @@ export default function ViewEditBlog() {
                                 {i + 1}
                               </div>
                               {[
-                                { fn: () => moveBlock(i, "up"),   Icon: FaArrowUp,   dis: i === 0 },
+                                { fn: () => moveBlock(i, "up"), Icon: FaArrowUp, dis: i === 0 },
                                 { fn: () => moveBlock(i, "down"), Icon: FaArrowDown, dis: i === blocks.length - 1 },
                               ].map(({ fn, Icon, dis }, j) => (
                                 <button
@@ -760,9 +763,9 @@ export default function ViewEditBlog() {
                                   <FaTimes className="w-2.5 h-2.5" />
                                 </button>
                               </div>
-                              {block.type === "heading"   && <input value={block.value} onChange={(e) => updateBlockValue(block.id, e.target.value)} placeholder="Enter heading…" className={`${inputClass} font-semibold`} />}
+                              {block.type === "heading" && <input value={block.value} onChange={(e) => updateBlockValue(block.id, e.target.value)} placeholder="Enter heading…" className={`${inputClass} font-semibold`} />}
                               {block.type === "paragraph" && <textarea value={block.value} onChange={(e) => updateBlockValue(block.id, e.target.value)} placeholder="Enter paragraph text…" rows={4} className={`${inputClass} resize-none`} />}
-                              {block.type === "image"     && (
+                              {block.type === "image" && (
                                 <UploadBox
                                   id={`imgInput-${block.id}`} preview={block.preview}
                                   onFileChange={(f) => updateBlockFile(block.id, f)}
@@ -942,9 +945,9 @@ export default function ViewEditBlog() {
                   </div>
                   <div className="p-5 space-y-3">
                     {[
-                      { label: "Status",  value: blog.published ? "Published" : "Draft" },
-                      { label: "Author",  value: blog.author || "—" },
-                      { label: "Blocks",  value: `${blocks.length} block${blocks.length !== 1 ? "s" : ""}` },
+                      { label: "Status", value: blog.published ? "Published" : "Draft" },
+                      { label: "Author", value: blog.author || "—" },
+                      { label: "Blocks", value: `${blocks.length} block${blocks.length !== 1 ? "s" : ""}` },
                       ...(blog.createdAt ? [{ label: "Created", value: new Date(blog.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) }] : []),
                     ].map(({ label, value }) => (
                       <div key={label} className="flex items-start justify-between gap-2">
@@ -981,7 +984,7 @@ export default function ViewEditBlog() {
       )}
 
       {showSuccessPopup && <SuccessPopup isOpen onClose={() => setShowSuccessPopup(false)} message="Blog updated successfully!" />}
-      {showErrorPopup   && <ErrorPopup   isOpen onClose={() => { setShowErrorPopup(false); setErrorMessage(""); }} errorMessage={errorMessage} />}
+      {showErrorPopup && <ErrorPopup isOpen onClose={() => { setShowErrorPopup(false); setErrorMessage(""); }} errorMessage={errorMessage} />}
     </>
   );
 }

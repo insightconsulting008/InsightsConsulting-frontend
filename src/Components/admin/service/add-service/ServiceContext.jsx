@@ -233,7 +233,7 @@ if (!employeeId) {
 
   const fetchCategories = async () => {
     try {
-      const response = await axiosInstance.get('/category');
+      const response = await axiosInstance.get('/admin/category');
       if (response.data.success) {
         setCategories(response.data.categories);
       }
@@ -244,7 +244,7 @@ if (!employeeId) {
 
   const fetchSubcategories = async () => {
     try {
-      const response = await axiosInstance.get('/subcategory');
+      const response = await axiosInstance.get('/admin/subcategory');
       if (response.data.success) {
         setSubcategories(response.data.subcategories);
       }
@@ -255,7 +255,7 @@ if (!employeeId) {
 
   const fetchMasterFields = async () => {
     try {
-      const response = await axiosInstance.get('/master-fields');
+      const response = await axiosInstance.get('/admin/master-fields');
       if (response.data.success) {
         setMasterFields(response.data.masterFields);
       }

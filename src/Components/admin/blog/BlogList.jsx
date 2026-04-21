@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../page-header/PageHeader";
-
-const BASE_URL = "https://insightsconsult-backend.onrender.com/blogs";
+import axiosInstance from "@src/providers/axiosInstance";
 
 /* ── Delete Confirm Popup ───────────────────────────────────── */
 const DeleteConfirmPopup = ({ isOpen, onClose, onConfirm, blogTitle }) => {
@@ -116,12 +115,23 @@ export default function AdminBlogList() {
 
   const navigate = useNavigate();
 
-  const fetchByType = async (type, page) => {
-    try {
-      const r = await fetch(`${BASE_URL}?type=${type}&page=${page}&limit=8`);
-      return await r.json();
-    } catch (e) { console.error(e); return null; }
-  };
+  
+ const fetchByType = async (type, page) => {
+  try {
+    const res = await axiosInstance.get("/admin/blogs", {
+      params: {
+        type,
+        page,
+        limit: 8,
+      },
+    });
+
+    return res.data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
 
   const fetchAll = async () => {
     setLoading(true);
@@ -160,28 +170,35 @@ export default function AdminBlogList() {
   );
 
   const handleDeleteClick   = (blog) => { setBlogToDelete(blog); setShowDeleteConfirm(true); };
-  const handleDeleteConfirm = async () => {
-    if (!blogToDelete?.blogId) return;
-    try {
-      const res  = await fetch(`${BASE_URL}/${blogToDelete.blogId}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Delete failed");
-      setAllBlogs((p) => p.filter((b) => b.blogId !== blogToDelete.blogId));
-      const bType = blogToDelete.published ? "public" : "draft";
-      setTotalCount((p) => ({ ...p, [bType]: p[bType] - 1 }));
-      if (filteredBlogs.length === 1 && currentPage[activeTab] > 1) {
-        const pg = currentPage[activeTab] - 1;
-        setCurrentPage((p) => ({ ...p, [activeTab]: pg }));
-        fetchTabData(pg);
-      } else if (filteredBlogs.length === 1) {
-        fetchTabData(1);
-      }
-      setShowDeleteConfirm(false);
-      setSuccessMessage(`"${blogToDelete.title}" has been deleted successfully`);
-      setShowSuccess(true);
-      setBlogToDelete(null);
-    } catch (e) { console.error(e); alert("Delete failed"); }
-  };
+ const handleDeleteConfirm = async () => {
+  if (!blogToDelete?.blogId) return;
+
+  try {
+    await axiosInstance.delete(`/admin/blogs/${blogToDelete.blogId}`);
+
+    setAllBlogs((p) => p.filter((b) => b.blogId !== blogToDelete.blogId));
+
+    const bType = blogToDelete.published ? "public" : "draft";
+
+    setTotalCount((p) => ({ ...p, [bType]: p[bType] - 1 }));
+
+    if (filteredBlogs.length === 1 && currentPage[activeTab] > 1) {
+      const pg = currentPage[activeTab] - 1;
+      setCurrentPage((p) => ({ ...p, [activeTab]: pg }));
+      fetchTabData(pg);
+    } else if (filteredBlogs.length === 1) {
+      fetchTabData(1);
+    }
+
+    setShowDeleteConfirm(false);
+    setSuccessMessage(`"${blogToDelete.title}" has been deleted successfully`);
+    setShowSuccess(true);
+    setBlogToDelete(null);
+  } catch (e) {
+    console.error(e);
+    alert("Delete failed");
+  }
+};
 
   const handleTabChange  = (tab) => {
     setActiveTab(tab);

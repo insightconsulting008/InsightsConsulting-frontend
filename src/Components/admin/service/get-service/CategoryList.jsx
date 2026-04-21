@@ -167,7 +167,7 @@ export default function CategoryList({ categories = [], subcategories = [], serv
     if (!newCategoryName.trim()) return;
     try {
       setActionLoading(true);
-      await axiosInstance.post('/category', { categoryName: newCategoryName });
+      await axiosInstance.post('/admin/category', { categoryName: newCategoryName });
       showToast('Category created successfully');
       onRefresh();
       setShowAddCategoryModal(false);
@@ -183,7 +183,7 @@ export default function CategoryList({ categories = [], subcategories = [], serv
     if (!editCategoryName.trim() || !selectedCategory) return;
     try {
       setActionLoading(true);
-      await axiosInstance.put(`/category/${selectedCategory.categoryId}`, { categoryName: editCategoryName });
+      await axiosInstance.put(`/admin/category/${selectedCategory.categoryId}`, { categoryName: editCategoryName });
       showToast('Category updated successfully');
       onRefresh();
       setShowEditCategoryModal(false);
@@ -200,7 +200,7 @@ export default function CategoryList({ categories = [], subcategories = [], serv
     if (!newSubcategoryName.trim() || !selectedCategoryForSubcategory) return;
     try {
       setActionLoading(true);
-      await axiosInstance.post('/subcategory', {
+      await axiosInstance.post('/admin/subcategory', {
         categoryId: selectedCategoryForSubcategory.categoryId,
         subCategoryName: newSubcategoryName,
       });
@@ -220,7 +220,7 @@ export default function CategoryList({ categories = [], subcategories = [], serv
     if (!editSubcategoryName.trim() || !selectedSubcategory) return;
     try {
       setActionLoading(true);
-      await axiosInstance.put(`/subcategory/${selectedSubcategory.subCategoryId}`, { subCategoryName: editSubcategoryName });
+      await axiosInstance.put(`/admin/subcategory/${selectedSubcategory.subCategoryId}`, { subCategoryName: editSubcategoryName });
       showToast('Subcategory updated successfully');
       onRefresh();
       setShowEditSubcategoryModal(false);
@@ -237,7 +237,7 @@ export default function CategoryList({ categories = [], subcategories = [], serv
     if (!deleteItem) return;
     try {
       setActionLoading(true);
-      const endpoint = deleteItem.type === 'category' ? `/category/${deleteItem.id}` : `/subcategory/${deleteItem.id}`;
+      const endpoint = deleteItem.type === 'category' ? `/admin/category/${deleteItem.id}` : `/admin/subcategory/${deleteItem.id}`;
       await axiosInstance.delete(endpoint);
       showToast(`${deleteItem.type === 'category' ? 'Category' : 'Subcategory'} deleted successfully`);
       onRefresh();

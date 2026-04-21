@@ -57,17 +57,17 @@ export default function Service() {
       const endpoints = [
         { 
           key: 'categories', 
-          url: '/category',
+          url: '/admin/category',
           config: {} 
         },
         { 
           key: 'subcategories', 
-          url: '/subcategory',
+          url: '/admin/subcategory',
           config: {} 
         },
         { 
           key: 'services', 
-          url: '/service',
+          url: '/admin/service',
           config: {
             params: {
               page: 1,
@@ -79,7 +79,7 @@ export default function Service() {
         },
         { 
           key: 'bundles', 
-          url: '/bundle',
+          url: '/admin/bundle',
           config: {} 
         }
       ];
@@ -230,7 +230,7 @@ export default function Service() {
       for (const test of tests) {
         try {
           console.log(`Testing with params:`, test.params);
-          const response = await axiosInstance.get('/service', { params: test.params });
+          const response = await axiosInstance.get('/admin/service', { params: test.params });
           console.log(`Test response:`, response.data);
           
           if (response.data.success) {

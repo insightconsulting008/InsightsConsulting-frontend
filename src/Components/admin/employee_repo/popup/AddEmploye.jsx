@@ -130,7 +130,7 @@ const EmployeeModal = ({
   async function fetchDepartments(page = departmentPage, limit = departmentLimit) {
     setLoading(true);
     try {
-      const url = `/department?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+      const url = `/admin/department?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
       const res = await axiosInstance.get(url);
       const json = res.data;
       let raw = [];
@@ -253,7 +253,7 @@ const EmployeeModal = ({
 
   async function postEmployee(formDataPayload) {
     try {
-      const res = await axiosInstance.post('/employee', formDataPayload, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await axiosInstance.post('/admin/employee', formDataPayload, { headers: { 'Content-Type': 'multipart/form-data' } });
       return { ok: true, status: res.status, body: res.data };
     } catch (err) {
       const resp = err.response;
@@ -263,7 +263,7 @@ const EmployeeModal = ({
 
   async function putEmployee(id, formDataPayload) {
     try {
-      const res = await axiosInstance.put(`/employee/${id}`, formDataPayload, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await axiosInstance.put(`/admin/employee/${id}`, formDataPayload, { headers: { 'Content-Type': 'multipart/form-data' } });
       return { ok: true, status: res.status, body: res.data };
     } catch (err) {
       const resp = err.response;

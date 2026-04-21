@@ -688,8 +688,8 @@ export default function ServiceDetailView() {
     setError(null);
     try {
       const [svcRes, subRes] = await Promise.all([
-        axiosInstance.get(`/service/${serviceId}`),
-        axiosInstance.get("/subcategory"),
+        axiosInstance.get(`/admin/service/${serviceId}`),
+        axiosInstance.get("/admin/subcategory"),
       ]);
       if (!svcRes.data.success) throw new Error("Service not found");
       const s = svcRes.data.service;
@@ -799,7 +799,7 @@ export default function ServiceDetailView() {
 
   /* ─── PUT /service/:id ── */
   const putSvc = async (body) => {
-    const r = await axiosInstance.put(`/service/${serviceId}`, body);
+    const r = await axiosInstance.put(`/admin/service/${serviceId}`, body);
     if (!r.data.success) throw new Error(r.data.error ?? "Update failed");
   };
 
@@ -846,7 +846,7 @@ export default function ServiceDetailView() {
       const fd = new FormData();
       fd.append("name", svc?.name ?? "service");
       fd.append("photoUrl", photoDraft, photoDraft.name);
-      const r = await axiosInstance.put(`/service/${serviceId}`, fd, {
+      const r = await axiosInstance.put(`/admin/service/${serviceId}`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (!r.data.success) throw new Error("Image upload failed");
@@ -918,7 +918,7 @@ export default function ServiceDetailView() {
         })),
       };
       const r = await axiosInstance.put(
-        `/service/${serviceId}/input-fields`,
+        `/admin/service/${serviceId}/input-fields`,
         payload,
       );
       if (!r.data.success)
@@ -945,7 +945,7 @@ export default function ServiceDetailView() {
         })),
       };
       const r = await axiosInstance.put(
-        `/service/${serviceId}/track-steps`,
+        `/admin/service/${serviceId}/track-steps`,
         payload,
       );
       if (!r.data.success)

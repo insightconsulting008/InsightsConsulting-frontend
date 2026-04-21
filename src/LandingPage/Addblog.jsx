@@ -14,7 +14,7 @@ export default function Blogdesc() {
     const fetchBlog = async () => {
       try {
         const res = await axios.get(
-          `https://insightsconsult-backend.onrender.com/blogs/${slug}`
+          `/blogs/${slug}`
         );
         setBlog(res.data);
       } catch (err) {

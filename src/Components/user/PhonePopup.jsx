@@ -13,7 +13,7 @@ function PhonePopup({ onClose }) {
     const fetchUserName = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await axiosInstance.get("/user/profile", {
+        const res = await axiosInstance.get("/user/settings/profile", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUserName(res.data.data.name || "User");
@@ -39,7 +39,7 @@ function PhonePopup({ onClose }) {
       const token = localStorage.getItem("accessToken");
       
       const res = await axiosInstance.post(
-        "/complete-profile",
+        "/user/settings/complete-profile",
         { phoneNumber },
         {
           headers: { Authorization: `Bearer ${token}` }

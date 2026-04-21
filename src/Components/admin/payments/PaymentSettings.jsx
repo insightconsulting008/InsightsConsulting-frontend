@@ -182,7 +182,7 @@ function AddDrawer({ onCancel, onSuccess }) {
     const webhookUrl = `https://${form.webhookDomain.trim()}${WEBHOOK_SUFFIX}`;
     setPwLoading(true);
     try {
-      await axiosInstance.post(`/settings/payment`, {
+      await axiosInstance.post(`/admin/settings/payment`, {
         razorpayKeyId: form.razorpayKeyId.trim(),
         razorpaySecret: form.razorpaySecret.trim(),
         alertEmail: form.alertEmail.trim(),
@@ -613,7 +613,7 @@ export default function PaymentSettings() {
     setLoading(true);
     setFetchError("");
     try {
-      const res = await axiosInstance.get("/settings/payment");
+      const res = await axiosInstance.get("/admin/settings/payment");
       setSettings(res.data.data || []);
     } catch (e) {
       setFetchError(e.response?.data?.message || "Failed to load payment accounts. Please refresh and try again.");
@@ -626,7 +626,7 @@ export default function PaymentSettings() {
 
   const handleToggle = async (id, newState, pw) => {
     try {
-      await axiosInstance.put(`/settings/payment/${id}`, { isRazorpayEnabled: newState, profilePassword: pw });
+      await axiosInstance.put(`/admin/settings/payment/${id}`, { isRazorpayEnabled: newState, profilePassword: pw });
       showToast(`Account ${newState ? "enabled and set as active gateway" : "disabled"}.`);
       fetchSettings();
     } catch (e) {
@@ -638,7 +638,7 @@ export default function PaymentSettings() {
 
   const handleDelete = async (id, pw) => {
     try {
-      await axiosInstance.delete(`/settings/payment/${id}`, { data: { profilePassword: pw } });
+      await axiosInstance.delete(`/admin/settings/payment/${id}`, { data: { profilePassword: pw } });
       showToast("Account deleted successfully.");
       fetchSettings();
     } catch (e) {

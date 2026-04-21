@@ -263,7 +263,7 @@ const EmployeeManagement = () => {
     const safePage = Math.max(1, pageArg || 1);
     setLoadingEmployees(true); setError(null);
     try {
-      const res        = await axiosInstance.get('/employee', { params: { page: safePage, limit } });
+      const res        = await axiosInstance.get('/admin/employee', { params: { page: safePage, limit } });
       const payload    = res?.data ?? {};
       const list       = Array.isArray(payload.data) ? payload.data : [];
       const pagination = payload.pagination ?? null;
@@ -280,7 +280,7 @@ const EmployeeManagement = () => {
     const safePage = Math.max(1, pageArg || 1);
     setLoadingDepartments(true); setDeptError(null);
     try {
-      const res        = await axiosInstance.get('/department', { params: { page: safePage, limit } });
+      const res        = await axiosInstance.get('/admin/department', { params: { page: safePage, limit } });
       const payload    = res?.data ?? {};
       const list       = Array.isArray(payload.data) ? payload.data : payload.departments || [];
       const pagination = payload.pagination ?? payload.meta ?? null;
@@ -295,7 +295,7 @@ const EmployeeManagement = () => {
 
   const fetchDashboardStats = useCallback(async () => {
     setLoadingStats(true);
-    try { const res = await axiosInstance.get('/dashboard/stats'); setDashboardStats(res?.data?.data ?? res?.data ?? null); }
+    try { const res = await axiosInstance.get('/admin/employee/stats'); setDashboardStats(res?.data?.data ?? res?.data ?? null); }
     catch { setDashboardStats(null); }
     finally { setLoadingStats(false); }
   }, []);
@@ -370,7 +370,7 @@ const EmployeeManagement = () => {
       let exportList = [];
       if (serverTotalDocs != null && serverTotalDocs > employees.length) {
         try {
-          const res = await axiosInstance.get('/employee', { params: { page: 1, limit: serverTotalDocs } });
+          const res = await axiosInstance.get('/admin/employee', { params: { page: 1, limit: serverTotalDocs } });
           exportList = Array.isArray(res?.data?.data) ? res.data.data : filteredEmployees.slice();
         } catch { exportList = filteredEmployees.slice(); }
       } else exportList = filteredEmployees.slice();
@@ -397,7 +397,7 @@ const EmployeeManagement = () => {
     const id = employeeToDelete._id ?? employeeToDelete.employeeId;
     if (!id) { setDeleteError('Invalid employee ID'); setDeleting(false); return; }
     try {
-      await axiosInstance.delete(`/employee/${id}`);
+      await axiosInstance.delete(`/admin/employee/${id}`);
       await fetchEmployees(page); await fetchDashboardStats();
       setDeleteSuccess(true);
     } catch (err) {
@@ -417,7 +417,7 @@ const EmployeeManagement = () => {
     const id = deptToDelete.departmentId ?? deptToDelete._id;
     if (!id) { setDeptDeleteError('Invalid department ID'); setDeletingDept(false); return; }
     try {
-      await axiosInstance.delete(`/department/${id}`);
+      await axiosInstance.delete(`/admin/department/${id}`);
       await fetchDepartments(1); await fetchDashboardStats();
       setDeptDeleteSuccess(true);
     } catch (err) { setDeptDeleteError(err?.response?.data?.message ?? 'Delete failed'); }

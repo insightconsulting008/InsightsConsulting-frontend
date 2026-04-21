@@ -43,7 +43,7 @@ export default function Report() {
   const fetchData = useCallback(() => {
     setLoading(true); setError(null);
     const params = new URLSearchParams({ page, limit: 10, ...(search ? { search } : {}) });
-    axiosInstance.get(`/application-history`, { params })
+    axiosInstance.get(`/admin/application-history`, { params })
       .then(res => {
         if (res.data.success) { setData(res.data.applications); setPagination(res.data.pagination); }
         else setError(res.data.message || "Something went wrong.");

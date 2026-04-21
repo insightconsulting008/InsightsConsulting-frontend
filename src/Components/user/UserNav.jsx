@@ -50,7 +50,7 @@ const UserNav = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await axiosInstance.get("/user/profile", {
+        const res = await axiosInstance.get("/user/settings/profile", {
           headers: { Authorization: `Bearer ${token}` }
         });
         

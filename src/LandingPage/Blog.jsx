@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { FiSearch, FiArrowUpRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Footerctn from "./reusable/Footerctn";
+import axiosInstance from "@src/providers/axiosInstance";
 
 // Skeleton Card Component
 const BlogCardSkeleton = () => (
@@ -28,8 +29,6 @@ const BlogCardSkeleton = () => (
   </div>
 );
 
-const BASE_URL = "https://insightsconsult-backend.onrender.com/blogs";
-
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,27 +36,24 @@ export default function Blog() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const fetchBlogs = useCallback((query = "") => {
+  const fetchBlogs = useCallback(async (query = "") => {
     setLoading(true);
     setError(null);
 
-    const url = query
-      ? `${BASE_URL}?page=1&limit=10&search=${encodeURIComponent(query)}`
-      : `${BASE_URL}?page=1&limit=10`;
-
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch blogs");
-        return res.json();
-      })
-      .then((data) => {
-        setBlogs(data.data || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Something went wrong");
-        setLoading(false);
+    try {
+      const response = await axiosInstance.get("/api/blogs", {
+        params: {
+          page: 1,
+          limit: 10,
+          search: query || undefined,
+        },
       });
+      setBlogs(response.data.data || []);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Failed to fetch blogs");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Initial load

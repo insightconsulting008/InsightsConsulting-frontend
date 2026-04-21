@@ -18,10 +18,10 @@ const cfo = {
       ],
       "helpIntro": "This is where Insight Consulting's Virtual CFO (vCFO) ecosystem makes the difference. We help businesses:",
       "helpPoints": [
-        "Make data-backed strategic decisions 📊",
-        "Stay cash-flow confident and future-ready 💼",
-        "Build strong governance and investor-grade discipline 🏛️",
-        "Strengthen finance processes that scale with growth 🚀",
+        "Make data-backed strategic decisions",
+        "Stay cash-flow confident and future-ready",
+        "Build strong governance and investor-grade discipline",
+        "Strengthen finance processes that scale with growth",
         "Enable promoters to focus on business, not firefighting finance gaps"
       ],
       "helpClosing": "With Insight Consulting as your Growth CFO Partner, finance becomes a strategic advantage — not a constraint.",
@@ -124,7 +124,7 @@ const cfo = {
       "description": "Our Virtual CFOs function as strategic co-founders to your business, bringing together a robust finance ecosystem, market-leading practices, and modern digital reporting frameworks that deliver speed, clarity, and insight where it matters most.",
       "helpIntro": "We enable you with:",
       "points": [
-        "Faster access to decision-ready financial intelligence 📊",
+        "Faster access to decision-ready financial intelligence",
         "Structured and reliable management reporting frameworks",
         "Scalable finance processes aligned to growth-stage needs",
         "Stronger planning support for expansion, funding, and transformation",

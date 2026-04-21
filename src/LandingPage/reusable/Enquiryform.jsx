@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { servicesData } from "../data/servicesData";
 import { Headphones } from "lucide-react";
+import axios from "axios";
 import axiosInstance from "@src/providers/axiosInstance";
 
 /* 
@@ -113,7 +114,7 @@ const Enquiryform = ({ initialService = "" }) => {
 
     try {
       const res = await axiosInstance.post(
-        "/enquiry",
+        "/api/forms/enquiry",
         formData
       );
       if (res.status === 200 || res.status === 201) {

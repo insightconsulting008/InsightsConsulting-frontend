@@ -35,7 +35,7 @@ const UserPage = () => {
         const token = localStorage.getItem("accessToken");
         
         const res = await axiosInstance.get(
-          "/user/profile",
+          "/user/settings/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
