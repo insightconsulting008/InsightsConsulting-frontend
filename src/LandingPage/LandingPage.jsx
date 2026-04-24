@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import Nav from "./Nav";
 import Blog from "./Blog";
 import Blogdesc from "./Blogdesc";
-import Addblog from "../Dashboard/AddBlog";
 import Home from "./Home";
 import ServiceInfo from "./ServiceInfo";
 import Contact from "./Contact";
@@ -21,7 +20,7 @@ const LandingPage = () => {
         <Route path="/" element={<Home />} />
         <Route path="/resource" element={<Blog />} />
         <Route path="/resource/:slug" element={<Blogdesc />} />
-        <Route path="/add-blog" element={<Addblog />} />
+     
         <Route
           path="/our-services/:categoryId/:subCategoryId"
           element={<ServiceInfoSection />}
