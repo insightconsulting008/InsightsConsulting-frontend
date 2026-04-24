@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { FaClock, FaTag, FaUser } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import axiosInstance from "@src/providers/axiosInstance";
+import api from "@src/providers/api";
 
 export default function Blogdesc() {
   const { slug } = useParams();
@@ -18,7 +18,7 @@ export default function Blogdesc() {
       try {
         setLoading(true);
         setError(null);
-        const res = await axiosInstance.get(
+        const res = await api.get(
           `/api/blogs/${slug}`
         );
         setBlog(res.data);

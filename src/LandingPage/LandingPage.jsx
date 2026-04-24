@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Nav from "./Nav";
 import Blog from "./Blog";
 import Blogdesc from "./Blogdesc";
-import Addblog from "./Addblog";
+import Addblog from "../Dashboard/AddBlog";
 import Home from "./Home";
 import ServiceInfo from "./ServiceInfo";
 import Contact from "./Contact";

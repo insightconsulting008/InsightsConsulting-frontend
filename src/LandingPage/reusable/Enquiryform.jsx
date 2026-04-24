@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { servicesData } from "../data/servicesData";
 import { Headphones } from "lucide-react";
-import axios from "axios";
-import axiosInstance from "@src/providers/axiosInstance";
+import api from "@src/providers/api";
 
 /* 
   Safely build flat list of all services – skip any missing subcategories, 
@@ -113,8 +112,8 @@ const Enquiryform = ({ initialService = "" }) => {
     setErrorMsg("");
 
     try {
-      const res = await axiosInstance.post(
-        "/api/forms/enquiry",
+      const res = await api.post(
+        "/forms/enquiry",
         formData
       );
       if (res.status === 200 || res.status === 201) {

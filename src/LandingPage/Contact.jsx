@@ -3,7 +3,7 @@ import { ArrowUpRight, MapPin, Mail, Phone } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup";
-import axiosInstance from "@src/providers/axiosInstance";
+import api from "@src/providers/api";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ const Contact = () => {
     setSuccess(false);
 
     try {
-      await axiosInstance.post("/forms/contact", formData);
+      await api.post("/forms/contact", formData);
       setSuccess(true);
       setFormData({
         firstName: "",

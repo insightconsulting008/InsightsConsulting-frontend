@@ -2,68 +2,73 @@ import { useState, useEffect, useRef } from "react";
 
 const testimonials = [
   {
-    quote:
-      "It is my privilege and pleasure to write about Mrs. Revathy Bhalaaji, CA, of Insight Consulting. I have been in awe of her poise — calm and friendly nature. She is very reassuring, frank, and pleasant & communicates with clarity.",
+    quote: `It is my privilege and pleasure to write about Mrs. Revathy Bhalaaji, CA, of Insight Consulting.
+I have been in awe of her poise-calm and friendly nature.
+She is very reassuring, frank, and pleasant & communicates with clarity.`,
     name: "Sridhar K R",
-    company: "L'aura Nirvana",
+    company: "L’aura Nirvana",
   },
   {
-    quote:
-      "Revathy immediately brought in professionalism and rigor to executive reporting. She is an experienced professional ready to challenge leadership to address inefficiencies. She has been a great addition to our team. Wishing you all the very best Revathy. Happy Networking.",
-    name: "Murugadoss Narayanan",
-    company: "Quadrobay Technologies P Ltd",
+    quote: `This is Murugadoss Narayanan representing Quadrobay Technologies Pvt Ltd., belonging to IT Consulting Category, we do consulting and development services on Oracle EBS, Fusion Applications, Salesforce & Modern Applications.
+Revathy immediately brought in professionalism and rigor to executive reporting. She is an experienced professional ready to challenge leadership to address in efficiencies. She has been a great addition to our team.
+Wishing you all the very best Revathy. Happy Networking.`,
+    name: "Murugadoss Narayan",
+    company: "Quadrobay Technologies P ltd",
   },
   {
-    quote:
-      "Wanted to thank you and your team for managing my Company taxation and other details to keep it legal. The journey so far has been fulfilling with you and your team so THANK YOU again Revathy.",
+    quote: `Wanted to thank you and your team for managing my Company taxation and other details to keep it legal. The journey so far has been fulfilling with you and your team so THANK YOU again Revathy.`,
     name: "Balasubramanian Jayaraman",
     company: "Golden Key Software Solutions P Ltd",
   },
   {
-    quote:
-      "I, Vignesh, Founder of Fresh Gala, would like to give a Certificate of Appreciation to Ms. Revathy Bhalaaji for my company auditing process for the last financial year and also thank her for fast execution and helping me understand the insides of taxation to reduce the financial burden.",
+    quote: `Hi, I, Vignesh, Founder of the Fresh Gala category of cattle farming and technology would like to give a Certificate of Appreciation to Ms. Revathy Bhalaaji for my company auditing process for the last financial year and also thank her for fast execution and to know the insides about taxation and help me to reduce the financial burden`,
     name: "Vignesh S S",
     company: "Freshgala Online Services",
   },
   {
-    quote:
-      "Mrs. Revathy Bhalaaji — I am really happy to share this testimonial. My take: I have done business with about 5 Chartered Accountants in my career, once you meet her in person, you will look no further. She understands you and gives you what you need and not just what she has got. Trust me on this — she can save you a lot of money through her professional guidance by enabling you to do things right the first time. A true professional mentor who one can rely on.",
+    quote: `This is Selvam from The Homework.co, we represent Commercial Interiors Category.
+Mrs. Revathy Bhalaaji, I am really happy to share this testimonial for her, a seasoned Professional.
+My take I have done business with about 5 Chartered Accounts in my career, once you meet her in person, you will look no further. She understands you and gives you what you need and not just what she has got. So are her team mates.
+Trust me on this, she can save you a lot of money through her professional guidance; by enabling you do things right the first time. A true professional mentor who one can rely on.`,
     name: "Selvam Sundaramurthy",
     company: "House of D Property Developers P Ltd",
   },
   {
-    quote:
-      "Had approached Revathy to do a statutory audit for one of my clients. She had done an excellent job even though it was given to her at the eleventh hour. She is very dedicated to the job she takes up. Would recommend Revathy for audit to all my friends and relatives.",
+    quote: `Had approached Revathy to do a statutory audit for one of my Client.
+She had done an excellent job even though it was given to her at the eleventh hour.
+She is very dedicated to the job she takes up.
+Would recommend Revathy for audit to all my friends and relatives.`,
     name: "Saradha",
     company: "Ekameva Consult Private Limited",
   },
   {
-    quote:
-      "I recently introduced Revathy madam to one of my customers who was looking to buy a house from an NRI and needed to file TDS. She expertly guided the customer and meticulously reviewed every aspect. Professionalism at its finest. Very trustworthy and dependable!",
+    quote: `I recently introduced Revathy madam to one of my customers who was looking to buy a house from an NRI and needed to file TDS. She expertly guided the customer and meticulously reviewed every aspect, reaching out to anything that was out of order. Professionalism at its finest. Very trustworthy and dependable! I'd recommend it to everyone.`,
     name: "Shankar K",
     company: "Fortune Financial Services",
   },
   {
-    quote:
-      "We are working with Revathy mam for five years now. She takes care of end-to-end financial requirements of our company, definitely much more than what we are paying her for. She treats our business like her own, suggests best practices, refers us clients, and more. We will be your lifetime customer.",
+    quote: `I am Mahendra, CEO of Mako IT Lab (www.makoitlab.com). We are working with Revathy mam for five years now. Been experienced setting up a new business, we all as new entrepreneur know along with the managing cash flows, getting new business, maintaining a healthy customer relationship etc etc, how difficult it will be to manage the assurance of a business from a financial standpoint. The later will be a nightmare for every entrepreneur but not for Mako IT Lab as we got into the safe hands of Revathy mam and her team.
+ 
+She takes care of end to end financial requirements of our company, definitely much more than what we are paying her for. She treats our business like her own and suggests us best practices, refer us clients and more to improve our business.
+ 
+It is very hard to find a business person who is not money minded but service oriented, Revathy mam is one such person, we have been paying her the same fees for more than four years to her but the level of work that her team does for us increased to a large extent in four years.
+ 
+We will be your lifetime customer and will vouch for your services mam. Thank you very much for your support in our early struggling times. It definitely means a lot to us.`,
     name: "Mahendra Vadivelu",
     company: "Mako IT Lab P Ltd",
   },
   {
-    quote:
-      "I would like to thank Revathy mam for an outstanding service given to one of my most important clients. It was a small job but it meant the world to me because she was always available for a call and ready to take up the job. My client is your forever fan.",
+    quote: `I would like to thank Revathy mam for an outstanding service given to one of my most important client. It was a small job but it meant a world to me because she was always available for a call and ready to take up the job. I am privileged to have such a competent and calm businesswoman and she deserves all the credit and much more. Thank you for your service mam. My client is your forever fan.`,
     name: "Swaminathan",
     company: "3Pin Realty",
   },
   {
-    quote:
-      "I've taken accounting service from Revathy in the past 1 year. She's very approachable at any time with any queries. She doesn't stop with the accounting service alone — she also advises us on the right things to be done. Her team is very cooperative and they have the right knowledge.",
+    quote: `I’ve taken accounting service from Revathy in the past 1 year. She’s very approachable at any time with any queries. She doesn’t stop with the accounting service alone, she also advices us on the right things to be done. Her team is very cooperative and they have the right knowledge. I would strongly recommend Revathy for any accounting needs.`,
     name: "Thamizh Selvan Vijayan",
     company: "Jeevathma Foundation",
   },
   {
-    quote:
-      "Revathy Balaji, our legal and accounting expert, is a force to be reckoned with. Her expertise in taxation and as an independent director for companies is truly praiseworthy. After taking a long break from work, her remarkable comeback with a bang is an inspiring testament to her resilience and skill.",
+    quote: `Revathy Balaji, our legal and accounting expert is a force to be reckoned with. Her expertise in taxation and as an independent director for companies is truly praiseworthy, showcasing her deep understanding of priorities like nobody else. After taking a long break from work, her remarkable comeback with a bang is an inspiring testament to her resilience and skill. Revathy's dedication and knowledge make her an invaluable asset to her clients.`,
     name: "Basker Natesan",
     company: "The Design Intellect",
   },

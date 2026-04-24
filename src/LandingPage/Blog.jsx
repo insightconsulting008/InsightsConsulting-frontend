@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { FiSearch, FiArrowUpRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Footerctn from "./reusable/Footerctn";
-import axiosInstance from "@src/providers/axiosInstance";
+import api from "../providers/api";
 
 // Skeleton Card Component
 const BlogCardSkeleton = () => (
@@ -41,7 +41,7 @@ export default function Blog() {
     setError(null);
 
     try {
-      const response = await axiosInstance.get("/api/blogs", {
+      const response = await api.get("/api/blogs", {
         params: {
           page: 1,
           limit: 10,
