@@ -256,7 +256,7 @@ const ErrorPopup = ({ isOpen, onClose, errorMessage }) => {
 /* ══════════════════════════════════════════════════════════════
    MAIN — Create Blog Page
 ══════════════════════════════════════════════════════════════ */
-export default function CreateBlogPage() {
+export default function AddBlog() {
   const navigate = useNavigate();
 
   const [title, setTitle]             = useState("");
