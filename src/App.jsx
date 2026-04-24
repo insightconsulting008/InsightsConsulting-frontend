@@ -8,7 +8,7 @@ import AdminNav from './Dashboard/AdminNav';
 import ProtectedRoute from './providers/ProtectedRoute';
 import AdminBlogList from './Dashboard/BlogList';
 import ViewEditBlog from './Dashboard/ViewEditBlog';
-import AddBlog from './Dashboard/Addblog';
+import CreateBlog from './Dashboard/CreateBlog';
 
 export default function App() {
   const location = useLocation();
@@ -49,7 +49,7 @@ export default function App() {
         } />
         <Route path="/blogs/add-blogs" element={
           <ProtectedRoute>
-          <AddBlog/>
+          <CreateBlog/>
           </ProtectedRoute>
         } />
         <Route path="/view-blogs/:slug" element={
