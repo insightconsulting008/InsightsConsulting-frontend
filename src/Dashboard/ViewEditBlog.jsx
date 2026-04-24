@@ -258,7 +258,7 @@ function PreviewPanel({ title, author, description, thumbnailPreview, blocks, ca
   return (
     <div className="bg-white">
       {/* Preview bar */}
-      <div className="sticky top-[64px] z-30 bg-white border-b border-gray-200">
+      <div className="sticky top-16 md:top-0 z-30 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-full">
             <FaEye className="w-3.5 h-3.5" /> Preview Mode
@@ -273,7 +273,7 @@ function PreviewPanel({ title, author, description, thumbnailPreview, blocks, ca
       </div>
 
       {/* Blog preview layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-20 md:pb-12">
 
         {/* ── Hero ── */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-10">
@@ -592,7 +592,7 @@ export default function ViewEditBlog() {
       <div className="bg-[var(--neutral-50)] min-h-screen">
 
         {/* ── Sticky top bar ── */}
-        <div className="sticky top-0 z-30 bg-white border-b border-[var(--neutral-200)] shadow-sm">
+        <div className="sticky top-16 md:top-0 z-30 bg-white border-b border-[var(--neutral-200)] shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
             <button
               onClick={() => navigate("/blogs/list")}
@@ -603,9 +603,9 @@ export default function ViewEditBlog() {
             </button>
 
             {/* Mode indicator */}
-            <span className={`hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${mode === "view" ? "bg-[var(--neutral-100)] text-gray-600" : "bg-amber-50 text-amber-700 border border-amber-200"
+            <span className={`hidden md:inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full ${mode === "view" ? "bg-[var(--neutral-100)] text-gray-600" : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}>
-              {mode === "view" ? "View Mode" : "✏️ Editing"}
+              {mode === "view" ? "View Mode" : "Editing"}
             </span>
 
             <div className="flex items-center gap-2 ml-auto">
@@ -649,7 +649,7 @@ export default function ViewEditBlog() {
         </div>
 
         {/* ── Blog content ── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-20 md:pb-8">
 
           {/* ════ EDIT MODE — two-column layout ════ */}
           {mode === "edit" && (
@@ -660,9 +660,9 @@ export default function ViewEditBlog() {
 
                 {/* Thumbnail */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
-                    <h3 className="text-sm font-semibold text-gray-800">Thumbnail Image</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">1200×800px · JPG or PNG</p>
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
+                    <h3 className="text-base font-semibold text-gray-800">Thumbnail Image</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">1200×800px · JPG or PNG</p>
                   </div>
                   <div className="p-5">
                     <UploadBox
@@ -685,8 +685,8 @@ export default function ViewEditBlog() {
 
                 {/* Title & Description */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
-                    <h3 className="text-sm font-semibold text-gray-800">Post Details</h3>
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
+                    <h3 className="text-base font-semibold text-gray-800">Post Details</h3>
                   </div>
                   <div className="p-5 space-y-4">
                     <div>
@@ -704,10 +704,10 @@ export default function ViewEditBlog() {
 
                 {/* Content Blocks */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)] flex items-center justify-between flex-wrap gap-2">
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)] flex items-center justify-between flex-wrap gap-2">
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800">Content</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{blocks.length} block{blocks.length !== 1 ? "s" : ""}</p>
+                      <h3 className="text-base font-semibold text-gray-800">Content</h3>
+                      <p className="text-sm text-gray-500 mt-0.5">{blocks.length} block{blocks.length !== 1 ? "s" : ""}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {[
@@ -717,7 +717,7 @@ export default function ViewEditBlog() {
                       ].map(({ label, type, icon }) => (
                         <button
                           key={type} type="button" onClick={() => addBlock(type)}
-                          className="inline-flex items-center gap-1.5 border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                          className="inline-flex items-center gap-2 border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all"
                         >
                           {icon} <span className="hidden sm:inline">{label}</span>
                         </button>
@@ -754,14 +754,14 @@ export default function ViewEditBlog() {
                             {/* Block content */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-primary)] bg-[var(--primary-50)] border border-[var(--primary-100)] px-2 py-0.5 rounded-md">
+                                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)] bg-[var(--primary-50)] border border-[var(--primary-100)] px-2.5 py-0.5 rounded-md">
                                   {block.type}
                                 </span>
                                 <button
                                   type="button" onClick={() => removeBlock(block.id)}
-                                  className="w-6 h-6 bg-white hover:bg-red-50 text-gray-400 hover:text-red-500 border border-[var(--neutral-200)] rounded-full flex items-center justify-center transition-colors"
+                                  className="w-7 h-7 bg-white hover:bg-red-50 text-gray-400 hover:text-red-500 border border-[var(--neutral-200)] rounded-full flex items-center justify-center transition-colors"
                                 >
-                                  <FaTimes className="w-2.5 h-2.5" />
+                                  <FaTimes className="w-3 h-3" />
                                 </button>
                               </div>
                               {block.type === "heading" && <input value={block.value} onChange={(e) => updateBlockValue(block.id, e.target.value)} placeholder="Enter heading…" className={`${inputClass} font-semibold`} />}
@@ -789,8 +789,8 @@ export default function ViewEditBlog() {
 
                 {/* Author + Status */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
-                    <h3 className="text-sm font-semibold text-gray-800">Post Settings</h3>
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
+                    <h3 className="text-base font-semibold text-gray-800">Post Settings</h3>
                   </div>
                   <div className="p-5 space-y-4">
                     <div>
@@ -802,7 +802,7 @@ export default function ViewEditBlog() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-gray-700">Visibility</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{published ? "Visible to all" : "Hidden draft"}</p>
+                        <p className="text-sm text-gray-500 mt-0.5">{published ? "Visible to all" : "Hidden draft"}</p>
                       </div>
                       <button
                         type="button" onClick={() => setPublished(!published)}
@@ -811,7 +811,7 @@ export default function ViewEditBlog() {
                         <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${published ? "translate-x-5" : "translate-x-0"}`} />
                       </button>
                     </div>
-                    <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium ${published ? "bg-green-50 text-green-700 border border-green-200" : "bg-yellow-50 text-yellow-700 border border-yellow-200"}`}>
+                    <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ${published ? "bg-green-50 text-green-700 border border-green-200" : "bg-yellow-50 text-yellow-700 border border-yellow-200"}`}>
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${published ? "bg-green-500" : "bg-yellow-500"}`} />
                       {published ? "Will publish immediately" : "Saved as draft"}
                     </div>
@@ -820,8 +820,8 @@ export default function ViewEditBlog() {
 
                 {/* Save actions */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
-                    <h3 className="text-sm font-semibold text-gray-800">Actions</h3>
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
+                    <h3 className="text-base font-semibold text-gray-800">Actions</h3>
                   </div>
                   <div className="p-5 space-y-3">
                     <button
@@ -867,7 +867,7 @@ export default function ViewEditBlog() {
 
                 {/* Meta */}
                 <div className="flex flex-wrap items-center gap-2 mb-5">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${blog.published ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${blog.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {blog.published ? "Published" : "Draft"}
                   </span>
                   {blog.category && (
@@ -941,19 +941,27 @@ export default function ViewEditBlog() {
                 </div>
                 {/* Blog info */}
                 <div className="bg-white rounded-xl border border-[var(--neutral-200)] shadow-sm overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
-                    <h3 className="text-sm font-semibold text-gray-800">Blog Info</h3>
+                  <div className="px-5 py-4 border-b border-[var(--neutral-200)] bg-[var(--neutral-50)]">
+                    <h3 className="text-base font-semibold text-gray-800">Blog Info</h3>
                   </div>
                   <div className="p-5 space-y-3">
+                    {/* Status row — colour coded */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-gray-500">Status</span>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${
+                        blog.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {blog.published ? "Published" : "Draft"}
+                      </span>
+                    </div>
                     {[
-                      { label: "Status", value: blog.published ? "Published" : "Draft" },
-                      { label: "Author", value: blog.author || "—" },
-                      { label: "Blocks", value: `${blocks.length} block${blocks.length !== 1 ? "s" : ""}` },
+                      { label: "Author",  value: blog.author || "—" },
+                      { label: "Blocks",  value: `${blocks.length} block${blocks.length !== 1 ? "s" : ""}` },
                       ...(blog.createdAt ? [{ label: "Created", value: new Date(blog.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) }] : []),
                     ].map(({ label, value }) => (
                       <div key={label} className="flex items-start justify-between gap-2">
-                        <span className="text-xs text-gray-500">{label}</span>
-                        <span className="text-xs font-semibold text-gray-800 text-right">{value}</span>
+                        <span className="text-sm text-gray-500">{label}</span>
+                        <span className="text-sm font-semibold text-gray-800 text-right">{value}</span>
                       </div>
                     ))}
                   </div>

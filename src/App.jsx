@@ -1,4 +1,5 @@
 import React from 'react'
+import './App.css'
 import LandingPage from './LandingPage/LandingPage'
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Login from './Dashboard/Login';
@@ -13,8 +14,8 @@ import CreateBlog from './Dashboard/CreateBlog';
 export default function App() {
   const location = useLocation();
 
-  const hideNavRoutes = ['/', '/login', '/register'];
-  const showNav = !hideNavRoutes.includes(location.pathname);
+  const adminPrefixes = ['/dashboard', '/profile', '/blogs', '/view-blogs'];
+  const showNav = adminPrefixes.some(prefix => location.pathname.startsWith(prefix));
 
   return (
     <>
@@ -26,7 +27,7 @@ export default function App() {
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/*" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path="/register" element={<Register />} /> */}
 

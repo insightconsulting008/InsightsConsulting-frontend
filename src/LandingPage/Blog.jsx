@@ -41,7 +41,7 @@ export default function Blog() {
     setError(null);
 
     try {
-      const response = await api.get("/api/blogs", {
+      const response = await api.get("/blogs", {
         params: {
           page: 1,
           limit: 10,
@@ -160,7 +160,7 @@ export default function Blog() {
                 <p className="text-gray-600 mb-6">
                   {searchQuery
                     ? `No blog posts matched "${searchQuery}". Try a different search term.`
-                    : "There are no blog posts available at the moment. Please check back later."}
+                    : "There are no blog posts available at the moment."}
                 </p>
                 {searchQuery ? (
                   <button
@@ -170,12 +170,13 @@ export default function Blog() {
                     Clear Search
                   </button>
                 ) : (
-                  <button
-                    onClick={() => fetchBlogs()}
-                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Refresh Page
-                  </button>
+                  // <button
+                  //   onClick={() => fetchBlogs()}
+                  //   className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+                  // >
+                  //   Refresh Page
+                  // </button>
+                  <div></div>
                 )}
               </div>
             </div>

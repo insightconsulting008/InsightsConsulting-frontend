@@ -7,11 +7,19 @@ export default function ProtectedRoute({ children }) {
   const [authStatus, setAuthStatus] = useState('checking'); // checking | ok | fail
 
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setAuthStatus('fail');
+      return;
+    }
+
     const verifyAuth = async () => {
       try {
-        await api.get('/auth/verify'); // hits your middleware-protected route
+        await api.get('/auth/verify');
         setAuthStatus('ok');
       } catch (err) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userId');
         setAuthStatus('fail');
       }
     };

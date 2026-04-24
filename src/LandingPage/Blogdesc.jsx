@@ -19,7 +19,7 @@ export default function Blogdesc() {
         setLoading(true);
         setError(null);
         const res = await api.get(
-          `/api/blogs/${slug}`
+          `/blogs/${slug}`
         );
         setBlog(res.data);
       } catch (err) {

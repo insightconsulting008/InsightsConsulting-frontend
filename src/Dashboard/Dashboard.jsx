@@ -149,13 +149,18 @@ const SubmissionCard = ({ item, type }) => {
           <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-sm" style={{ color: "#8a4a34" }}>
             {item.email && (
               <span className="flex items-center gap-1.5">
-                <MailIcon />
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" strokeWidth="2" />
+                  <polyline points="22,6 12,13 2,6" strokeWidth="2" />
+                </svg>
                 <span className="truncate max-w-[200px]">{item.email}</span>
               </span>
             )}
             {item.phone && (
               <span className="flex items-center gap-1.5">
-                <PhoneIcon />
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.3 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" strokeWidth="2" />
+                </svg>
                 {item.phone}
               </span>
             )}
@@ -314,7 +319,7 @@ export default function Dashboard() {
   const hasFilters = search || fromDate || toDate;
 
   return (
-    <div className="min-h-screen font-sans" style={{ background: "#fdf5f2" }}>
+    <div className="min-h-screen font-sans">
 
       {/* ── Top banner (brand color) ── */}
 
@@ -324,21 +329,24 @@ export default function Dashboard() {
         className="w-full border-b"
         style={{ background: "#fff", borderColor: "#f0d5cc" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-      
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] font-semibold" style={{ color: "#f13c20" }}>
-                Insight Consulting
-              </p>
-              <h1 className="text-2xl font-bold leading-tight" style={{ color: "#2d1308" }}>
-                Form Submissions
-              </h1>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: "#fde8e3" }}
+          >
+            <SunburstIcon />
           </div>
-          <p className="text-sm" style={{ color: "#8a4a34" }}>
-            Manage and review all incoming enquiries and contact forms.
-          </p>
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] font-semibold" style={{ color: "#f13c20" }}>
+              Insight Consulting
+            </p>
+            <h1 className="text-2xl font-bold leading-tight" style={{ color: "#2d1308" }}>
+              Form Submissions
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: "#8a4a34" }}>
+              Manage and review all incoming enquiries and contact forms.
+            </p>
+          </div>
         </div>
       </header>
 
@@ -355,10 +363,10 @@ export default function Dashboard() {
               <button
                 key={tab}
                 onClick={() => handleTabChange(tab)}
-                className="px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-all duration-200"
+                className="px-5 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all duration-200"
                 style={
                   activeTab === tab
-                    ? { background: "#f13c20", color: "#fff", boxShadow: "0 2px 8px rgba(241,60,32,0.3)" }
+                    ? { background: "#f13c20", color: "#fff", boxShadow: "0 2px 10px rgba(241,60,32,0.25)" }
                     : { color: "#b45a3a" }
                 }
               >

@@ -23,7 +23,7 @@ const DeleteConfirmPopup = ({ isOpen, onClose, onConfirm, blogTitle }) => {
           onClick={onClose}
           className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-600 bg-white rounded-full p-1.5 md:p-2 shadow-md transition-colors z-10"
         >
-          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -78,7 +78,7 @@ const SuccessPopup = ({ isOpen, onClose, message }) => {
           onClick={onClose}
           className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-600 bg-white rounded-full p-1.5 md:p-2 shadow-md transition-colors z-10"
         >
-          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -276,6 +276,23 @@ export default function AdminBlogList() {
       <div className="bg-[var(--neutral-50)] min-h-screen px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="max-w-7xl mx-auto">
 
+          {/* ── Page Header ── */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Blog Posts</h1>
+              <p className="text-sm text-gray-500 mt-0.5">Manage your published posts and drafts</p>
+            </div>
+            <button
+              onClick={() => navigate("/blogs/add-blogs")}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-white text-sm font-semibold rounded-lg transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Post
+            </button>
+          </div>
+
           {/* ── Stat cards ── */}
           <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
             {[
@@ -284,7 +301,7 @@ export default function AdminBlogList() {
                 value: totalCount.public + totalCount.draft,
                 valueClass: "text-gray-900",
                 icon: (
-                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                   </svg>
                 ),
@@ -294,9 +311,9 @@ export default function AdminBlogList() {
               {
                 label: "Published",
                 value: totalCount.public,
-                valueStyle: { color: "var(--color-primary)" },
+                valueClass: "text-green-600",
                 icon: (
-                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 ),
@@ -308,7 +325,7 @@ export default function AdminBlogList() {
                 value: totalCount.draft,
                 valueClass: "text-yellow-600",
                 icon: (
-                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 ),
@@ -317,12 +334,12 @@ export default function AdminBlogList() {
               },
             ].map(({ label, value, valueClass, valueStyle, icon, iconBg, iconColor }) => (
               <div key={label} className="bg-white rounded-xl border border-[var(--neutral-200)] p-3 md:p-5 shadow-sm flex items-center gap-3 md:gap-4 min-w-0">
-                <div className={`hidden sm:flex w-9 h-9 md:w-11 md:h-11 rounded-xl flex-shrink-0 items-center justify-center ${iconBg} ${iconColor}`}>
+                <div className={`flex w-10 h-10 md:w-12 md:h-12 rounded-xl flex-shrink-0 items-center justify-center ${iconBg} ${iconColor}`}>
                   {icon}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-xl md:text-3xl font-bold leading-none mb-1 ${valueClass || ""}`} style={valueStyle}>{value}</p>
-                  <p className="text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wide truncate">{label}</p>
+                  <p className={`text-2xl md:text-3xl font-bold leading-none mb-1 ${valueClass || ""}`} style={valueStyle}>{value}</p>
+                  <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide truncate">{label}</p>
                 </div>
               </div>
             ))}
@@ -338,7 +355,7 @@ export default function AdminBlogList() {
                 <button
                   key={key}
                   onClick={() => handleTabChange(key)}
-                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 border-b-2 -mb-px ${
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 border-b-2 -mb-px ${
                     activeTab === key
                       ? "border-[var(--color-primary)] text-[var(--color-primary)]"
                       : "border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300"
@@ -372,7 +389,7 @@ export default function AdminBlogList() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1.5">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No {activeTab === "public" ? "Published" : "Draft"} Posts
               </h3>
               <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
@@ -381,7 +398,7 @@ export default function AdminBlogList() {
                   : "Save a blog as draft to review it before publishing."}
               </p>
               <button
-                onClick={() => navigate("/add-blog")}
+                onClick={() => navigate("/blogs/add-blogs")}
                 className="inline-flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold rounded-lg transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,36 +427,36 @@ export default function AdminBlogList() {
                         onError={(e) => { e.target.src = "https://placehold.co/400x267/f1f1f5/9ca3af?text=No+Image"; }}
                       />
                       {/* Status badge */}
-                      <span className={`absolute top-2.5 right-2.5 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                        blog.published ? "bg-green-500 text-white" : "bg-yellow-400 text-yellow-900"
+                      <span className={`absolute top-2.5 right-2.5 text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+                        blog.published ? "bg-green-500 text-white" : "bg-amber-500 text-white"
                       }`}>
                         {blog.published ? "Live" : "Draft"}
                       </span>
                     </div>
 
                     {/* Content */}
-                    <div className="p-4 flex flex-col flex-1 gap-2.5">
-                      <h2 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
+                    <div className="p-5 flex flex-col flex-1 gap-3">
+                      <h2 className="text-base font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
                         {blog.title}
                       </h2>
 
                       {blog.description && (
-                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed flex-1">{blog.description}</p>
+                        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed flex-1">{blog.description}</p>
                       )}
 
                       {/* Meta */}
-                      <div className="flex items-center gap-2 text-[11px] text-gray-400 flex-wrap mt-auto">
+                      <div className="flex items-center gap-3 text-xs text-gray-400 flex-wrap mt-auto">
                         {blog.author && (
-                          <span className="flex items-center gap-1 min-w-0">
-                            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <span className="flex items-center gap-1.5 min-w-0">
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             <span className="truncate">{blog.author}</span>
                           </span>
                         )}
                         {blog.createdAt && (
-                          <span className="flex items-center gap-1 ml-auto flex-shrink-0">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <span className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             {new Date(blog.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -451,13 +468,13 @@ export default function AdminBlogList() {
                       <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[var(--neutral-200)]">
                         <button
                           onClick={() => navigate(`/view-blogs/${blog.slug}`)}
-                          className="text-xs font-semibold py-2 rounded-lg transition-colors bg-[var(--primary-50)] hover:bg-[var(--primary-100)] text-[var(--color-primary)]"
+                          className="text-sm font-semibold py-2.5 rounded-lg transition-colors bg-[var(--primary-50)] hover:bg-[var(--primary-100)] text-[var(--color-primary)]"
                         >
                           Edit / View
                         </button>
                         <button
                           onClick={() => handleDeleteClick(blog)}
-                          className="text-xs font-semibold py-2 rounded-lg transition-colors bg-[var(--neutral-100)] hover:bg-red-50 text-gray-500 hover:text-red-600"
+                          className="text-sm font-semibold py-2.5 rounded-lg transition-colors bg-[var(--neutral-100)] hover:bg-red-50 text-gray-500 hover:text-red-600"
                         >
                           Delete
                         </button>

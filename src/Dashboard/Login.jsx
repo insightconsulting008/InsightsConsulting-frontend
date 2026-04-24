@@ -103,12 +103,12 @@ export default function UserLogin() {
       <div className="w-full max-w-sm">
 
         {/* Brand */}
-        <div className="mb-6 text-center">
-          <div className="w-9 h-9 bg-[#f13c20] rounded-lg flex items-center justify-center mb-4 mx-auto">
+        <div className="mb-7 text-center">
+          <div className="w-11 h-11 bg-[#f13c20] rounded-xl flex items-center justify-center mb-4 mx-auto shadow-sm">
             <UserIcon />
           </div>
-          <h1 className="text-xl font-semibold text-neutral-800">Welcome back</h1>
-          <p className="text-sm text-neutral-500 mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-neutral-800">Welcome back</h1>
+          <p className="text-sm text-neutral-500 mt-1.5">Sign in to your account</p>
         </div>
 
         {/* Card */}
@@ -125,7 +125,7 @@ export default function UserLogin() {
 
             {/* Email */}
             <div>
-              <label className="block text-xs text-neutral-500 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-neutral-600 mb-1.5">Email</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
                   <MailIcon />
@@ -146,7 +146,7 @@ export default function UserLogin() {
 
             {/* Password */}
             <div>
-              <label className="block text-xs text-neutral-500 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-neutral-600 mb-1.5">Password</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
                   <LockIcon />

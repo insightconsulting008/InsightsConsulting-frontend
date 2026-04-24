@@ -1,8 +1,9 @@
 // AdminNav.jsx
 import React, { useState, useEffect } from "react";
 import {
-  Phone,
-  BookOpen,
+  LayoutDashboard,
+  FileText,
+  FilePlus,
   Menu,
   X,
   ChevronLeft,
@@ -57,9 +58,9 @@ const AdminNav = () => {
   }, []);
 
   const navItems = [
-    { path: "/dashboard", icon: BookOpen, label: "Dashboard" },
-    { path: "/blogs/list", icon: BookOpen, label: "Blog List" },
-    { path: "/blogs/add-blogs", icon: BookOpen, label: "Add Blogs" },
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/blogs/list", icon: FileText, label: "Blog List" },
+    { path: "/blogs/add-blogs", icon: FilePlus, label: "Add Blogs" },
   ];
 
   const isRouteActive = (routePath) => {
@@ -82,6 +83,8 @@ const AdminNav = () => {
     } catch (err) {
       console.error('Logout failed:', err);
     } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('userId');
       navigate('/login');
     }
   };
@@ -149,7 +152,7 @@ const AdminNav = () => {
       <div className="h-16 flex items-center border-b border-neutral-200 px-4 flex-shrink-0">
         <div className={`flex items-center gap-3 ${!(isOpen || isHovered) ? "justify-center w-full" : "justify-between w-full"}`}>
           {(isOpen || isHovered) && (
-            <span className="font-bold text-xl tracking-tight animate-fadeIn" style={{ color: '#f13c20' }}>
+            <span className="font-extrabold text-lg tracking-tight animate-fadeIn" style={{ color: '#f13c20' }}>
               Admin Portal
             </span>
           )}

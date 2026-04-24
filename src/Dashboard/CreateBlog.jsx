@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import {
   FiImage, FiArrowUp, FiArrowDown, FiCheck, FiX,
-  FiLoader, FiSend, FiCrop, FiEye,
+  FiLoader, FiSend, FiCrop, FiEye, FiType, FiAlignLeft,
 } from "react-icons/fi";
 import { BiSolidError } from "react-icons/bi";
 import { MdErrorOutline } from "react-icons/md";
@@ -167,10 +167,10 @@ function UploadBox({ id, preview, onFileChange, showCropButton = false, onCropCl
 function Panel({ title, subtitle, children, headerRight }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
-          {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+          <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+          {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
         {headerRight}
       </div>
@@ -207,7 +207,7 @@ const SuccessPopup = ({ isOpen, onClose, message }) => {
           <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-2">Blog Published!</h2>
           <p className="text-sm md:text-base text-gray-600 mb-6">{message || "Your blog post has been successfully created."}</p>
           <button
-            onClick={() => { navigate("/manage-blog"); onClose(); }}
+            onClick={() => { navigate("/blogs/list"); onClose(); }}
             className="inline-flex items-center justify-center w-full gap-2 px-6 py-2.5 text-white font-medium rounded-lg transition-all"
             style={{ backgroundColor: '#f13c20' }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#d4331a'}
@@ -376,15 +376,22 @@ export default function CreateBlog() {
   };
 
   const blockTypes = [
-    { label: "Heading",   type: "heading",   icon: "H" },
-    { label: "Paragraph", type: "paragraph", icon: "¶" },
-    { label: "Image",     type: "image",     icon: "🖼️" },
+    { label: "Heading",   type: "heading",   icon: <FiType className="w-4 h-4" /> },
+    { label: "Paragraph", type: "paragraph", icon: <FiAlignLeft className="w-4 h-4" /> },
+    { label: "Image",     type: "image",     icon: <FiImage className="w-4 h-4" /> },
   ];
 
   return (
     <>
       <div className="bg-gray-50 min-h-screen py-6 md:py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+
+          {/* ── Page Header ── */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900">Add New Blog</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Fill in the details below to create and publish a new post</p>
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div className="grid lg:grid-cols-3 gap-5 items-start">
 
@@ -461,12 +468,12 @@ export default function CreateBlog() {
                       {blockTypes.map(({ label, type, icon }) => (
                         <button
                           key={type} type="button" onClick={() => addBlock(type)}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all border"
                           style={{ borderColor: '#f13c20', color: '#f13c20' }}
                           onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#f13c20'; e.currentTarget.style.color = 'white'; }}
                           onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = '#f13c20'; }}
                         >
-                          <span className="text-sm leading-none">{icon}</span>
+                          {icon}
                           <span className="hidden sm:inline">{label}</span>
                         </button>
                       ))}
@@ -476,10 +483,10 @@ export default function CreateBlog() {
                   {blocks.length === 0 ? (
                     <div className="text-center py-10 rounded-xl border-2 border-dashed border-gray-200">
                       <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                        <span className="text-2xl">✏️</span>
+                        <FiAlignLeft className="w-6 h-6 text-gray-400" />
                       </div>
                       <p className="text-sm font-medium text-gray-500">No content blocks yet</p>
-                      <p className="text-xs text-gray-400 mt-1">Use the buttons above to add headings, paragraphs, or images</p>
+                      <p className="text-sm text-gray-400 mt-1">Use the buttons above to add headings, paragraphs, or images</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -515,16 +522,16 @@ export default function CreateBlog() {
                           <div className="flex-1 relative min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <span
-                                className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md border"
+                                className="text-xs font-semibold uppercase tracking-wide px-2.5 py-0.5 rounded-md border"
                                 style={{ color: '#f13c20', backgroundColor: '#fff5f4', borderColor: '#ffd0c8' }}
                               >
                                 {block.type}
                               </span>
                               <button
                                 type="button" onClick={() => removeBlock(block.id)}
-                                className="w-6 h-6 bg-white text-gray-400 border border-gray-200 rounded-full flex items-center justify-center transition-colors hover:bg-red-50 hover:text-red-500"
+                                className="w-7 h-7 bg-white text-gray-400 border border-gray-200 rounded-full flex items-center justify-center transition-colors hover:bg-red-50 hover:text-red-500"
                               >
-                                <FiX size={11} />
+                                <FiX size={13} />
                               </button>
                             </div>
 
@@ -575,7 +582,7 @@ export default function CreateBlog() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-gray-700">Visibility</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{published ? "Visible to all readers" : "Hidden draft"}</p>
+                        <p className="text-sm text-gray-500 mt-0.5">{published ? "Visible to all readers" : "Hidden draft"}</p>
                       </div>
                       <button
                         type="button" onClick={() => setPublished((p) => !p)}
@@ -587,7 +594,7 @@ export default function CreateBlog() {
                     </div>
 
                     {/* Status indicator */}
-                    <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium ${published ? "bg-green-50 text-green-700 border border-green-200" : "bg-yellow-50 text-yellow-700 border border-yellow-200"}`}>
+                    <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ${published ? "bg-green-50 text-green-700 border border-green-200" : "bg-yellow-50 text-yellow-700 border border-yellow-200"}`}>
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${published ? "bg-green-500" : "bg-yellow-500"}`} />
                       {published ? "Will publish immediately" : "Saved as draft"}
                     </div>
@@ -619,7 +626,7 @@ export default function CreateBlog() {
                       "Use headings to structure content",
                       "Write a clear description for SEO",
                     ].map((tip) => (
-                      <li key={tip} className="flex items-start gap-2.5 text-xs text-gray-600">
+                      <li key={tip} className="flex items-start gap-2.5 text-sm text-gray-600">
                         <span
                           className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 border"
                           style={{ backgroundColor: '#fff5f4', borderColor: '#ffd0c8' }}
@@ -642,7 +649,7 @@ export default function CreateBlog() {
                       { label: "Content added", done: blocks.length > 0 },
                       { label: "Description written", done: description.trim().length > 0 },
                     ].map(({ label, done }) => (
-                      <li key={label} className="flex items-center gap-2.5 text-xs">
+                      <li key={label} className="flex items-center gap-2.5 text-sm">
                         <span
                           className="w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-all"
                           style={{
