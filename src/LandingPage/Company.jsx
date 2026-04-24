@@ -1,4 +1,5 @@
 import Footerctn from "./reusable/Footerctn";
+import TestimonialsSection from "./reusable/Testimonials";
 
 const About = () => {
   const teamMembers = [
@@ -709,6 +710,8 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      <TestimonialsSection/>
 
       <Footerctn />
     </div>

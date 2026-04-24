@@ -1,12 +1,12 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import EnquiryPopup from "./Popup.jsx";
 
 const Footerctn = () => {
-  const navigate = useNavigate();
+  const [popupOpen, setPopupOpen] = useState(false);
 
   return (
     <div>
-      <section className="w-full pt-[72px] pb-[56px] bg-[linear-gradient(180deg,#F8FAFF_0%,#EEF4FF_100%)]">
+      <section className="w-full pt-[72px] pb-[56px] bg-[linear-gradient(180deg,#FFFFFF_0%,#EEF4FF_100%)]">
         <div className="container mx-auto px-4 lg:px-12">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
             {/* Text */}
@@ -23,7 +23,7 @@ const Footerctn = () => {
             {/* Button */}
             <div className="flex items-center justify-center shrink-0">
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => setPopupOpen(true)}
                 className="h-[50px] px-7 bg-primary text-white font-semibold rounded-xl 
                 shadow-[0_6px_20px_rgba(37,99,235,0.25)]
                 hover:shadow-[0_10px_30px_rgba(37,99,235,0.35)]
@@ -41,6 +41,11 @@ const Footerctn = () => {
       <div className="max-w-7xl mx-auto px-4 lg:px-12">
         <div className="h-[1px] bg-border/70"></div>
       </div>
+       <EnquiryPopup
+        open={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        initialService={""}
+      />
     </div>
   );
 };

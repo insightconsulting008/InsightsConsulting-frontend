@@ -29,6 +29,7 @@ import { IoPlay } from "react-icons/io5";
 import Enquiryform from "./reusable/Enquiryform";
 import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup.jsx";
+import TestimonialsSection from "./reusable/Testimonials";
 
 const steps = [
   {
@@ -179,6 +180,8 @@ export default function Home() {
     { value: "5,000+", label: "Services Delivered" },
     { value: "100%", label: "Compliance Track" },
   ];
+
+
 
   return (
     <>
@@ -898,6 +901,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <TestimonialsSection/>
       </section>
     </>
   );

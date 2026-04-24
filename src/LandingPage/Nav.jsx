@@ -332,12 +332,7 @@ export default function Nav() {
               );
             })}
 
-            <button
-              onClick={() => navigate("/login")}
-              className="ml-2 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-semibold"
-            >
-              Login
-            </button>
+          
           </nav>
 
           <button className="lg:hidden" onClick={() => setMobileOpen(true)}>
@@ -488,12 +483,7 @@ export default function Nav() {
               <span>+91 98578474975</span>
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={() => { setMobileOpen(false); navigate("/login"); }}
-                className="flex-1 border border-primary text-primary text-sm font-semibold py-2.5 rounded-lg hover:bg-secondary transition-colors"
-              >
-                Login
-              </button>
+           
               <button
                 onClick={() => { setMobileOpen(false); navigate("/contact"); }}
                 className="flex-1 bg-primary text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-primary/90 transition-colors"
