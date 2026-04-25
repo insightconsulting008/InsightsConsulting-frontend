@@ -40,8 +40,8 @@ const About = () => {
       borderColor: "border-emerald-100",
     },
     {
-      name: "Bala",
-      role: "B. Com, ACA, Applied Finance – IIM Kolkata",
+      name: "Balasubramanian K",
+      role: "B. Com, MFM, ACA, IIM(C)",
       experience: "20+ Years",
       expertise: "FMCG & Manufacturing",
       desc: "Bala brings 20 years of powerhouse experience, including PAN-India leadership roles across Credit Administration, Risk & Policy Management, and Underwriting. He has contributed to top-tier driving growth, compliance, and high-quality credit portfolios on a national scale..  Bala blends analytical precision with strategic financial acumen in building scalable finance processes enabling better decisions, driving risk assurance and compliance and supporting organizations in navigating evolving regulatory requirement.",

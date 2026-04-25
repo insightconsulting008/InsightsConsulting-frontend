@@ -3,7 +3,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://insightsconsulting-normal-backend-production.up.railway.app/api", // your backend
+  baseURL: "https://insightsconsulting-normal-backend.onrender.com/api", // your backend
   withCredentials: true, // IMPORTANT for cookies
 });
 
