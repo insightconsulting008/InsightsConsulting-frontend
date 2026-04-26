@@ -79,12 +79,10 @@ const AdminNav = () => {
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/auth/logout'); // backend clears cookie
     } catch (err) {
       console.error('Logout failed:', err);
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('userId');
       navigate('/login');
     }
   };

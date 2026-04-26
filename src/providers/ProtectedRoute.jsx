@@ -1,28 +1,20 @@
-// src/Dashboard/ProtectedRoute.jsx
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import api from '../providers/api';
 
 export default function ProtectedRoute({ children }) {
-  const [authStatus, setAuthStatus] = useState('checking'); // checking | ok | fail
+  const [authStatus, setAuthStatus] = useState('checking');
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setAuthStatus('fail');
-      return;
-    }
-
     const verifyAuth = async () => {
       try {
-        await api.get('/auth/verify');
+        await api.get('/auth/verify'); // cookie auto sent
         setAuthStatus('ok');
       } catch (err) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('userId');
         setAuthStatus('fail');
       }
     };
+
     verifyAuth();
   }, []);
 

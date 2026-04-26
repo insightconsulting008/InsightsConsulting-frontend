@@ -10,6 +10,8 @@ import ProtectedRoute from './providers/ProtectedRoute';
 import AdminBlogList from './Dashboard/BlogList';
 import ViewEditBlog from './Dashboard/ViewEditBlog';
 import CreateBlog from './Dashboard/CreateBlog';
+import ForgotPassword from './Dashboard/ForgotPassword'
+import ResetPassword from './Dashboard/ResetPassword';
 
 export default function App() {
   const location = useLocation();
@@ -29,6 +31,8 @@ export default function App() {
         {/* Public Routes */}
         <Route path="/*" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         {/* <Route path="/register" element={<Register />} /> */}
 
         {/* Protected Routes */}

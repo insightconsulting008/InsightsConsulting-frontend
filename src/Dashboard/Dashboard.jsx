@@ -1,9 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import api from "@src/providers/api";
 
 // ── API ────────────────────────────────────────────────────────────────────────
-// GET /enquiry?page=1&limit=10&search=john
-// GET /contact?page=2&limit=5&search=gmail
 const fetchData = async (type, params) => {
   const endpoint = type === "enquiry" ? "/forms/enquiry" : "/forms/contact";
   const res = await api.get(endpoint, { params });
@@ -11,12 +9,6 @@ const fetchData = async (type, params) => {
 };
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
-const DateIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" />
-    <path d="M16 2v4M8 2v4M3 10h18" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
 const SearchIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <circle cx="11" cy="11" r="8" strokeWidth="2" />
@@ -71,21 +63,24 @@ const MessageIcon = () => (
   </svg>
 );
 
+// ── Spinner ────────────────────────────────────────────────────────────────────
+const Spinner = () => (
+  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="#f13c20" strokeWidth="4" />
+    <path className="opacity-75" fill="#f13c20" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+  </svg>
+);
+
 // ── Empty State ────────────────────────────────────────────────────────────────
 const EmptyState = ({ tab }) => (
   <div className="flex flex-col items-center justify-center py-24" style={{ color: "#b45a3a" }}>
-    <div
-      className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-      style={{ background: "#fde8e3" }}
-    >
+    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#fde8e3" }}>
       {tab === "enquiry" ? <MailIcon /> : <PhoneIcon />}
     </div>
     <p className="text-lg font-semibold" style={{ color: "#7a2a14" }}>
       No {tab === "enquiry" ? "enquiries" : "contacts"} found
     </p>
-    <p className="text-sm mt-1" style={{ color: "#b45a3a" }}>
-      Try adjusting your filters or search query
-    </p>
+    <p className="text-sm mt-1" style={{ color: "#b45a3a" }}>Try adjusting your filters or search query</p>
   </div>
 );
 
@@ -96,18 +91,13 @@ const Badge = ({ children, type }) => {
       ? { background: "#fde8e3", color: "#c0321a", border: "1px solid #f8b4a3" }
       : { background: "#fef3e2", color: "#b56a00", border: "1px solid #f8d89a" };
   return (
-    <span
-      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-      style={styles}
-    >
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style={styles}>
       {children}
     </span>
   );
 };
 
 // ── Submission Card ────────────────────────────────────────────────────────────
-// Enquiry shape : { formSubmissionId, fullName, email, phone, serviceRequired, comments, createdAt }
-// Contact shape : { formSubmissionId, firstName, lastName, email, phone, message, createdAt }
 const SubmissionCard = ({ item, type }) => {
   const [expanded, setExpanded] = useState(false);
   const date = new Date(item.createdAt);
@@ -116,14 +106,10 @@ const SubmissionCard = ({ item, type }) => {
   const accentColor = type === "enquiry" ? "#f13c20" : "#e8a000";
   const isEnquiry = type === "enquiry";
 
-  // Resolve display values based on formType
-  const displayName = isEnquiry
-    ? (item.fullName || "—")
-    : ([item.firstName, item.lastName].filter(Boolean).join(" ") || "—");
-
-  const displayEmail   = item.email   || null;
-  const displayPhone   = item.phone   || null;
-  const displayService = isEnquiry ? (item.serviceRequired || null) : null;  // enquiry only
+  const displayName    = isEnquiry ? (item.fullName || "—") : ([item.firstName, item.lastName].filter(Boolean).join(" ") || "—");
+  const displayEmail   = item.email || null;
+  const displayPhone   = item.phone || null;
+  const displayService = isEnquiry ? (item.serviceRequired || null) : null;
   const displayComment = isEnquiry ? (item.comments || null) : (item.message || null);
 
   return (
@@ -133,14 +119,10 @@ const SubmissionCard = ({ item, type }) => {
       style={{
         background: "#fff",
         border: "1.5px solid #f0d5cc",
-        boxShadow: expanded
-          ? "0 4px 24px rgba(241,60,32,0.10)"
-          : "0 1px 4px rgba(180,90,58,0.07)",
+        boxShadow: expanded ? "0 4px 24px rgba(241,60,32,0.10)" : "0 1px 4px rgba(180,90,58,0.07)",
       }}
     >
-
       <div className="px-5 py-4 flex items-start gap-4">
-        {/* Avatar */}
         <div
           className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold"
           style={{ background: isEnquiry ? "#fde8e3" : "#fef3e2", color: accentColor }}
@@ -149,20 +131,14 @@ const SubmissionCard = ({ item, type }) => {
         </div>
 
         <div className="flex-1 min-w-0">
-          {/* Name + badge + date */}
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold truncate" style={{ color: "#2d1308" }}>
-                {displayName}
-              </span>
+              <span className="font-semibold truncate" style={{ color: "#2d1308" }}>{displayName}</span>
               <Badge type={type}>{type}</Badge>
             </div>
-            <span className="text-xs shrink-0" style={{ color: "#b45a3a" }}>
-              {formattedDate} · {formattedTime}
-            </span>
+            <span className="text-xs shrink-0" style={{ color: "#b45a3a" }}>{formattedDate} · {formattedTime}</span>
           </div>
 
-          {/* Email + Phone row */}
           <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-sm" style={{ color: "#8a4a34" }}>
             {displayEmail && (
               <span className="flex items-center gap-1.5">
@@ -183,17 +159,14 @@ const SubmissionCard = ({ item, type }) => {
             )}
           </div>
 
-          {/* Collapsed preview */}
           {!expanded && displayService && (
             <p className="mt-2 text-sm line-clamp-1 flex items-center gap-1.5" style={{ color: "#b45a3a" }}>
-              <BriefcaseIcon />
-              {displayService}
+              <BriefcaseIcon />{displayService}
             </p>
           )}
           {!expanded && !displayService && displayComment && (
             <p className="mt-2 text-sm line-clamp-1 flex items-center gap-1.5" style={{ color: "#b45a3a" }}>
-              <MessageIcon />
-              {displayComment}
+              <MessageIcon />{displayComment}
             </p>
           )}
         </div>
@@ -206,51 +179,31 @@ const SubmissionCard = ({ item, type }) => {
         </svg>
       </div>
 
-      {/* Expanded section */}
       {expanded && (
         <div className="px-5 pb-5 pt-0 border-t" style={{ borderColor: "#f0d5cc" }}>
-
-          {/* Service Required — enquiry only */}
           {displayService && (
             <div className="mt-4">
-              <p className="text-xs uppercase tracking-wider mb-1.5 font-semibold" style={{ color: "#c06040" }}>
-                Service Required
-              </p>
-              <p
-                className="text-sm leading-relaxed px-3 py-2 rounded-lg"
-                style={{ color: "#5a2a14", background: "#fdf5f2", border: "1px solid #f0d5cc" }}
-              >
+              <p className="text-xs uppercase tracking-wider mb-1.5 font-semibold" style={{ color: "#c06040" }}>Service Required</p>
+              <p className="text-sm leading-relaxed px-3 py-2 rounded-lg" style={{ color: "#5a2a14", background: "#fdf5f2", border: "1px solid #f0d5cc" }}>
                 {displayService}
               </p>
             </div>
           )}
-
-          {/* Comments (enquiry) / Message (contact) */}
           {displayComment && (
             <div className="mt-4">
               <p className="text-xs uppercase tracking-wider mb-1.5 font-semibold" style={{ color: "#c06040" }}>
                 {isEnquiry ? "Comments" : "Message"}
               </p>
-              <p
-                className="text-sm leading-relaxed whitespace-pre-wrap px-3 py-2 rounded-lg"
-                style={{ color: "#5a2a14", background: "#fdf5f2", border: "1px solid #f0d5cc" }}
-              >
+              <p className="text-sm leading-relaxed whitespace-pre-wrap px-3 py-2 rounded-lg" style={{ color: "#5a2a14", background: "#fdf5f2", border: "1px solid #f0d5cc" }}>
                 {displayComment}
               </p>
             </div>
           )}
-
-          {/* Clickable email + phone */}
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {displayEmail && (
               <div>
                 <p className="text-xs uppercase tracking-wider mb-1 font-semibold" style={{ color: "#c06040" }}>Email</p>
-                <a
-                  href={`mailto:${displayEmail}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-sm underline underline-offset-2"
-                  style={{ color: "#f13c20" }}
-                >
+                <a href={`mailto:${displayEmail}`} onClick={(e) => e.stopPropagation()} className="text-sm underline underline-offset-2" style={{ color: "#f13c20" }}>
                   {displayEmail}
                 </a>
               </div>
@@ -258,12 +211,7 @@ const SubmissionCard = ({ item, type }) => {
             {displayPhone && (
               <div>
                 <p className="text-xs uppercase tracking-wider mb-1 font-semibold" style={{ color: "#c06040" }}>Phone</p>
-                <a
-                  href={`tel:${displayPhone}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-sm underline underline-offset-2"
-                  style={{ color: "#f13c20" }}
-                >
+                <a href={`tel:${displayPhone}`} onClick={(e) => e.stopPropagation()} className="text-sm underline underline-offset-2" style={{ color: "#f13c20" }}>
                   {displayPhone}
                 </a>
               </div>
@@ -284,12 +232,9 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
 
   return (
     <div className="flex items-center justify-center gap-1.5 mt-6 flex-wrap">
-      <button
-        onClick={() => onPageChange(page - 1)}
-        disabled={page === 1}
+      <button onClick={() => onPageChange(page - 1)} disabled={page === 1}
         className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-        style={{ border: "1.5px solid #f0d5cc", color: "#c06040" }}
-      >
+        style={{ border: "1.5px solid #f0d5cc", color: "#c06040" }}>
         <ChevronIcon dir="left" />
       </button>
 
@@ -301,37 +246,22 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
       )}
 
       {pages.map((p) => (
-        <button
-          key={p}
-          onClick={() => onPageChange(p)}
-          className={btnBase}
-          style={
-            p === page
-              ? { background: "#f13c20", color: "#fff", fontWeight: 700 }
-              : { color: "#8a4a34" }
-          }
-        >
+        <button key={p} onClick={() => onPageChange(p)} className={btnBase}
+          style={p === page ? { background: "#f13c20", color: "#fff", fontWeight: 700 } : { color: "#8a4a34" }}>
           {p}
         </button>
       ))}
 
       {pages[pages.length - 1] < totalPages && (
         <>
-          {pages[pages.length - 1] < totalPages - 1 && (
-            <span style={{ color: "#d0a090" }} className="px-1">…</span>
-          )}
-          <button onClick={() => onPageChange(totalPages)} className={btnBase} style={{ color: "#8a4a34" }}>
-            {totalPages}
-          </button>
+          {pages[pages.length - 1] < totalPages - 1 && <span style={{ color: "#d0a090" }} className="px-1">…</span>}
+          <button onClick={() => onPageChange(totalPages)} className={btnBase} style={{ color: "#8a4a34" }}>{totalPages}</button>
         </>
       )}
 
-      <button
-        onClick={() => onPageChange(page + 1)}
-        disabled={page === totalPages || totalPages === 0}
+      <button onClick={() => onPageChange(page + 1)} disabled={page === totalPages || totalPages === 0}
         className="p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-        style={{ border: "1.5px solid #f0d5cc", color: "#c06040" }}
-      >
+        style={{ border: "1.5px solid #f0d5cc", color: "#c06040" }}>
         <ChevronIcon dir="right" />
       </button>
     </div>
@@ -342,27 +272,38 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
 export default function Dashboard() {
   const [activeTab, setActiveTab]     = useState("enquiry");
   const [search, setSearch]           = useState("");
-  const [fromDate, setFromDate]       = useState("");
-  const [toDate, setToDate]           = useState("");
   const [page, setPage]               = useState(1);
-  const [limit]                       = useState(10);
+  const [limit]                       = useState(8);
   const [data, setData]               = useState({ items: [], total: 0, totalPages: 0 });
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading]         = useState(false);  // full skeleton: tab / page change
+  const [searching, setSearching]     = useState(false);  // subtle spinner: search only
   const [searchInput, setSearchInput] = useState("");
+  const searchTriggered               = useRef(false);    // flag to know what caused the load
 
+  // ── Debounce: 500 ms after user stops typing → update `search` state ──
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchTriggered.current = true;
+      setSearch(searchInput);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // ── Fetch ──
   const load = useCallback(async () => {
-    setLoading(true);
+    const isSearch = searchTriggered.current;
+    searchTriggered.current = false;
+
+    // Search → subtle spinner; tab / page change → full skeleton
+    if (isSearch) setSearching(true);
+    else          setLoading(true);
+
     try {
-      // Only send params the API supports: page, limit, search
       const params = { page, limit };
-      if (search)   params.search   = search;
-      if (fromDate) params.fromDate = fromDate;
-      if (toDate)   params.toDate   = toDate;
+      if (search) params.search = search;
 
-      const res = await fetchData(activeTab, params);
-
-      // Enquiry endpoint returns: { success, enquiries: [], total, totalPages }
-      // Contact endpoint returns: { success, contacts: [],  total, totalPages }
+      const res   = await fetchData(activeTab, params);
       const items = (activeTab === "enquiry" ? res.enquiries : res.contacts) || [];
 
       setData({
@@ -374,8 +315,9 @@ export default function Dashboard() {
       setData({ items: [], total: 0, totalPages: 0 });
     } finally {
       setLoading(false);
+      setSearching(false);
     }
-  }, [activeTab, search, fromDate, toDate, page, limit]);
+  }, [activeTab, search, page, limit]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -384,48 +326,21 @@ export default function Dashboard() {
     setPage(1);
     setSearch("");
     setSearchInput("");
-    setFromDate("");
-    setToDate("");
   };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearch(searchInput);
-    setPage(1);
-  };
-
-  const clearFilters = () => {
-    setSearch("");
-    setSearchInput("");
-    setFromDate("");
-    setToDate("");
-    setPage(1);
-  };
-
-  const hasFilters = search || fromDate || toDate;
 
   return (
     <div className="min-h-screen font-sans">
 
       {/* ── Header ── */}
       <header className="w-full border-b" style={{ background: "#fff", borderColor: "#f0d5cc" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "#fde8e3" }}
-          >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#fde8e3" }}>
             <SunburstIcon />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] font-semibold" style={{ color: "#f13c20" }}>
-              Insight Consulting
-            </p>
-            <h1 className="text-2xl font-bold leading-tight" style={{ color: "#2d1308" }}>
-              Form Submissions
-            </h1>
-            <p className="text-sm mt-0.5" style={{ color: "#8a4a34" }}>
-              Manage and review all incoming enquiries and contact forms.
-            </p>
+            <p className="text-xs uppercase tracking-[0.18em] font-semibold" style={{ color: "#f13c20" }}>Insight Consulting</p>
+            <h1 className="text-md font-bold leading-tight" style={{ color: "#2d1308" }}>Form Submissions</h1>
+            <p className="text-sm mt-0.5" style={{ color: "#8a4a34" }}>Manage and review all incoming enquiries and contact forms.</p>
           </div>
         </div>
       </header>
@@ -435,10 +350,7 @@ export default function Dashboard() {
 
         {/* Tabs + total count */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <div
-            className="flex p-1 rounded-xl"
-            style={{ background: "#fde8e3", border: "1.5px solid #f8b4a3" }}
-          >
+          <div className="flex p-1 rounded-xl" style={{ background: "#fde8e3", border: "1.5px solid #f8b4a3" }}>
             {["enquiry", "contact"].map((tab) => (
               <button
                 key={tab}
@@ -457,120 +369,51 @@ export default function Dashboard() {
 
           {!loading && (
             <div className="flex items-center gap-2 text-sm" style={{ color: "#8a4a34" }}>
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: activeTab === "enquiry" ? "#f13c20" : "#e8a000" }}
-              />
-              <span>
-                <span className="font-bold" style={{ color: "#2d1308" }}>{data.total}</span> total records
-              </span>
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: activeTab === "enquiry" ? "#f13c20" : "#e8a000" }} />
+              <span><span className="font-bold" style={{ color: "#2d1308" }}>{data.total}</span> total records</span>
             </div>
           )}
         </div>
 
-        {/* Filters */}
-        <div
-          className="rounded-xl p-4 mb-6 space-y-3"
-          style={{ background: "#fff", border: "1.5px solid #f0d5cc", boxShadow: "0 1px 8px rgba(241,60,32,0.06)" }}
-        >
-          {/* Search */}
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#c06040" }}>
-                <SearchIcon />
-              </span>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder={
-                  activeTab === "enquiry"
-                    ? "Search by name, email, phone, service…"
-                    : "Search by name, email, phone, comments…"
-                }
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg text-sm outline-none transition-all"
-                style={{ background: "#fdf5f2", border: "1.5px solid #f0d5cc", color: "#2d1308" }}
-                onFocus={e => (e.target.style.borderColor = "#f13c20")}
-                onBlur={e => (e.target.style.borderColor = "#f0d5cc")}
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-lg text-sm font-semibold shrink-0 transition-all"
-              style={{ background: "#f13c20", color: "#fff" }}
-              onMouseEnter={e => (e.target.style.background = "#c0321a")}
-              onMouseLeave={e => (e.target.style.background = "#f13c20")}
-            >
-              Search
-            </button>
-          </form>
-
-          {/* Date range */}
-          {/* <div className="flex gap-2 flex-wrap items-center">
-            <div className="relative flex-1 min-w-[160px]">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "#c06040" }}>
-                <DateIcon />
-              </span>
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all [color-scheme:light]"
-                style={{ background: "#fdf5f2", border: "1.5px solid #f0d5cc", color: "#5a2a14" }}
-                onFocus={e => (e.target.style.borderColor = "#f13c20")}
-                onBlur={e => (e.target.style.borderColor = "#f0d5cc")}
-              />
-            </div>
-            <span className="text-sm shrink-0" style={{ color: "#c06040" }}>to</span>
-            <div className="relative flex-1 min-w-[160px]">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "#c06040" }}>
-                <DateIcon />
-              </span>
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => { setToDate(e.target.value); setPage(1); }}
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all [color-scheme:light]"
-                style={{ background: "#fdf5f2", border: "1.5px solid #f0d5cc", color: "#5a2a14" }}
-                onFocus={e => (e.target.style.borderColor = "#f13c20")}
-                onBlur={e => (e.target.style.borderColor = "#f0d5cc")}
-              />
-            </div>
-            {hasFilters && (
-              <button
-                onClick={clearFilters}
-                className="px-3 py-2.5 text-sm rounded-lg shrink-0 transition-all"
-                style={{ border: "1.5px solid #f0d5cc", color: "#b45a3a" }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = "#f13c20")}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = "#f0d5cc")}
-              >
-                Clear
-              </button>
-            )}
-          </div> */}
+        {/* Search input */}
+        <div className="rounded-xl p-4 mb-6" style={{ background: "#fff", border: "1.5px solid #f0d5cc", boxShadow: "0 1px 8px rgba(241,60,32,0.06)" }}>
+          <div className="relative">
+            {/* Icon slot: spinner while searching, magnifier otherwise */}
+            <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#c06040" }}>
+              <SearchIcon />
+            </span>
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={
+                activeTab === "enquiry"
+                  ? "Search by name, email, phone, service…"
+                  : "Search by name, email, phone, comments…"
+              }
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg text-sm outline-none transition-all"
+              style={{ background: "#fdf5f2", border: "1.5px solid #f0d5cc", color: "#2d1308" }}
+              onFocus={e => (e.target.style.borderColor = "#f13c20")}
+              onBlur={e => (e.target.style.borderColor = "#f0d5cc")}
+            />
+          </div>
         </div>
 
         {/* Content */}
         {loading ? (
+          // Full skeleton only on tab / page change
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="h-20 rounded-xl animate-pulse"
-                style={{ background: "#fde8e3", border: "1.5px solid #f8b4a3" }}
-              />
+              <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: "#fde8e3", border: "1.5px solid #f8b4a3" }} />
             ))}
           </div>
         ) : data.items.length === 0 ? (
           <EmptyState tab={activeTab} />
         ) : (
-          <div className="space-y-2.5">
+          // Cards fade slightly while a search is in-flight
+          <div className={`space-y-2.5 transition-opacity duration-200 ${searching ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
             {data.items.map((item) => (
-              <SubmissionCard
-                key={item.formSubmissionId || item.id}
-                item={item}
-                type={activeTab}
-              />
+              <SubmissionCard key={item.formSubmissionId || item.id} item={item} type={activeTab} />
             ))}
           </div>
         )}
