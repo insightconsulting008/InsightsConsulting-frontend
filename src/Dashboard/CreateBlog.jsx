@@ -383,8 +383,8 @@ export default function CreateBlog() {
 
   return (
     <>
-      <div className="bg-gray-50 min-h-screen py-6 md:py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div className=" min-h-screen py-6 md:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* ── Page Header ── */}
           <div className="mb-8">

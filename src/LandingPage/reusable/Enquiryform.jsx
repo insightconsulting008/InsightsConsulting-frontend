@@ -23,6 +23,11 @@ const GSTR_2B_SERVICE = {
   name: "GSTR 2B Reconciliation",
 };
 
+const GST_REFUND_SERVICE = {
+  serviceId: "gst-refund",
+  name: "GST Refund",
+};
+
 // Build base flat list – conditionally include SCHEME_SERVICE
 let baseServices = [
   ...(today < schemeEndDate ? [SCHEME_SERVICE] : []),
@@ -40,7 +45,7 @@ const targetIndex = baseServices.findIndex(
 
 const ALL_SERVICES = [...baseServices];
 if (targetIndex !== -1) {
-  ALL_SERVICES.splice(targetIndex + 1, 0, GSTR_2B_SERVICE);
+  ALL_SERVICES.splice(targetIndex + 1, 0, GSTR_2B_SERVICE,  GST_REFUND_SERVICE);
 } else {
   ALL_SERVICES.push(GSTR_2B_SERVICE);
 }

@@ -260,7 +260,7 @@ export default function AdminBlogList() {
   if (loading && allBlogs.length === 0) {
     return (
       <>
-        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 bg-[var(--neutral-50)]">
+        <div className="flex flex-col items-center justify-center min-h-[100vh] gap-4 bg-[var(--neutral-50)]">
           <div className="w-12 h-12 border-4 border-[var(--neutral-200)] rounded-full animate-spin" style={{ borderTopColor: "var(--color-primary)" }} />
           <p className="text-gray-500 text-sm">Loading blogs…</p>
         </div>
@@ -273,8 +273,8 @@ export default function AdminBlogList() {
       {/* ── Admin Page Header ── */}
    
 
-      <div className="bg-[var(--neutral-50)] min-h-screen px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="max-w-7xl mx-auto">
+      <div className=" min-h-screen px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* ── Page Header ── */}
           <div className="flex items-center justify-between mb-8">

@@ -40,15 +40,15 @@ const steps = [
   },
   {
     no: "02",
-    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%201.png",
-    title: "Login & Submit Details",
-    desc: "Access your dashboard and upload required documents",
-  },
-  {
-    no: "03",
     icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%202.png",
     title: "Representative Assigned",
     desc: "A representative manages your service and updates everything.",
+  },
+  {
+    no: "03",
+    icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/upload-cloud-folder%201.png",
+    title: "Submit relevant documents",
+    desc: "Send your documents securely we’ll handle the rest.",
   },
   {
     no: "04",
@@ -128,11 +128,11 @@ export default function Home() {
       title: "Built-In Follow-Ups & Tracking",
       desc: "Automated reminders and status tracking replace manual follow-ups and last-minute rushes.",
     },
-    {
-      icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(3).png?updatedAt=1771417293273",
-      title: " Dashboards",
-      desc: "Clients track progress transparently, while teams manage workloads with clear visibility.",
-    },
+    // {
+    //   icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(3).png?updatedAt=1771417293273",
+    //   title: " Dashboards",
+    //   desc: "Clients track progress transparently, while teams manage workloads with clear visibility.",
+    // },
     {
       icon: "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Text%20Container%20(4).png?updatedAt=1771417293232",
       title: "Recurring Compliance Management",
@@ -141,35 +141,36 @@ export default function Home() {
   ];
 
   const features1 = [
-    {
-      title: " Dashboard",
-      desc: "Track service status, uploads, certificates, and history in one place.",
-      icon: <MdDashboard className="text-2xl" />,
-      badge: "Popular",
-    },
+    // {
+    //   title: " Dashboard",
+    //   desc: "Track service status, uploads, certificates, and history in one place.",
+    //   icon: <MdDashboard className="text-2xl" />,
+    //   badge: "Popular",
+    // },
     {
       title: "Dedicated Representative",
       desc: "A single point of contact assigned to handle your service end-to-end.",
       icon: <FaUserTie className="text-2xl" />,
+      badge: "Popular",
     },
     {
       title: "Centralised Communication",
-      desc: "All updates, requests, and confirmations tracked within the system.",
+      desc: "All your updates and requests are handled in one place without confusion.",
       icon: <FaSlack className="text-2xl" />,
     },
     {
-      title: "Secure Document Storage",
-      desc: "Upload, access, and download documents securely anytime.",
+      title: "Secure Document Handling",
+      desc: "Collect and receive your documents securely, anytime you need.",
       icon: <HiOutlineDocumentText className="text-2xl" />,
     },
     {
-      title: "Automated Follow-Ups",
-      desc: "Renewals and recurring compliances tracked and followed up proactively.",
+      title: "Timely Follow-Ups",
+      desc: "We remind you and follow up on important deadlines so nothing is missed.",
       icon: <FaDropbox className="text-2xl" />,
     },
     {
-      title: "Complete Service History",
-      desc: "View past services, filings, and certificates whenever needed.",
+      title: "Service Records",
+      desc: "Get details of your past services and documents whenever you need them.",
       icon: <FaHistory className="text-2xl" />,
     },
   ];
@@ -180,8 +181,6 @@ export default function Home() {
     { value: "5,000+", label: "Services Delivered" },
     { value: "100%", label: "Compliance Track" },
   ];
-
-
 
   return (
     <>
@@ -200,9 +199,9 @@ export default function Home() {
           className="absolute -bottom-10  md:right-16 lg:right-0   lg:w-[50%]  h-160 md:h-180 lg:h-140   "
         />
 
-        <div className="relative lg:px-12 px-4 container  mx-auto  pt-20 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative lg:px-12 px-4 container mx-auto pt-20 flex flex-col lg:flex-row justify-between items-center gap-12">
           {/* LEFT CONTENT */}
-          <div className=" ">
+          <div className="w-full lg:w-[60%]">
             <p className="text-sm text-gray-600 mb-4">
               Trusted by{" "}
               <span className="text-primary font-semibold">1,000+</span>{" "}
@@ -229,7 +228,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="mt-4  text-gray-600 max-w-lg">
+            <p className="mt-4 text-gray-600 max-w-lg">
               From registrations to ongoing filings, we help businesses stay
               compliant across multiple regulatory requirements.
             </p>
@@ -243,7 +242,7 @@ export default function Home() {
           </div>
 
           {/* RIGHT FORM */}
-          <div className="relative">
+          <div className="w-full lg:w-[40%]">
             <Enquiryform />
           </div>
         </div>
@@ -402,12 +401,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-yellow/5   py-10 lg:py-20">
+      <section className="bg-gray-50 py-10 lg:py-20">
         <div className="mx-auto container">
           <div className=" px-4 lg:px-12 mx-auto ">
             {/* Header */}
             <div className="text-center mb-12">
-              <p className="text-yellow text-sm font-semibold mb-2">
+              <p className="text-primary text-sm font-semibold mb-2">
                 WHY INSIGHT CONSULTING
               </p>
 
@@ -431,8 +430,8 @@ export default function Home() {
             {/* Cards Grid */}
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Left Card */}
-              <div className="relative bg-secondary rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
-                <h3 className="text-xl  font-semibold text-green-600 ">
+              <div className="relative bg-orange-50 rounded-2xl md:p-6 p-3 min-h-[340px] overflow-hidden">
+                <h3 className="text-xl  font-semibold text-primary">
                   Hassle Free
                 </h3>
                 <h4 className="font-semibold text-xl text-gray-800 mb-4 ">
@@ -454,7 +453,7 @@ export default function Home() {
               {/* Middle Column */}
               <div className="flex flex-col gap-6">
                 {/* Card 2 */}
-                <div className="relative bg-secondary rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
+                <div className="relative bg-blue-50 rounded-2xl md:p-6 p-3 min-h-[200px] overflow-hidden">
                   <h3 className="text-xl font-semibold text-gray-800">
                     No <span className="text-blue-600">Chasing</span>
                   </h3>
@@ -475,7 +474,7 @@ export default function Home() {
                 </div>
 
                 {/* Card 3 */}
-                <div className="relative bg-yellow/10 rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
+                <div className="relative bg-yellow-50 rounded-2xl p-3 lg:p-6 min-h-[200px] overflow-hidden">
                   <h3 className="text-xl font-semibold text-yellow-600">
                     Clear Ownership
                   </h3>
@@ -496,9 +495,9 @@ export default function Home() {
               </div>
 
               {/* Right Card */}
-              <div className="relative bg-secondary rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
+              <div className="relative bg-cyan-50 rounded-2xl p-3 lg:p-6 min-h-[340px] overflow-hidden">
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Human <span className="text-green-600">Support</span>
+                  Human <span className="text-cyan-600">Support</span>
                 </h3>
                 <p className="text-gray-600 text-sm mt-2 max-w-xs">
                   Real people who understand your business handle your
@@ -901,7 +900,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <TestimonialsSection/>
+        <TestimonialsSection />
       </section>
     </>
   );

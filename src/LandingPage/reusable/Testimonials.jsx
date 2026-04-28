@@ -126,11 +126,11 @@ function Modal({ t, colorIdx, onClose }) {
         {/* Stars */}
         <div className="flex gap-1 mb-5">
           {"★★★★★".split("").map((s, i) => (
-            <span key={i} className="text-primary text-lg">{s}</span>
+            <span key={i} className="text-primary text-lg">
+              {s}
+            </span>
           ))}
         </div>
-
-       
 
         {/* Full quote */}
         <p className="text-lg sm:text-xl leading-[1.82] text-black font-medium mb-8">
@@ -147,7 +147,9 @@ function Modal({ t, colorIdx, onClose }) {
             {getInitials(t.name)}
           </div>
           <div>
-            <div className="text-base sm:text-lg font-bold text-black">{t.name}</div>
+            <div className="text-base sm:text-lg font-bold text-black">
+              {t.name}
+            </div>
             <div className="text-sm text-gray-500 mt-0.5">{t.company}</div>
           </div>
         </div>
@@ -182,7 +184,9 @@ function TestimonialCard({ t, index, onReadMore }) {
       {/* Stars */}
       <div className="flex gap-0.5 mb-3">
         {"★★★★★".split("").map((s, i) => (
-          <span key={i} className="text-primary text-sm">{s}</span>
+          <span key={i} className="text-primary text-sm">
+            {s}
+          </span>
         ))}
       </div>
 
@@ -235,7 +239,9 @@ function TestimonialCard({ t, index, onReadMore }) {
           {getInitials(t.name)}
         </div>
         <div>
-          <div className="text-base font-bold text-black leading-snug">{t.name}</div>
+          <div className="text-base font-bold text-black leading-snug">
+            {t.name}
+          </div>
           <div className="text-xs text-gray-500 mt-0.5">{t.company}</div>
         </div>
       </div>
@@ -250,22 +256,32 @@ export default function TestimonialsSection() {
 
   return (
     <>
-      <style>{`
-        .marquee-track {
-          display: flex;
-          gap: 20px;
-          width: max-content;
-          animation: marqueeScroll 55s linear infinite;
-          padding: 12px 0;
-        }
-        .marquee-track:hover {
-          animation-play-state: paused;
-        }
-        @keyframes marqueeScroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
-      `}</style>
+     <style>{`
+  .marquee-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: marqueeScroll 55s linear infinite;
+    padding: 12px 0;
+  }
+
+  /* Pause when modal is open */
+  .marquee-track.paused {
+    animation-play-state: paused;
+  }
+
+  /* Hover pause only for md+ */
+  @media (min-width: 768px) {
+    .marquee-track:hover {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+`}</style>
 
       <section className="bg-secondary pt-16 lg:pt-24 overflow-hidden">
         {/* Header */}
@@ -291,7 +307,7 @@ export default function TestimonialsSection() {
           <div className="absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-secondary to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-secondary to-transparent z-10 pointer-events-none" />
 
-          <div className="marquee-track">
+          <div className={`marquee-track ${modalData ? "paused" : ""}`}>
             {doubled.map((t, i) => (
               <TestimonialCard
                 key={i}
