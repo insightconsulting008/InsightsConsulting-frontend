@@ -15,6 +15,7 @@ import { FaUserGroup } from "react-icons/fa6";
 import { IoFlagSharp } from "react-icons/io5";
 import { BiChalkboard } from "react-icons/bi";
 import { HiArrowRight } from "react-icons/hi2";
+import { Helmet } from "react-helmet";
 
 import { FaUserTie, FaSlack, FaDropbox, FaHistory } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
@@ -184,6 +185,11 @@ export default function Home() {
 
   return (
     <>
+<Helmet>
+  <title>Insight Consulting - where Clarity meets Growth</title>
+  <meta name="description" content="Insight Consulting is a trusted professional services firm offering bookkeeping, GST filing, income tax services, MCA compliance, CFO services, and business advisory solutions for startups, SMEs, and growing enterprises. We help organizations scale with confidence, control, and clarity." />
+  <link rel="canonical" href="https://insightconsulting.info/" />
+</Helmet>
       <section
         className="relative bg-cover  bg-center bg-no-repeat"
         style={{

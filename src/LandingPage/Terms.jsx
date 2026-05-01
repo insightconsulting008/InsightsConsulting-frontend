@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Helmet } from "react-helmet";
 
 const Terms = () => {
   const [activeSection, setActiveSection] = useState("confidentiality");
@@ -98,8 +99,14 @@ const Terms = () => {
     { key: "confidentiality", label: "Confidentiality Statement" },
     { key: "privacy", label: "Privacy Policy" },
   ];
-
+  
   return (
+    <>
+    <Helmet>
+        <title>Terms & Conditions | Insight Consulting</title>
+        <meta name="description" content="Read the terms and conditions of Insight Consulting." />
+        <link rel="canonical" href="/terms-conditions" />
+      </Helmet>
     <div className="bg-white min-h-screen">
       {/* HERO */}
       <div className="text-center pt-20 pb-4 max-w-3xl mx-auto px-6">
@@ -539,6 +546,7 @@ const Terms = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

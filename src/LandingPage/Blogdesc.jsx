@@ -263,7 +263,7 @@ export default function Blogdesc() {
             The blog post you're looking for doesn't exist or has been removed.
           </p>
           <a
-            href="/blogs"
+            href="/resource"
             className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             Back to Blogs

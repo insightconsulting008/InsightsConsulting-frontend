@@ -14,8 +14,8 @@ const Footer = () => {
     {
       title: "Legal",
       links: [
-        { label: "Confidentiality", path: "/terms&conditions" },
-        { label: "Privacy Policy", path: "/terms&conditions" },
+        { label: "Confidentiality", path: "/terms-conditions" },
+        { label: "Privacy Policy", path: "/terms-conditions" },
         // { label: "Refund Policy", path: "/terms&conditions" },
       ],
     },

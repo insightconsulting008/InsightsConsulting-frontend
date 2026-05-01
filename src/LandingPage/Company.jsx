@@ -1,5 +1,6 @@
 import Footerctn from "./reusable/Footerctn";
 import TestimonialsSection from "./reusable/Testimonials";
+import { Helmet } from "react-helmet";
 
 const About = () => {
   const teamMembers = [
@@ -302,6 +303,11 @@ const About = () => {
   ];
 
   return (
+    <>
+    <Helmet>
+  <title>About Us | Insight Consulting</title>
+  <link rel="canonical" href="https://insightconsulting.info/about" />
+    </Helmet>
     <div className="font-inter w-full overflow-x-hidden">
       {/* ── Hero ── */}
       <section className="w-full bg-white pt-10 pb-12 lg:pt-20 lg:pb-20">
@@ -715,6 +721,7 @@ const About = () => {
 
       <Footerctn />
     </div>
+    </>
   );
 };
 

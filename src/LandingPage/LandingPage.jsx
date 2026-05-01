@@ -12,6 +12,7 @@ import Footer from "./Footer";
 import ServiceInfoSection from "./ServiceInfo";
 import Terms from "./Terms";
 
+
 const LandingPage = () => {
   return (
     <div className="landing-page">
@@ -31,7 +32,7 @@ const LandingPage = () => {
         />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
-        <Route path="/terms&conditions" element={<Terms />} />
+        <Route path="/terms-conditions" element={<Terms />} />
       </Routes>
       <Footer />
     </div>

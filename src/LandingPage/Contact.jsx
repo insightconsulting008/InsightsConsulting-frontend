@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup";
 import api from "@src/providers/api";
+import { Helmet } from "react-helmet";
+
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -91,6 +93,11 @@ const Contact = () => {
   ];
 
   return (
+<>
+    <Helmet>
+         <title>Contact | Insight Consulting</title>
+         <link rel="canonical" href="https://insightconsulting.info/contact" />
+    </Helmet>
     <div className="flex flex-col items-center w-full overflow-x-hidden bg-white">
       {/* SECTION ONE: Contact Header */}
       <section className="mt-[60px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -461,6 +468,7 @@ const Contact = () => {
         initialService={""}
       />
     </div>
+    </>
   );
 };
 
