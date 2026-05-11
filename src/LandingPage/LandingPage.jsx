@@ -1,6 +1,6 @@
 // LandingPage.jsx
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Nav from "./Nav";
 import Blog from "./Blog";
 import Blogdesc from "./Blogdesc";
@@ -33,6 +33,9 @@ const LandingPage = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms-conditions" element={<Terms />} />
+
+        {/* Redirect unknown PUBLIC routes to "/" */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
     </div>
