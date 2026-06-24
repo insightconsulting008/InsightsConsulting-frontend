@@ -6,7 +6,7 @@ const About = () => {
   const teamMembers = [
     {
       name: "Revathy Bhalaaji",
-      role: "B. Com, FCA, ACMA",
+      role: "B. Com, FCA, ACMA, Certified Independent Director",
       experience: "30+ Years",
       expertise: "Financial Reporting & Audit",
       desc: "With over 30 years of professional experience across financial reporting, internal audit and risk management. Her career reflects deep expertise in building structured finance environments, strengthening governance frameworks, and supporting organizations in navigating evolving regulatory and operational landscapes. She is a recognized speaker and knowledge contributor in areas such as GST, Microfinance, Finance for Non-Finance professionals, and Tax Management, and has delivered 300+ technical and executive sessions in industry forums such as TANSTIA, CODISSIA, and various Corporates.",
