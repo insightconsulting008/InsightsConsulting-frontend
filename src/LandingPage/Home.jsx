@@ -32,6 +32,9 @@ import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup.jsx";
 import TestimonialsSection from "./reusable/Testimonials";
 
+import support from "@src/assets/Subject.png"
+import ServicesShowcase from "./reusable/ServicesShowcase";
+
 const steps = [
   {
     no: "01",
@@ -280,6 +283,8 @@ export default function Home() {
           </marquee>
         </div>
       )}
+
+      <ServicesShowcase />
       <section className="mt-10 py-10 lg:py-20 bg-secondary text-gray-900">
         <div className="container mx-auto">
           <div className="lg:px-12 px-4 mx-auto">
@@ -511,9 +516,9 @@ export default function Home() {
                 </p>
 
                 <img
-                  src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/portrait-man-working-as-telemarketer%201.png"
+                  src={support}
                   alt="dummy"
-                  className="absolute bottom-0 h-46 md:h-72 right-4"
+                  className="absolute bottom-0 h-46 md:h-72 left-1/2 -translate-x-1/2"
                 />
               </div>
             </div>

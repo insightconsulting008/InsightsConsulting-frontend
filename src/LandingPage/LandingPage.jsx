@@ -11,7 +11,7 @@ import About from "./Company";
 import Footer from "./Footer";
 import ServiceInfoSection from "./ServiceInfo";
 import Terms from "./Terms";
-
+import WhatsAppButton from "./reusable/WhatsAppButton";
 
 const LandingPage = () => {
   return (
@@ -21,7 +21,6 @@ const LandingPage = () => {
         <Route path="/" element={<Home />} />
         <Route path="/resource" element={<Blog />} />
         <Route path="/resource/:slug" element={<Blogdesc />} />
-     
         <Route
           path="/our-services/:categoryId/:subCategoryId"
           element={<ServiceInfoSection />}
@@ -33,11 +32,11 @@ const LandingPage = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms-conditions" element={<Terms />} />
-
         {/* Redirect unknown PUBLIC routes to "/" */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 };
