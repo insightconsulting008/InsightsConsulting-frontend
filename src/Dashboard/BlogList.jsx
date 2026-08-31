@@ -163,6 +163,9 @@ export default function AdminBlogList() {
     finally { setLoading(false); }
   };
 
+  // Mount-only fetch: fetchAll is redefined each render, so listing it as a
+  // dependency would refetch on every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchAll(); }, []);
 
   const filteredBlogs = allBlogs.filter((b) =>

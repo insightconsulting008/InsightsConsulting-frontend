@@ -3,7 +3,6 @@ import { FiSearch, FiArrowUpRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Footerctn from "./reusable/Footerctn";
 import api from "../providers/api";
-import { Helmet } from "react-helmet";
 
 // Skeleton Card Component
 const BlogCardSkeleton = () => (
@@ -72,10 +71,6 @@ export default function Blog() {
 
   return (
     <>
-    <Helmet>
-  <title>Blogs | Insight Consulting</title>
-  <link rel="canonical" href="https://insightconsulting.info/resource" />
-    </Helmet>
     <section className="relative overflow-hidden">
       {/* Heading */}
       <div className="bg-yellow/10 px-4 relative">

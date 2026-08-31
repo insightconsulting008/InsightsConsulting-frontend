@@ -61,11 +61,17 @@ export default function Nav() {
   const [selectedSubId,  setSelectedSubId]   = useState(null);
   const [selectedSvcId,  setSelectedSvcId]   = useState(null);
 
+  // Intentionally sticky: the selection is only rewritten on /our-services
+  // routes, so the mega menu keeps its last highlight on other pages. Deriving
+  // this during render would clear it, so the setState-in-effect rule is
+  // scoped off rather than changing that behaviour.
   useEffect(() => {
     const parts = location.pathname.split("/");
     if (parts[1] === "our-services") {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setSelectedSubId(parts[3] || null);
       setSelectedSvcId(parts[4] || null);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [location]);
 

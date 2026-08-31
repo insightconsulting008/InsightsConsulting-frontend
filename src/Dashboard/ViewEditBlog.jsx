@@ -25,9 +25,9 @@ function CropModal({ isOpen, onClose, imageSrc, onCropComplete, aspect = 12 / 8 
   const [cropLoading, setCropLoading] = useState(false);
   const IMAGE_SIZE = { width: 1000, height: 600 };
 
-  if (!isOpen) return null;
-
   const onCropCompleteHandler = useCallback((_, pixels) => setCroppedAreaPixels(pixels), []);
+
+  if (!isOpen) return null;
 
   const createImage = (url) =>
     new Promise((resolve, reject) => {
@@ -905,7 +905,7 @@ export default function ViewEditBlog() {
 
                 {/* Content blocks */}
                 <div>
-                  {blocks.map((block, i) => (
+                  {blocks.map((block) => (
                     <div key={block.id}>
                       {block.type === "image" && block.preview && (
                         <div className="my-8 rounded-xl overflow-hidden shadow-sm border border-[var(--neutral-200)]">

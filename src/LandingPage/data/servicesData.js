@@ -1,6 +1,7 @@
 import registrationData from './registration';
 import data2 from './registration2';
 import cfo from './cfo';
+import dpdp from './dpdp';
 import gst from './Gst';
 import incometax from './incometax';
 import mca from './mca';
@@ -306,7 +307,7 @@ function normalizeSectionsService(rawData) {
       const cleanDark = dark.map((s) => {
         if (s.closingText) {
           serviceNote = serviceNote || s.closingText;
-          const { closingText, ...rest } = s;
+          const { closingText: _closingText, ...rest } = s;
           return rest;
         }
         return s;
@@ -849,6 +850,111 @@ function normalizeCfoService(rawData) {
   };
 }
 
+// ─── DPDP normalizer ─────────────────────────────────────────────────────────
+// dpdp.js sections carry an explicit `kind` (hero | content | dark | tail | cta)
+// plus an `eyebrow` kicker, so the mapping stays a straight pass-through into
+// the generic renderer — every string in the source document is preserved.
+function normalizeDpdpService(rawData) {
+  const heroSections = [];
+  const contentSections = [];
+  const darkSections = [];
+  const tailSections = [];
+  let cta;
+
+  const mapSubSections = (subs) =>
+    subs.map((sub) => ({
+      heading: sub.title,
+      ...(sub.description && { description: sub.description }),
+      ...(sub.points?.length && { items: sub.points }),
+      ...(sub.nested?.length && { nestedItems: sub.nested }),
+      ...(sub.extraDescription && { extraDescription: sub.extraDescription }),
+    }));
+
+  const toGeneric = (sec) => ({
+    ...(sec.eyebrow && { preHeading: sec.eyebrow }),
+    ...(sec.title && { heading: sec.title }),
+    ...(sec.inlineDoc && { inlineDoc: true }),
+    ...(sec.content?.length && { paragraphs: sec.content }),
+    ...(sec.subheading && { subheading: sec.subheading }),
+    ...(sec.points?.length && { items: sec.points }),
+    ...(sec.services?.length && {
+      serviceItems: sec.services.map((s) => ({
+        name: s.name,
+        description: s.description,
+      })),
+    }),
+    ...(sec.steps?.length && {
+      processSteps: sec.steps.map((s) => ({
+        name: s.name,
+        ...(s.description && { description: s.description }),
+      })),
+    }),
+    ...(sec.subSections?.length && { subSections: mapSubSections(sec.subSections) }),
+    ...(sec.table && { table: sec.table }),
+    ...(sec.comparison && { comparisonTable: sec.comparison }),
+    ...(sec.accordion && { accordion: true }),
+    ...(sec.note && { note: sec.note }),
+    ...(sec.footerNote && { footerNote: sec.footerNote }),
+  });
+
+  rawData.sections.forEach((sec) => {
+    switch (sec.kind) {
+      case 'hero':
+        heroSections.push({
+          ...(sec.eyebrow && { preHeading: sec.eyebrow }),
+          ...(sec.title && { heading: sec.title }),
+          ...(sec.content?.length && { paragraphs: sec.content }),
+          ...(sec.timeline?.length && { timeline: sec.timeline }),
+        });
+        break;
+
+      case 'dark':
+        darkSections.push({
+          ...(sec.eyebrow && { heading: sec.eyebrow }),
+          ...(sec.title && { paragraphs: [sec.title] }),
+          ...(sec.subSections?.length && { subSections: mapSubSections(sec.subSections) }),
+          ...(sec.closingParagraphs?.length && { closingParagraphs: sec.closingParagraphs }),
+          ...(sec.closingText && { closingText: sec.closingText }),
+          fullWidth: true,
+        });
+        break;
+
+      case 'tail':
+        tailSections.push(toGeneric(sec));
+        break;
+
+      case 'cta':
+        cta = {
+          headline: sec.title,
+          tagline: sec.description,
+          buttonText: sec.action,
+          ...(sec.email && { email: sec.email }),
+        };
+        break;
+
+      default:
+        contentSections.push(toGeneric(sec));
+    }
+  });
+
+  if (rawData.closingTagline) {
+    tailSections.push({ closingTagline: rawData.closingTagline });
+  }
+
+  return {
+    tagline: rawData.tagline,
+    whyChoose: undefined,
+    heroSections,
+    process: [],
+    processSummary: undefined,
+    contentSections,
+    darkSections,
+    tailSections,
+    hideInsightTitle: true,
+    cta,
+  };
+}
+
 // ─── Builder ─────────────────────────────────────────────────────────────────
 function buildService(serviceId, name, dataType, rawData) {
   let normalized;
@@ -859,6 +965,7 @@ function buildService(serviceId, name, dataType, rawData) {
     case 'gst':            normalized = normalizeGstSection(rawData);          break;
     case 'compliance':     normalized = normalizeComplianceSection(rawData);   break;
     case 'cfo':            normalized = normalizeCfoService(rawData);          break;
+    case 'dpdp':           normalized = normalizeDpdpService(rawData);         break;
     default:               normalized = {};
   }
   return { serviceId, name, dataType, rawData, ...normalized };
@@ -962,6 +1069,17 @@ export const servicesData = [
         subCategoryId: 'cfo-services',
         subCategoryName: 'CFO Services',
         services: [buildService('cfo-services', cfo.serviceName, 'cfo', cfo)],
+      },
+    ],
+  },
+  {
+    categoryId: 'dpdp',
+    categoryName: 'DPDP Compliance',
+    subcategories: [
+      {
+        subCategoryId: 'dpdp-compliance',
+        subCategoryName: 'DPDP Compliance',
+        services: [buildService('dpdp-compliance', dpdp.serviceName, 'dpdp', dpdp)],
       },
     ],
   },

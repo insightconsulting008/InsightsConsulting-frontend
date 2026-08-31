@@ -22,11 +22,11 @@ function CropModal({ isOpen, onClose, imageSrc, onCropComplete, aspect = 12 / 8 
   const [cropLoading, setCropLoading] = useState(false);
   const IMAGE_SIZE = { width: 1200, height: 800 };
 
-  if (!isOpen) return null;
-
   const onCropCompleteHandler = useCallback((_, pixels) => {
     setCroppedAreaPixels(pixels);
   }, []);
+
+  if (!isOpen) return null;
 
   const createImage = (url) =>
     new Promise((resolve, reject) => {
@@ -257,8 +257,6 @@ const ErrorPopup = ({ isOpen, onClose, errorMessage }) => {
    MAIN — Create Blog Page
 ══════════════════════════════════════════════════════════════ */
 export default function CreateBlog() {
-  const navigate = useNavigate();
-
   const [title, setTitle]             = useState("");
   const [author, setAuthor]           = useState("");
   const [description, setDescription] = useState("");
@@ -346,7 +344,7 @@ export default function CreateBlog() {
     form.append("content", JSON.stringify(contentPayload));
 
     try {
-      const res = await api.post("/blogs", form);
+      await api.post("/blogs", form);
       setSuccess("Blog created successfully!");
       setShowSuccessPopup(true);
       setTitle("");
@@ -370,10 +368,6 @@ export default function CreateBlog() {
 
   const inputClass =
     "w-full px-3 py-2 md:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm bg-white";
-
-  const inputStyle = {
-    '--tw-ring-color': '#f13c20',
-  };
 
   const blockTypes = [
     { label: "Heading",   type: "heading",   icon: <FiType className="w-4 h-4" /> },

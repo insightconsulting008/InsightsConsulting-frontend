@@ -1540,7 +1540,7 @@ const mca = {
           title: "Not Actively Operating Your Company?",
           description: [
             "If your company is inactive or not carrying on significant business, you can apply for Dormant Status under the Companies Act.",
-            ,
+            "",
             "Instead of closing your company, you can:",
           ],
           points: [

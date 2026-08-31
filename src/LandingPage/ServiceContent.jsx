@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { CheckCircle2, Building2, Heart, Tag, Sparkles } from "lucide-react";
+import { CheckCircle2, Building2, Heart, Tag, Sparkles, Plus } from "lucide-react";
 
 const TABLE_HEADER_ICONS = {
   "12A": <Building2 size={13} className="text-primary flex-shrink-0" />,
@@ -246,7 +246,6 @@ const GroupedSectionBox = ({ sections }) => {
           items,
           table,
           subSections,
-          nestedItems,
           closingParagraphs,
           extraItems,
           footerNote,
@@ -410,6 +409,7 @@ const GenericSectionCard = ({ section }) => {
     comparisonTable,
     nestedItems,
     subheading,
+    accordion,
     closingText,
     closingParagraphs,
     extraItems,
@@ -663,7 +663,31 @@ const GenericSectionCard = ({ section }) => {
         </p>
       )}
 
-      {subSections?.length > 0 && (
+      {/* accordion variant — open/close rows (native <details>, so the answers
+          stay in the HTML for crawlers and work without JavaScript) */}
+      {accordion && subSections?.length > 0 && (
+        <div className="divide-y divide-gray-200 border-y border-gray-200 mb-4">
+          {subSections.map((sub, i) => (
+            <details key={i} className="group py-1">
+              <summary className="flex items-start justify-between gap-4 cursor-pointer list-none py-4 marker:hidden [&::-webkit-details-marker]:hidden">
+                <span className="text-[15px] lg:text-[17px] font-bold text-gray-900 leading-snug">
+                  {stripLeadingEmoji(sub.heading)}
+                </span>
+                <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full border border-primary text-primary flex items-center justify-center transition-transform duration-300 group-open:rotate-45">
+                  <Plus size={15} />
+                </span>
+              </summary>
+              {sub.description && (
+                <p className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed pb-4 pr-11">
+                  {sub.description}
+                </p>
+              )}
+            </details>
+          ))}
+        </div>
+      )}
+
+      {!accordion && subSections?.length > 0 && (
         <div className={`grid ${colClass(subSections.length)} gap-4 mb-4`}>
           {subSections.map((sub, i) => (
             <div
@@ -1747,6 +1771,13 @@ const ServiceContent = ({ hideCta = false }) => {
                       </div>
                     )}
                   </div>
+                ) : section.closingTagline ? (
+                  /* ── standalone closing tagline ── */
+                  <div className="text-center py-6">
+                    <p className="text-[24px] lg:text-[32px] font-bold tracking-tight italic">
+                      {section.closingTagline}
+                    </p>
+                  </div>
                 ) : (
                   <GenericSectionCard section={section} />
                 )}
@@ -1788,14 +1819,25 @@ const ServiceContent = ({ hideCta = false }) => {
                   </p>
                 )}
 
-                {service.cta.buttonText && (
-                  <button
-                    onClick={() => setPopupOpen(true)}
-                    className="inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-primary font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.22)] hover:-translate-y-0.5"
-                  >
-                    {stripLeadingEmoji(service.cta.buttonText)}
-                  </button>
-                )}
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  {service.cta.buttonText && (
+                    <button
+                      onClick={() => setPopupOpen(true)}
+                      className="inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-primary font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.22)] hover:-translate-y-0.5"
+                    >
+                      {stripLeadingEmoji(service.cta.buttonText)}
+                    </button>
+                  )}
+
+                  {service.cta.email && (
+                    <a
+                      href={`mailto:${service.cta.email}`}
+                      className="inline-flex items-center gap-2.5 bg-white/10 hover:bg-white/20 border border-white/40 text-white font-bold text-base px-9 py-3.5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      Email {service.cta.email}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </section>

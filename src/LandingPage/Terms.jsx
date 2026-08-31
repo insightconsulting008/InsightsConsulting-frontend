@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Helmet } from "react-helmet";
+import React, { useState, useRef, useEffect } from "react";
 
 const Terms = () => {
   const [activeSection, setActiveSection] = useState("confidentiality");
@@ -14,39 +13,46 @@ const Terms = () => {
     privacy: privacyRef,
   };
 
-  // Function to determine active section based on scroll position
-  const updateActiveSection = useCallback(() => {
-    if (isProgrammaticScroll.current) return;
+  // Scroll-spy: the measurement function lives inside the effect so the
+  // listener is still attached exactly once, and is exposed through a ref for
+  // the post-scroll re-check in handleMenuClick.
+  const updateActiveSectionRef = useRef(null);
 
-    const sections = [
-      { key: "confidentiality", ref: confidentialityRef },
-      { key: "privacy", ref: privacyRef },
-    ];
-
-    // Get the offset of the sticky header (the nav bar)
-    const stickyHeader = document.querySelector(".sticky-nav");
-    const headerOffset = stickyHeader ? stickyHeader.getBoundingClientRect().bottom : 200;
-
-    let closestSection = "confidentiality";
-    let closestDistance = Infinity;
-
-    sections.forEach(({ key, ref }) => {
-      const el = ref.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Distance from the top of the section to the header bottom
-      const distance = Math.abs(rect.top - headerOffset);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestSection = key;
-      }
-    });
-
-    setActiveSection(closestSection);
-  }, []);
-
-  // Scroll listener with RAF and debounce
   useEffect(() => {
+    const updateActiveSection = () => {
+      if (isProgrammaticScroll.current) return;
+
+      const sections = [
+        { key: "confidentiality", ref: confidentialityRef },
+        { key: "privacy", ref: privacyRef },
+      ];
+
+      // Get the offset of the sticky header (the nav bar)
+      const stickyHeader = document.querySelector(".sticky-nav");
+      const headerOffset = stickyHeader
+        ? stickyHeader.getBoundingClientRect().bottom
+        : 200;
+
+      let closestSection = "confidentiality";
+      let closestDistance = Infinity;
+
+      sections.forEach(({ key, ref }) => {
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        // Distance from the top of the section to the header bottom
+        const distance = Math.abs(rect.top - headerOffset);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSection = key;
+        }
+      });
+
+      setActiveSection(closestSection);
+    };
+
+    updateActiveSectionRef.current = updateActiveSection;
+
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
@@ -59,11 +65,15 @@ const Terms = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    // Initial call to set correct active section
-    updateActiveSection();
+    // Initial measurement — deferred to the next frame (the same path the
+    // scroll handler uses) so the effect body itself doesn't set state.
+    const initialFrame = requestAnimationFrame(updateActiveSection);
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [updateActiveSection]);
+    return () => {
+      cancelAnimationFrame(initialFrame);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleMenuClick = (section) => {
     // Disable scroll listener during programmatic scroll
@@ -91,7 +101,7 @@ const Terms = () => {
     scrollTimeout.current = setTimeout(() => {
       isProgrammaticScroll.current = false;
       // Force a final update to ensure correct section
-      updateActiveSection();
+      updateActiveSectionRef.current?.();
     }, 800); // Slightly longer than smooth scroll duration
   };
 
@@ -102,11 +112,6 @@ const Terms = () => {
   
   return (
     <>
-    <Helmet>
-        <title>Terms & Conditions | Insight Consulting</title>
-        <meta name="description" content="Read the terms and conditions of Insight Consulting." />
-        <link rel="canonical" href="/terms-conditions" />
-      </Helmet>
     <div className="bg-white min-h-screen">
       {/* HERO */}
       <div className="text-center pt-20 pb-4 max-w-3xl mx-auto px-6">

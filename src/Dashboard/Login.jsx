@@ -115,7 +115,7 @@ export default function UserLogin() {
         "If the email exists, a reset link has been sent."
       );
 
-    } catch (err) {
+    } catch {
       setError("Something went wrong");
     } finally {
       setLoading(false);

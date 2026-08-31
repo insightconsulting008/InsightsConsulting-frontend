@@ -10,6 +10,7 @@ const PER_CATEGORY = {
   "income-tax": 5,
   mca: 5,
   cfo: 1,
+  dpdp: 1,
 };
 
 /* Flatten the catalogue into the pills the strip renders */
@@ -63,7 +64,7 @@ function MarqueeRow({ items, direction, onOpen }) {
 
 export default function ServicesShowcase() {
   const navigate = useNavigate();
-  const items = useMemo(buildItems, []);
+  const items = useMemo(() => buildItems(), []);
 
   const rowOne = items.filter((_, i) => i % 2 === 0);
   const rowTwo = items.filter((_, i) => i % 2 === 1);

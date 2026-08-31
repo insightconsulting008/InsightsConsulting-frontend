@@ -1,29 +1,308 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-		<!--	created with www.mysitemapgenerator.com	-->
-		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 	<loc>https://insightconsulting.info/</loc>
-	<lastmod>2026-05-01T06:53:39+01:00</lastmod>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://insightconsulting.info/about</loc>
-	<lastmod>2026-05-01T06:53:39+01:00</lastmod>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
 	<priority>0.9</priority>
 </url>
 <url>
 	<loc>https://insightconsulting.info/contact</loc>
-	<lastmod>2026-05-01T06:53:39+01:00</lastmod>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
 	<priority>0.8</priority>
 </url>
 <url>
 	<loc>https://insightconsulting.info/resource</loc>
-	<lastmod>2026-05-01T06:53:39+01:00</lastmod>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
 	<priority>0.7</priority>
 </url>
 <url>
 	<loc>https://insightconsulting.info/terms-conditions</loc>
-	<lastmod>2026-05-01T06:53:39+01:00</lastmod>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
 	<priority>0.6</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration/private-limited-company</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration/one-person-company-opc</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration/limited-liability-partnership-llp</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration/partnership</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/registration/company-registration/proprietorship</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/compliance/ngo-compliance</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/compliance/ngo-compliance/12a-80g</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/compliance/ngo-compliance/ngo-darpan-registration</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/compliance/ngo-compliance/dsc-digital-signature-certificate</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/compliance/ngo-compliance/udhyam-registration</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-registration-in-landing-page</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-registration-for-foreigners-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-amendment-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-revocation-of-cancellation</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/virtual-office-gst-registration</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-notice-response-representation</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-return-filing-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-lut-filing-letter-of-undertaking</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gst-annual-return-filing-gstr-9-9c</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/gst/gst-services/gstr-10-filing-final-return-under-gst</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/income-tax-e-filing-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/form-15ca-15cb-filing</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/partnership-firm-itr-filing</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/llp-compliance-filing-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/company-income-tax-return-itr-filing</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/trust-ngo-itr-filing-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/updated-income-tax-return-itr-u-filing</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/business-taxation-filing-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/tan-registration-tds-compliance-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/tds-return-filing-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/income-tax/income-tax-services/income-tax-notice-handling-response</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/company-mca-compliance-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/llp-compliance-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/opc-compliance-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/company-name-change-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/registered-office-change-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/din-ekyc-filing-dir-3-kyc-dir-3-kyc-web</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/din-reactivation-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/director-removal-resignation-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/adt-1-filing-auditor-appointment</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/dpt-3-filing-return-of-deposits</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/llp-form-11-filing-annual-return</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/dormant-company-status-filing</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/moa-amendment-services-memorandum-of-association</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/aoa-amendment-services-articles-of-association</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/authorised-capital-increase</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/share-transfer-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/company-winding-up-closure-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/llp-winding-up-closure-services-in-india</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/mca/mca-services/inc-20a-filing-commencement-of-business-certificate</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/cfo/cfo-services/cfo-services</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://insightconsulting.info/our-services/dpdp/dpdp-compliance/dpdp-compliance</loc>
+	<lastmod>2026-08-31T07:32:04.107Z</lastmod>
+	<priority>0.8</priority>
 </url>
 </urlset>

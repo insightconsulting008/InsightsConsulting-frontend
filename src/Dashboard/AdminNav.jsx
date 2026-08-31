@@ -17,7 +17,6 @@ const AdminNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeRoute, setActiveRoute] = useState(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -25,7 +24,7 @@ const AdminNav = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false); // NEW
 
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -72,7 +71,6 @@ const AdminNav = () => {
   };
 
   const handleNavClick = (path) => {
-    setActiveRoute(path);
     navigate(path);
     if (isMobile) setIsMobileMenuOpen(false);
   };
@@ -86,12 +84,6 @@ const AdminNav = () => {
       navigate('/login');
     }
   };
-
-  useEffect(() => {
-    const activeNavItem = navItems.find(item => isRouteActive(item.path));
-    if (activeNavItem) setActiveRoute(activeNavItem.path);
-    else setActiveRoute(location.pathname);
-  }, [location.pathname]);
 
   const sidebarWidth = isOpen || isHovered ? "w-64" : "w-20";
 

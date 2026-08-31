@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { FaClock, FaTag, FaUser } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import api from "@src/providers/api";
+import applySeo from "./applySeo";
+import { SITE_URL } from "./data/seo";
 
 export default function Blogdesc() {
   const { slug } = useParams();
@@ -31,6 +33,50 @@ export default function Blogdesc() {
     };
     fetchBlog();
   }, [slug]);
+
+  // 👉 keep the head in step with the loaded post (client-side navigation)
+  useEffect(() => {
+    const url = `${SITE_URL}/resource/${slug}`;
+
+    // On a direct load the build-time prerendered head is already correct for
+    // this post, so leave it alone until the post arrives — overwriting it with
+    // placeholders would throw away good metadata (and lose it entirely if the
+    // fetch fails). Only after client-side navigation, where the head still
+    // belongs to the previous route, is the placeholder an improvement.
+    const currentCanonical = document.head
+      .querySelector('link[rel="canonical"]')
+      ?.getAttribute("href");
+    if (!blog?.title && currentCanonical === url) return;
+
+    applySeo({
+      title: blog?.title
+        ? `${blog.title} | Insight Consulting`
+        : "Blogs | Insight Consulting",
+      description:
+        blog?.description ||
+        "Insights, updates and practical guidance on business registration, GST, income tax, MCA compliance and data protection from the Insight Consulting team.",
+      url,
+      keywords: null,
+      image: blog?.thumbnail || null,
+      schema: blog?.title
+        ? [
+            {
+              "@context": "https://schema.org",
+              "@type": "BlogPosting",
+              headline: blog.title,
+              ...(blog.description && { description: blog.description }),
+              url,
+              ...(blog.thumbnail && { image: blog.thumbnail }),
+              publisher: {
+                "@type": "Organization",
+                name: "Insight Consulting",
+                url: SITE_URL,
+              },
+            },
+          ]
+        : null,
+    });
+  }, [blog, slug]);
 
   // 👉 convert content array to HTML string and extract headings
   const parsedContent = useMemo(() => {

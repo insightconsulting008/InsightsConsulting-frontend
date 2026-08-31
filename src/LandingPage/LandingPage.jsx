@@ -12,10 +12,12 @@ import Footer from "./Footer";
 import ServiceInfoSection from "./ServiceInfo";
 import Terms from "./Terms";
 import WhatsAppButton from "./reusable/WhatsAppButton";
+import PageSeo from "./PageSeo";
 
 const LandingPage = () => {
   return (
     <div className="landing-page">
+      <PageSeo />
       <Nav />
       <Routes>
         <Route path="/" element={<Home />} />

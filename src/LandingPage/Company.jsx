@@ -1,6 +1,5 @@
 import Footerctn from "./reusable/Footerctn";
 import TestimonialsSection from "./reusable/Testimonials";
-import { Helmet } from "react-helmet";
 
 const About = () => {
   const teamMembers = [
@@ -27,6 +26,19 @@ const About = () => {
       color: "from-blue-50 to-sky-50",
       badgeColor: "bg-blue-100 text-blue-700",
       borderColor: "border-blue-100",
+    },
+    {
+      name: "Kannan Subbiah",
+      role: "B. Com, FCA, CISA, CGEIT, C|CISO, CCMP, Cyber Security Strategist",
+      experience: "30+ Years",
+      expertise: "IT Governance & Cyber Security",
+      desc: "About 3 decades of demonstrated IT Leadership involving designing & architecting solutions arounds IT systems and Infra and have led organizations through IS 9001, ISO 27001 and CMMI certifications. Currently offering services as fractional CXO, IT Strategy, IT Governance, IS Audit & Assessments",
+      // TODO: replace with the uploaded ImageKit URL for Kannan's photo
+      image:
+        "https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/Image%20(8).jfif",
+      color: "from-cyan-50 to-sky-50",
+      badgeColor: "bg-cyan-100 text-cyan-700",
+      borderColor: "border-cyan-100",
     },
     {
       name: "Bhalaaji Muthuswamy",
@@ -304,10 +316,6 @@ const About = () => {
 
   return (
     <>
-    <Helmet>
-  <title>About Us | Insight Consulting</title>
-  <link rel="canonical" href="https://insightconsulting.info/about" />
-    </Helmet>
     <div className="font-inter w-full overflow-x-hidden">
       {/* ── Hero ── */}
       <section className="w-full bg-white pt-10 pb-12 lg:pt-20 lg:pb-20">
@@ -680,8 +688,6 @@ const About = () => {
                   className="bg-white border-2 border-primary rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-default"
                   onMouseEnter={(e) => {
                     const box = e.currentTarget.querySelector(".svc-icon-box");
-                    const svg =
-                      e.currentTarget.querySelector(".svc-icon-box svg");
 
                     if (box) box.style.backgroundColor = "var(--color-primary)";
                    

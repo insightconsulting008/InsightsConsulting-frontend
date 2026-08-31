@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }) {
       try {
         await api.get('/auth/verify'); // cookie auto sent
         setAuthStatus('ok');
-      } catch (err) {
+      } catch {
         setAuthStatus('fail');
       }
     };

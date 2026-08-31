@@ -10,6 +10,8 @@ import {
   findSubcategory,
   servicesData,
 } from "./data/servicesData";
+import { buildServiceSeo } from "./data/seo";
+import applySeo from "./applySeo";
 
 const stripLeadingEmoji = (text) => {
   if (!text || typeof text !== "string") return text;
@@ -142,6 +144,19 @@ const HeroCombinedSection = ({ data }) => {
 };
 
 /* ─────────────────────────────────────────────────────────
+   SEO — the same values the build-time prerenderer bakes into the
+   static HTML, re-applied so client-side navigation stays correct.
+───────────────────────────────────────────────────────── */
+const ServiceSeo = ({ service, categoryName, subCategoryName, path }) => {
+  useEffect(() => {
+    const seo = buildServiceSeo({ service, categoryName, subCategoryName, path });
+    if (seo) applySeo(seo);
+  }, [service, categoryName, subCategoryName, path]);
+
+  return null;
+};
+
+/* ─────────────────────────────────────────────────────────
    HERO SECTION
 ───────────────────────────────────────────────────────── */
 const ServiceInfoSection = () => {
@@ -166,6 +181,13 @@ const ServiceInfoSection = () => {
 
   return (
     <main className="bg-white">
+      <ServiceSeo
+        service={selectedService}
+        categoryName={categoryName}
+        subCategoryName={subCategoryName}
+        path={`/our-services/${categoryId}/${subCategoryId}${serviceId ? `/${serviceId}` : ""}`}
+      />
+
       {/* ════════════════════════════════════════════════════
           HERO — title · form · process strip
       ════════════════════════════════════════════════════ */}
@@ -310,6 +332,11 @@ const ServiceInfoSection = () => {
                 /* ── Normal hero section ── */
                 return (
                   <div key={i} className="mb-5 lg:mb-8">
+                    {sec.preHeading && (
+                      <p className="text-[11px] font-bold tracking-widest uppercase text-primary mb-2">
+                        {sec.preHeading}
+                      </p>
+                    )}
                     {sec.heading && (
                       <div className="flex items-start gap-3 mb-3 lg:mb-4">
                         <span className="w-[3px] h-6 bg-primary rounded-full flex-shrink-0 mt-[3px]" />
@@ -341,6 +368,27 @@ const ServiceInfoSection = () => {
                         )}
                       </div>
                     )}
+                    {/* vertical timeline — fills the hero column beside the form */}
+                    {sec.timeline?.length > 0 && (
+                      <ol className="relative mt-5 lg:mt-6 space-y-5 lg:space-y-6 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-px before:bg-primary/25">
+                        {sec.timeline.map((item, j) => (
+                          <li key={j} className="relative pl-7">
+                            <span
+                              className={`absolute left-0 top-[6px] w-[15px] h-[15px] rounded-full border-2 border-primary ${
+                                item.year === "NOW" ? "bg-primary" : "bg-white"
+                              }`}
+                            />
+                            <p className="text-[13px] lg:text-[14px] font-bold tracking-widest uppercase text-primary leading-none mb-1.5">
+                              {item.year}
+                            </p>
+                            <p className="text-gray-900 text-[15px] lg:text-[17px] leading-relaxed">
+                              {item.description}
+                            </p>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+
                     {sec.processSteps?.length > 0 && (
                       <ol className="space-y-3">
                         {sec.processSteps.map((step, j) => (
