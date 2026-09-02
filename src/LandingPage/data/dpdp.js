@@ -512,7 +512,7 @@ const dpdp = {
             "Primary regulatory liaison: submits audit/DPIA findings and executes mandatory breach notifications.",
         },
         {
-          title: "Business, Engineering & HR",
+          title: "Business & HR",
           description: "Internal · Operational",
           extraDescription:
             "Operational guide: technical/organisational safeguards (Rule 6), vendor due diligence, and data minimisation.",
