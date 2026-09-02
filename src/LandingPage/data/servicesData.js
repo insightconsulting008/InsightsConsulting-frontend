@@ -893,6 +893,8 @@ function normalizeDpdpService(rawData) {
     ...(sec.table && { table: sec.table }),
     ...(sec.comparison && { comparisonTable: sec.comparison }),
     ...(sec.accordion && { accordion: true }),
+    ...(sec.stepsFirst && { stepsFirst: true }),
+    ...(sec.hubLayout && { hubLayout: true }),
     ...(sec.note && { note: sec.note }),
     ...(sec.footerNote && { footerNote: sec.footerNote }),
   });

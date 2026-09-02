@@ -192,11 +192,10 @@ const ServiceInfoSection = () => {
           HERO — title · form · process strip
       ════════════════════════════════════════════════════ */}
       <section
-        className="relative bg-cover bg-center bg-no-repeat"
+        className="relative bg-fixed-desktop"
         style={{
-          backgroundImage:
+          "--bg-fixed-image":
             "url('https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/a887b935f178ca98fda0052257faa5c0f46c4a37.jpg')",
-          backgroundAttachment: "fixed",
         }}
       >
         <div className="absolute inset-0 bg-white/88" />

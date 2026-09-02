@@ -290,14 +290,14 @@ const GroupedSectionBox = ({ sections }) => {
               )
             )}
             {table && (
-              <div className="overflow-x-auto mt-2 mb-4">
+              <div className="overflow-x-auto mt-2 mb-4 w-fit max-w-full rounded-2xl border border-[rgba(241,60,32,0.55)] shadow-[0_1px_3px_rgba(241,60,32,0.07)]">
                 <table className="w-auto text-left border-collapse">
                   <thead>
                     <tr>
                       {table.headers.map((h, i) => (
                         <th
                           key={i}
-                          className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                          className={`border-b border-[rgba(255,255,255,0.28)] bg-gradient-to-b from-[#F13C20] to-[#D92F16] first:rounded-tl-2xl last:rounded-tr-2xl px-5 py-4 font-bold text-white text-[15px] lg:text-[17px] whitespace-nowrap [&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-[rgba(255,255,255,0.28)] ${i > 0 ? "text-center" : ""}`}
                         >
                           {stripLeadingEmoji(h)}
                         </th>
@@ -308,14 +308,16 @@ const GroupedSectionBox = ({ sections }) => {
                     {table.rows.map((row, i) => (
                       <tr
                         key={i}
-                        className={
-                          i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"
-                        }
+                        className={`${
+                    i % 2 === 0
+                      ? "bg-[rgba(255,255,255,0.72)]"
+                      : "bg-[rgba(241,60,32,0.045)]"
+                  }`}
                       >
                         {(Array.isArray(row) ? row : []).map((cell, j) => (
                           <td
                             key={j}
-                            className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
+                            className={`border border-[rgba(241,60,32,0.18)] px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
                           >
                             {j === 0 ? stripLeadingEmoji(cell) : cell}
                           </td>
@@ -392,6 +394,34 @@ const GroupedSectionBox = ({ sections }) => {
 };
 
 /* ─────────────────────────────────────────────────────────
+   HUB CARD — a spoke around the centre node (see `hubLayout`)
+───────────────────────────────────────────────────────── */
+const HubCard = ({ sub, side }) => (
+  <div className="relative h-full bg-white/60 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(241,60,32,0.08)] backdrop-blur-[1px]">
+    {/* connector towards the centre node — desktop only */}
+    <span
+      aria-hidden
+      className={`hidden lg:block absolute top-1/2 -translate-y-1/2 h-px w-8 bg-primary/40 ${
+        side === "left" ? "left-full" : "right-full"
+      }`}
+    />
+    <p className="text-[16px] lg:text-[17px] font-bold text-gray-900 leading-snug mb-1.5">
+      {stripLeadingEmoji(sub.heading)}
+    </p>
+    {sub.description && (
+      <p className="text-primary text-[13px] font-semibold uppercase tracking-wider mb-3">
+        {stripLeadingEmoji(sub.description)}
+      </p>
+    )}
+    {sub.extraDescription && (
+      <p className="text-gray-900 text-[15px] lg:text-[16px] leading-relaxed pt-3 border-t border-primary/15">
+        {sub.extraDescription}
+      </p>
+    )}
+  </div>
+);
+
+/* ─────────────────────────────────────────────────────────
    GENERIC SECTION CARD  (border, backdrop-blur)
 ───────────────────────────────────────────────────────── */
 const GenericSectionCard = ({ section }) => {
@@ -410,6 +440,8 @@ const GenericSectionCard = ({ section }) => {
     nestedItems,
     subheading,
     accordion,
+    stepsFirst,
+    hubLayout,
     closingText,
     closingParagraphs,
     extraItems,
@@ -419,6 +451,34 @@ const GenericSectionCard = ({ section }) => {
     transitionText,
   } = section;
   const groups = parseGroups(items);
+
+  const processBlock =
+    processSteps?.length > 0 ? (
+      <div className="mb-4">
+          <ol className={`grid ${colClass(processSteps.length)} gap-4`}>
+            {processSteps.map((step, i) => (
+              <li
+                key={i}
+                className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.07)] flex items-start gap-3 hover:border-primary transition-all duration-200 backdrop-blur-[1px]"
+              >
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="text-[15px] lg:text-[17px] font-semibold text-gray-900">
+                    {stripLeadingEmoji(step.name)}
+                  </p>
+                  {step.description && (
+                    <p className="text-gray-900 text-[14px] lg:text-[15px] leading-relaxed mt-1">
+                      {stripLeadingEmoji(step.description)}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+    ) : null;
 
   return (
     <div className="bg-white/40 border border-primary rounded-2xl p-5 lg:p-10 shadow-[0_2px_24px_rgba(124,58,237,0.07)] backdrop-blur-[1px]">
@@ -464,7 +524,7 @@ const GenericSectionCard = ({ section }) => {
       )}
 
       {/* inline sub-heading (sits between title and items) */}
-      {subheading && (
+      {subheading && !hubLayout && (
         <p className="text-[15px] lg:text-[17px] font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200 leading-snug">
           {subheading}
         </p>
@@ -687,7 +747,42 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {!accordion && subSections?.length > 0 && (
+      {stepsFirst && processBlock}
+
+      {/* hub layout — 2 cards left, 2 cards right, centre node connecting all */}
+      {hubLayout && subSections?.length > 0 && (
+        <div className="relative mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 lg:gap-8 items-stretch">
+            {/* left column — indexes 0 and 2 */}
+            <div className="flex flex-col gap-4 lg:gap-8">
+              {[subSections[0], subSections[2]].map(
+                (sub, i) => sub && <HubCard key={`l${i}`} sub={sub} side="left" />,
+              )}
+            </div>
+
+            {/* centre node */}
+            <div className="relative flex items-center justify-center py-2 lg:py-0">
+              {/* vertical spine behind the node (desktop only) */}
+              <span
+                aria-hidden
+                className="hidden lg:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-primary/30"
+              />
+              <div className="relative z-[1] w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-primary text-white flex items-center justify-center text-[18px] lg:text-[20px] font-bold shadow-[0_8px_30px_rgba(241,60,32,0.35)] ring-8 ring-white/70">
+                {subheading || "DPO"}
+              </div>
+            </div>
+
+            {/* right column — indexes 1 and 3 */}
+            <div className="flex flex-col gap-4 lg:gap-8">
+              {[subSections[1], subSections[3]].map(
+                (sub, i) => sub && <HubCard key={`r${i}`} sub={sub} side="right" />,
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!accordion && !hubLayout && subSections?.length > 0 && (
         <div className={`grid ${colClass(subSections.length)} gap-4 mb-4`}>
           {subSections.map((sub, i) => (
             <div
@@ -799,42 +894,17 @@ const GenericSectionCard = ({ section }) => {
         </div>
       )}
 
-      {processSteps?.length > 0 && (
-        <div className="mb-4">
-          <ol className={`grid ${colClass(processSteps.length)} gap-4`}>
-            {processSteps.map((step, i) => (
-              <li
-                key={i}
-                className="h-full bg-white/40 border border-primary rounded-xl p-5 lg:p-6 shadow-[0_2px_12px_rgba(124,58,237,0.07)] flex items-start gap-3 hover:border-primary transition-all duration-200 backdrop-blur-[1px]"
-              >
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <p className="text-[15px] lg:text-[17px] font-semibold text-gray-900">
-                    {stripLeadingEmoji(step.name)}
-                  </p>
-                  {step.description && (
-                    <p className="text-gray-900 text-[14px] lg:text-[15px] leading-relaxed mt-1">
-                      {stripLeadingEmoji(step.description)}
-                    </p>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
+      {!stepsFirst && processBlock}
 
       {table && (
-        <div className="overflow-x-auto mt-6 mb-4">
+        <div className="overflow-x-auto mt-6 mb-4 w-fit max-w-full rounded-2xl border border-[rgba(241,60,32,0.55)] shadow-[0_1px_3px_rgba(241,60,32,0.07)]">
           <table className="w-auto text-left border-collapse">
             <thead>
               <tr>
                 {table.headers.map((h, i) => (
                   <th
                     key={i}
-                    className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                    className={`border-b border-[rgba(255,255,255,0.28)] bg-gradient-to-b from-[#F13C20] to-[#D92F16] first:rounded-tl-2xl last:rounded-tr-2xl px-5 py-4 font-bold text-white text-[15px] lg:text-[17px] whitespace-nowrap [&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-[rgba(255,255,255,0.28)] ${i > 0 ? "text-center" : ""}`}
                   >
                     <span
                       className={`inline-flex items-center gap-1.5 ${i > 0 ? "justify-center" : ""}`}
@@ -850,12 +920,16 @@ const GenericSectionCard = ({ section }) => {
               {table.rows.map((row, i) => (
                 <tr
                   key={i}
-                  className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}
+                  className={`${
+                    i % 2 === 0
+                      ? "bg-[rgba(255,255,255,0.72)]"
+                      : "bg-[rgba(241,60,32,0.045)]"
+                  }`}
                 >
                   {(Array.isArray(row) ? row : []).map((cell, j) => (
                     <td
                       key={j}
-                      className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
+                      className={`border border-[rgba(241,60,32,0.18)] px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j > 0 ? "text-center" : ""}`}
                     >
                       {j === 0 ? stripLeadingEmoji(cell) : cell}
                     </td>
@@ -868,14 +942,14 @@ const GenericSectionCard = ({ section }) => {
       )}
 
       {comparisonTable && (
-        <div className="overflow-x-auto mb-4">
+        <div className="overflow-x-auto mb-4 w-fit max-w-full rounded-2xl border border-[rgba(241,60,32,0.55)] shadow-[0_1px_3px_rgba(241,60,32,0.07)]">
           <table className="w-auto text-left border-collapse">
             <thead>
               <tr>
                 {comparisonTable.headers.map((h, i) => (
                   <th
                     key={i}
-                    className={`border border-gray-200 bg-primary/[0.06] px-5 py-4 font-bold text-gray-900 text-[15px] lg:text-[17px] whitespace-nowrap ${i > 0 ? "text-center" : ""}`}
+                    className={`border-b border-[rgba(255,255,255,0.28)] bg-gradient-to-b from-[#F13C20] to-[#D92F16] first:rounded-tl-2xl last:rounded-tr-2xl px-5 py-4 font-bold text-white text-[15px] lg:text-[17px] whitespace-nowrap [&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-[rgba(255,255,255,0.28)] ${i > 0 ? "text-center" : ""}`}
                   >
                     <span
                       className={`inline-flex items-center gap-1.5 ${i > 0 ? "justify-center" : ""}`}
@@ -891,12 +965,16 @@ const GenericSectionCard = ({ section }) => {
               {comparisonTable.rows.map((row, i) => (
                 <tr
                   key={i}
-                  className={i % 2 === 0 ? "bg-white/40" : "bg-gray-50/80"}
+                  className={`${
+                    i % 2 === 0
+                      ? "bg-[rgba(255,255,255,0.72)]"
+                      : "bg-[rgba(241,60,32,0.045)]"
+                  }`}
                 >
                   {row.map((cell, j) => (
                     <td
                       key={j}
-                      className={`border border-gray-200 px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j === 0 ? "font-semibold" : "text-center"}`}
+                      className={`border border-[rgba(241,60,32,0.18)] px-5 py-3.5 text-gray-900 text-[14px] lg:text-[16px] leading-relaxed ${j === 0 ? "" : "text-center"}`}
                     >
                       {j === 0 ? stripLeadingEmoji(cell) : cell}
                     </td>
@@ -1321,14 +1399,10 @@ const ServiceContent = ({ hideCta = false }) => {
 
   return (
     <div
-      className="relative"
+      className="relative bg-fixed-desktop"
       style={{
-        backgroundImage:
+        "--bg-fixed-image":
           "url('https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/a887b935f178ca98fda0052257faa5c0f46c4a37.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
       }}
     >
       {/* gradient overlay: let image breathe at top, fade to clean white towards body */}

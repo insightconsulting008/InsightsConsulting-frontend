@@ -496,6 +496,8 @@ const dpdp = {
       eyebrow: "Governance in Practice",
       title: "The DPO as the ecosystem hub",
       subheading: "DPO",
+      // 2 spokes left, 2 right, DPO node in the centre connecting all four
+      hubLayout: true,
       subSections: [
         {
           title: "Board of Directors",
@@ -563,6 +565,8 @@ const dpdp = {
       kind: "content",
       eyebrow: "Our Approach",
       title: "The Delivery Framework",
+      // numbered 01–06 phases lead, the three grouped boxes follow
+      stepsFirst: true,
       content: [
         "A structured, six-phase path from first gap assessment to sustained compliance.",
       ],

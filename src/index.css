@@ -155,3 +155,21 @@ html {
     animation: none;
   }
 }
+
+/* ── Service-page background image: desktop only ────────
+   iOS/Android ignore `background-attachment: fixed` and end up
+   painting a hugely zoomed, mis-positioned crop of the image, so
+   the artwork is dropped entirely on small screens. */
+.bg-fixed-desktop {
+  background-image: none !important;
+}
+
+@media (min-width: 1024px) {
+  .bg-fixed-desktop {
+    background-image: var(--bg-fixed-image) !important;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}
