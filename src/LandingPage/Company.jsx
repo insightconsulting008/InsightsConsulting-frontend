@@ -54,7 +54,7 @@ const About = () => {
     },
     {
       name: "M G Ramachandran",
-      role: "F.C.A, CA",
+      role: "F.C.A",
       experience: "3 Decades",
       expertise: "Taxation & International Tax",
       desc: "Chartered Accountant with 3 decades of experience in varied facets of taxation, M G Ramachandran has worked extensively on corporate tax, international tax, GST, and other indirect taxes at PwC and KPMG. He has advised clients across sectors including Automobile, Pharma, and IT & ITES, and has authored various articles in periodicals and presented on taxation and related topics at industry forums such as CII, FICCI, IDMA, and PHD Chamber of Commerce, as well as professional forums including the International Fiscal Association and ICAI. He was earlier a member of the CII–AP Finance & Tax Committee and the Indirect Tax Study Group of ICAI Chennai.",
