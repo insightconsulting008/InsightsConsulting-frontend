@@ -20,14 +20,14 @@ const ORGANIZATION = {
   url: SITE_URL,
   email: "enquiry@insightconsulting.info",
   telephone: "+91 73390 09906",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress:
-      "Flat No 6, Door No 6, Second Floor, Radial House, 14/1, Welcome Colony, Anna Nagar West Extension",
-    addressLocality: "Chennai",
-    postalCode: "600101",
-    addressCountry: "IN",
-  },
+ address: {
+  "@type": "PostalAddress",
+  streetAddress:
+    "Door No 37, 3rd Floor, Block 1, SIDCO Electronics Complex, Thiru Vi Kha Industrial Estate, Guindy",
+  addressLocality: "Chennai",
+  postalCode: "600032",
+  addressCountry: "IN",
+},
 };
 
 

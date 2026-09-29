@@ -69,11 +69,13 @@ const Footer = () => {
               </svg>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Insight Consulting <br />
-                Flat No 6, Door No 6 <br />
-                Second Floor, Radial House <br />
-                14/1, Welcome Colony <br />
-                Anna Nagar West Extension <br />
-                Chennai – 600101
+                Door No 37 <br />
+                3rd Floor <br />
+                Block 1 <br />
+                SIDCO ELECTRONICS COMPLEX <br />
+                Thiru Vi Kha Industrial Estate <br />
+                Guindy <br />
+                Chennai – 600032
               </p>
             </div>
 
@@ -100,101 +102,105 @@ const Footer = () => {
               </a>
             </div>
 
-           {/* Enquiry */}
-<div className="flex items-start gap-3 group">
-  <svg
-    className="w-5 h-5 mt-0.5 shrink-0 text-gray-400 group-hover:text-primary transition-colors"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={1.5}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-    />
-  </svg>
-  <div>
-    <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">Enquiry</p>
-    <a
-      href="mailto:enquiry@insightconsulting.info"
-      className="text-gray-700 text-sm font-medium hover:text-primary transition-colors break-all"
-    >
-      enquiry@insightconsulting.info
-    </a>
-  </div>
-</div>
-
-{/* Help-desk */}
-<div className="flex items-start gap-3 group">
-  <svg
-    className="w-5 h-5 mt-0.5 shrink-0 text-gray-400 group-hover:text-primary transition-colors"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={1.5}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M18.364 5.636L16.95 7.05A7 7 0 1016.95 16.95l1.414 1.414M12 15.5v-7m0 0l-2 2m2-2l2 2"
-    />
-  </svg>
-  <div>
-    <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">Help-desk</p>
-    <a
-      href="mailto:support@insightconsulting.info"
-      className="text-gray-700 text-sm font-medium hover:text-primary transition-colors break-all"
-    >
-      support@insightconsulting.info
-    </a>
-  </div>
-</div>
-          </div>
-
-          {/* Map Column */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-gray-800 text-sm font-semibold uppercase tracking-wide">
-              📍 Location
-            </h4>
-
-            <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.184153781989!2d80.1957386!3d13.0875126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265f17e762bbb%3A0xa91a1073eeb6a55d!2sAccuTant%20FinTax%20Academy%20-%20Business%20Accounting%20and%20Taxation%20Course%20%7C%20Accounting%20Course%20%7C%20Placements%20%7C%20Audit%20%26%20Tax%20Consultant!5e0!3m2!1sen!2sin!4v1776670300789!5m2!1sen!2sin"
-                width="100%"
-                height="180"
-                style={{ border: 0 }}
-                loading="lazy"
-                className="w-full"
-                title="Google Map of AccuTant FinTax Academy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </div>
-
-            <a
-              href="https://maps.google.com?q=AccuTant+FinTax+Academy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1 w-fit"
-            >
-              Open in Google Maps
+            {/* Enquiry */}
+            <div className="flex items-start gap-3 group">
               <svg
-                className="w-4 h-4"
+                className="w-5 h-5 mt-0.5 shrink-0 text-gray-400 group-hover:text-primary transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={1.5}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-            </a>
+              <div>
+                <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">
+                  Enquiry
+                </p>
+                <a
+                  href="mailto:enquiry@insightconsulting.info"
+                  className="text-gray-700 text-sm font-medium hover:text-primary transition-colors break-all"
+                >
+                  enquiry@insightconsulting.info
+                </a>
+              </div>
+            </div>
+
+            {/* Help-desk */}
+            <div className="flex items-start gap-3 group">
+              <svg
+                className="w-5 h-5 mt-0.5 shrink-0 text-gray-400 group-hover:text-primary transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18.364 5.636L16.95 7.05A7 7 0 1016.95 16.95l1.414 1.414M12 15.5v-7m0 0l-2 2m2-2l2 2"
+                />
+              </svg>
+              <div>
+                <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">
+                  Help-desk
+                </p>
+                <a
+                  href="mailto:support@insightconsulting.info"
+                  className="text-gray-700 text-sm font-medium hover:text-primary transition-colors break-all"
+                >
+                  support@insightconsulting.info
+                </a>
+              </div>
+            </div>
           </div>
+
+          {/* Map Column */}
+<div className="flex flex-col gap-4">
+  <h4 className="text-gray-800 text-sm font-semibold uppercase tracking-wide">
+    📍 Location
+  </h4>
+
+  <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
+    <iframe
+      src="https://www.google.com/maps?q=13.01742,80.212153&output=embed"
+      width="100%"
+      height="180"
+      style={{ border: 0 }}
+      loading="lazy"
+      className="w-full"
+      title="Google Map of Insight Consulting"
+      allowFullScreen
+      referrerPolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+
+  <a
+    href="https://www.google.com/maps/search/?api=1&query=13.01742,80.212153"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1 w-fit"
+  >
+    Open in Google Maps
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10v-4M14 4h6m0 0v6m0-6L10 14"
+      />
+    </svg>
+  </a>
+</div>
 
           {/* Links Columns (Quick Links + Legal) */}
           <div className="grid grid-cols-2 gap-8">
