@@ -325,7 +325,7 @@ const Contact = () => {
                               <span className="text-gray-500 font-medium min-w-[70px]">
                                 Enquiry:
                               </span>
-                              <p className="text-gray-900 font-semibold hover:text-primary break-all">
+                              <p className="text-gray-900 font-semibold md:text-base hover:text-primary break-all">
                                 {item.enquiryEmail}
                               </p>
                             </a>
@@ -337,7 +337,7 @@ const Contact = () => {
                               <span className="text-gray-500 font-medium min-w-[70px]">
                                 Help-desk:
                               </span>
-                              <p className="text-gray-900 font-semibold hover:text-primary break-all">
+                              <p className="text-gray-900 font-semibold md:text-base hover:text-primary break-all">
                                 {item.helpdeskEmail}
                               </p>
                             </a>
