@@ -33,6 +33,10 @@ const Footer = () => {
               alt="Insight Consulting Logo"
               className="w-40 object-contain"
             />
+            <span className="-mt-3 text-sm leading-none text-black whitespace-nowrap">
+              where <span className="font-bold">CLARITY</span> meets{" "}
+              <span className="font-bold">GROWTH</span>
+            </span>
             <p className="text-gray-600 text-sm leading-relaxed">
               Simplifying business registrations, taxation, and compliance with
               reliable expert support you can trust.

@@ -814,6 +814,8 @@ export default function Home() {
         </div>
       </section>
 
+      <TestimonialsSection />
+
       <section className="bg-secondary py-10 lg:py-20">
         <div className="px-4 lg:px-12 container mx-auto py-5">
           <div className="flex justify-center mb-4">
@@ -895,7 +897,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <TestimonialsSection />
       </section>
     </>
   );

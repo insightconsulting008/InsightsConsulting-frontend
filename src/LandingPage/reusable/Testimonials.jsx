@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import MuxPlayer from "@mux/mux-player-react";
 
 const testimonials = [
   {
@@ -71,6 +72,28 @@ We will be your lifetime customer and will vouch for your services mam. Thank yo
     quote: `Revathy Balaji, our legal and accounting expert is a force to be reckoned with. Her expertise in taxation and as an independent director for companies is truly praiseworthy, showcasing her deep understanding of priorities like nobody else. After taking a long break from work, her remarkable comeback with a bang is an inspiring testament to her resilience and skill. Revathy's dedication and knowledge make her an invaluable asset to her clients.`,
     name: "Basker Natesan",
     company: "The Design Intellect",
+  },
+];
+
+const videoTestimonials = [
+  {
+    name: "Mr. Vidyashankar Guru",
+    role: "Co-founder & Chief Vision Officer",
+    company: "MiTran Global",
+    duration: "0:59",
+    highlight:
+      "She doesn't just focus on numbers and compliance. She provides practical insights that help businesses make better decisions.",
+    playbackId: "zKPBwGt5AXPxdT3TghYrYV00B1KfiS02CpHS2nbLyuyqk",
+  },
+  {
+    name: "Dr. Kavitha Sairam",
+    role: "Founder",
+    // TODO: confirm the exact company name ("___ Life Technologies") with the client
+    company: "",
+    duration: "0:40",
+    highlight:
+      "She's very knowledgeable, informative and updated, and has also been helping me in some strategic decisions.",
+    playbackId: "X9N63d9u8M6XLFhtYu6JlbZceg012cVy4fN402KJ1EyIM",
   },
 ];
 
@@ -249,6 +272,137 @@ function TestimonialCard({ t, index, onReadMore }) {
   );
 }
 
+// ─── Video Card ───────────────────────────────────────────────────────────────
+function VideoTestimonialCard({ v }) {
+  const playerRef = useRef(null);
+  const containerRef = useRef(null);
+  // false = muted looping background preview, true = user pressed play (sound + controls)
+  const [active, setActive] = useState(false);
+  const activeRef = useRef(false);
+
+  // Autoplay the muted preview while the card is on screen, pause it when it leaves
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const player = playerRef.current;
+        if (!player) return;
+        if (entry.isIntersecting) {
+          if (!activeRef.current && !reduceMotion) player.play()?.catch(() => {});
+        } else {
+          player.pause();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const playWithSound = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    activeRef.current = true;
+    setActive(true);
+    player.loop = false;
+    player.muted = false;
+    player.currentTime = 0;
+    player.play()?.catch(() => {});
+  };
+
+  // When the full video finishes, drop back to the silent looping preview
+  const handleEnded = () => {
+    if (!activeRef.current) return;
+    const player = playerRef.current;
+    activeRef.current = false;
+    setActive(false);
+    player.muted = true;
+    player.loop = true;
+    player.play()?.catch(() => {});
+  };
+
+  return (
+    <article className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+      <div ref={containerRef} className="relative aspect-video w-full bg-black">
+        <MuxPlayer
+          ref={playerRef}
+          playbackId={v.playbackId}
+          metadata={{ video_title: v.name }}
+          thumbnailTime={2}
+          accentColor="#F13C20"
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onEnded={handleEnded}
+          className="absolute inset-0 w-full h-full"
+          style={{
+            aspectRatio: "16 / 9",
+            "--media-object-fit": "cover",
+            "--controls": active ? undefined : "none",
+          }}
+        />
+
+        {!active && (
+          <button
+            type="button"
+            onClick={playWithSound}
+            aria-label={`Play video testimonial from ${v.name} with sound`}
+            className="group absolute inset-0 w-full h-full cursor-pointer border-none p-0 bg-transparent"
+          >
+            <span className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300" />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-20 h-20 rounded-full backdrop-blur-md border border-white/40 shadow-[0_8px_32px_rgba(241,60,32,0.45)] ring-8 ring-white/15 group-hover:brightness-110 group-hover:scale-110 transition-all duration-300"
+              style={{ backgroundColor: "rgba(241, 60, 32, 0.72)" }}
+            >
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="white" className="ml-1">
+                <path d="M7 4.5v15l13-7.5z" />
+              </svg>
+            </span>
+          </button>
+        )}
+      </div>
+
+      <div className="p-6 sm:p-7 flex flex-col flex-1">
+        {/* Meta row */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-0.5">
+            {"★★★★★".split("").map((s, i) => (
+              <span key={i} className="text-primary text-sm">
+                {s}
+              </span>
+            ))}
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+              <path d="M2 1.2v7.6L8.5 5z" />
+            </svg>
+            Video · {v.duration}
+          </span>
+        </div>
+
+        {/* Pull quote */}
+        <blockquote className="text-lg sm:text-xl leading-snug text-black font-medium mb-6">
+          {v.highlight}
+        </blockquote>
+
+        {/* Person */}
+        <div className="mt-auto">
+          <div className="text-base font-bold text-black leading-snug">
+            {v.name}
+          </div>
+          <div className="text-sm text-gray-500 mt-0.5">
+            {v.role}
+            {v.company && `, ${v.company}`}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 // ─── Section ──────────────────────────────────────────────────────────────────
 export default function TestimonialsSection() {
   const [modalData, setModalData] = useState(null);
@@ -300,6 +454,21 @@ export default function TestimonialsSection() {
             Trusted by founders, SMEs and enterprises across industries for
             audit, taxation, and financial clarity.
           </p>
+        </div>
+
+        {/* Video testimonials */}
+        <div className="max-w-6xl mx-auto px-4 lg:px-6 mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h3 className="text-xl md:text-2xl font-semibold text-black">
+              Hear it from our clients
+            </h3>
+            <span className="flex-1 h-px bg-gray-200" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {videoTestimonials.map((v) => (
+              <VideoTestimonialCard key={v.src} v={v} />
+            ))}
+          </div>
         </div>
 
         {/* Marquee */}

@@ -167,12 +167,16 @@ export default function Nav() {
 
         {/* ── Main nav ── */}
         <div className="lg:px-12 px-4 py-3 flex justify-between items-center">
-          <Link to="/">
+          <Link to="/" className="flex flex-col items-start">
             <img
               src="https://ik.imagekit.io/vqdzxla6k/insights%20consultancy%20/landingPage/image%2033%201%20(1)%201.png"
               className="h-10"
               alt="logo"
             />
+            <span className="mt-1 text-[11px] leading-none text-black whitespace-nowrap">
+              where <span className="font-bold">CLARITY</span> meets{" "}
+              <span className="font-bold">GROWTH</span>
+            </span>
           </Link>
 
           {/* ── Desktop nav ── */}
