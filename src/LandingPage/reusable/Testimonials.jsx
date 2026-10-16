@@ -87,9 +87,8 @@ const videoTestimonials = [
   },
   {
     name: "Dr. Kavitha Sairam",
-    role: "Founder",
-    // TODO: confirm the exact company name ("___ Life Technologies") with the client
-    company: "",
+    role: "Founder & CEO",
+    company: "FIB-SOL Life Technologies Pvt. Ltd",
     duration: "0:40",
     highlight:
       "She's very knowledgeable, informative and updated, and has also been helping me in some strategic decisions.",
