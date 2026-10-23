@@ -1,9 +1,10 @@
 import React from "react";
 import { ArrowUpRight, MapPin, Mail, Phone } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup";
 import api from "@src/providers/api";
+import { checkSubmission, recordSubmission } from "./utils/spamGuard";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -11,6 +12,7 @@ const Contact = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const navigate = useNavigate();
+  const formStartedAt = useRef(Date.now());
 
   const cards = [
     {
@@ -47,8 +49,24 @@ const Contact = () => {
     setErrorMsg("");
     setSuccess(false);
 
+    const guard = checkSubmission("contact", formStartedAt.current);
+    if (!guard.ok) {
+      setLoading(false);
+      if (guard.reason === "too_fast") {
+        // Likely a bot: pretend it worked without sending anything
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      } else {
+        setErrorMsg(guard.message);
+        setTimeout(() => setErrorMsg(""), 5000);
+      }
+      return;
+    }
+
     try {
       await api.post("/forms/contact", formData);
+      recordSubmission("contact");
+      formStartedAt.current = Date.now();
       setSuccess(true);
       setFormData({
         firstName: "",

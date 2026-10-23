@@ -3,6 +3,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { servicesData } from "../data/servicesData";
 import { Headphones } from "lucide-react";
 import api from "@src/providers/api";
+import { checkSubmission, recordSubmission } from "../utils/spamGuard";
 
 /* 
   Safely build flat list of all services – skip any missing subcategories, 
@@ -74,6 +75,7 @@ const Enquiryform = ({ initialService = "" }) => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const dropdownRef = useRef();
+  const formStartedAt = useRef(Date.now());
 
   /*
   ─────────────────────────────────
@@ -116,12 +118,28 @@ const Enquiryform = ({ initialService = "" }) => {
     setSuccess(false);
     setErrorMsg("");
 
+    const guard = checkSubmission("enquiry", formStartedAt.current);
+    if (!guard.ok) {
+      setLoading(false);
+      if (guard.reason === "too_fast") {
+        // Likely a bot: pretend it worked without sending anything
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      } else {
+        setErrorMsg(guard.message);
+        setTimeout(() => setErrorMsg(""), 5000);
+      }
+      return;
+    }
+
     try {
       const res = await api.post(
         "/forms/enquiry",
         formData
       );
       if (res.status === 200 || res.status === 201) {
+        recordSubmission("enquiry");
+        formStartedAt.current = Date.now();
         setSuccess(true);
         setFormData({
           fullName: "",
