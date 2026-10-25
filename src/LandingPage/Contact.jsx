@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EnquiryPopup from "./reusable/Popup";
 import api from "@src/providers/api";
 import { checkSubmission, recordSubmission } from "./utils/spamGuard";
+import { getApiErrorMessage, getApiFailureMessage } from "./utils/apiError";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -64,7 +65,16 @@ const Contact = () => {
     }
 
     try {
-      await api.post("/forms/contact", formData);
+      const res = await api.post("/forms/contact", formData);
+
+      /* Backend can answer 200 with { success: false, message }. */
+      const failure = getApiFailureMessage(res.data);
+      if (failure) {
+        setErrorMsg(failure);
+        setTimeout(() => setErrorMsg(""), 6000);
+        return;
+      }
+
       recordSubmission("contact");
       formStartedAt.current = Date.now();
       setSuccess(true);
@@ -78,8 +88,8 @@ const Contact = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error(error);
-      setErrorMsg("Something went wrong. Please try again.");
-      setTimeout(() => setErrorMsg(""), 3000);
+      setErrorMsg(getApiErrorMessage(error));
+      setTimeout(() => setErrorMsg(""), 6000);
     } finally {
       setLoading(false);
     }
@@ -288,7 +298,11 @@ const Contact = () => {
 
                     {/* Error */}
                     {errorMsg && (
-                      <div className="bg-primary/5 border border-primary/20 text-primary text-sm md:text-base px-4 py-2 rounded-lg">
+                      <div
+                        role="alert"
+                        aria-live="polite"
+                        className="bg-red-50 border border-red-200 text-red-700 text-sm md:text-base px-4 py-3 rounded-lg"
+                      >
                         {errorMsg}
                       </div>
                     )}

@@ -4,6 +4,7 @@ import { servicesData } from "../data/servicesData";
 import { Headphones } from "lucide-react";
 import api from "@src/providers/api";
 import { checkSubmission, recordSubmission } from "../utils/spamGuard";
+import { getApiErrorMessage, getApiFailureMessage } from "../utils/apiError";
 
 /* 
   Safely build flat list of all services – skip any missing subcategories, 
@@ -137,6 +138,16 @@ const Enquiryform = ({ initialService = "" }) => {
         "/forms/enquiry",
         formData
       );
+      /* Backend can answer 200 with { success: false, message }. */
+      const failure = getApiFailureMessage(res.data);
+      if (failure) {
+        setErrorMsg(failure);
+        setTimeout(() => {
+          setErrorMsg("");
+        }, 6000);
+        return;
+      }
+
       if (res.status === 200 || res.status === 201) {
         recordSubmission("enquiry");
         formStartedAt.current = Date.now();
@@ -155,12 +166,10 @@ const Enquiryform = ({ initialService = "" }) => {
       }
     } catch (error) {
       console.error(error);
-      setErrorMsg(
-        error.response?.data?.message || "Failed to submit enquiry"
-      );
+      setErrorMsg(getApiErrorMessage(error, "Failed to submit enquiry"));
       setTimeout(() => {
         setErrorMsg("");
-      }, 4000);
+      }, 6000);
     } finally {
       setLoading(false);
     }
@@ -340,7 +349,13 @@ const Enquiryform = ({ initialService = "" }) => {
             </p>
           )}
           {errorMsg && (
-            <p className="text-primary text-sm text-center">{errorMsg}</p>
+            <p
+              role="alert"
+              aria-live="polite"
+              className="text-red-600 text-sm text-center"
+            >
+              {errorMsg}
+            </p>
           )}
         </div>
       </form>
